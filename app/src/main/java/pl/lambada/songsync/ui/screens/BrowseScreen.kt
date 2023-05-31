@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,16 +54,16 @@ fun BrowseScreen(viewModel: MainViewModel) {
         val uriHandler = LocalUriHandler.current
 
         // queryStatus: "Not submitted", "Pending", "Success", "Failed" - used to show different UI
-        var queryStatus by remember { mutableStateOf("Not submitted") }
+        var queryStatus by rememberSaveable { mutableStateOf("Not submitted") }
 
         // querySong, queryArtist - used to store user input, offset - for search again
-        var querySong by remember { mutableStateOf("") }
-        var queryArtist by remember { mutableStateOf("") }
-        var offset by remember { mutableStateOf(0) }
+        var querySong by rememberSaveable { mutableStateOf("") }
+        var queryArtist by rememberSaveable { mutableStateOf("") }
+        var offset by rememberSaveable { mutableStateOf(0) }
 
         // queryResult - used to store result of query, failReason - used to store error message if error occurs
         var queryResult by remember { mutableStateOf(SongInfo()) }
-        var failReason by remember { mutableStateOf("") }
+        var failReason by rememberSaveable { mutableStateOf("") }
 
         when (queryStatus) {
             "Not submitted" -> {
