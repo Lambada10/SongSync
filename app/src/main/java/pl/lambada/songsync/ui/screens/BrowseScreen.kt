@@ -105,6 +105,10 @@ fun BrowseScreen(viewModel: MainViewModel) {
                 CircularProgressIndicator()
             }
             "Success" -> {
+                // fix nulls after rotating device by using rememberSaveable which can't hold complex objects like SongInfo
+                val songResult by rememberSaveable { mutableStateOf(queryResult.songName.toString()) }
+                val artistResult by rememberSaveable { mutableStateOf(queryResult.artistName.toString()) }
+                val albumArtResult by rememberSaveable { mutableStateOf(queryResult.albumCoverLink.toString()) }
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedCard(
                     shape = RoundedCornerShape(10.dp),
@@ -112,7 +116,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                         .fillMaxWidth()
                         .padding(8.dp)
                 ) {
-                    val painter = rememberImagePainter(data = queryResult.albumCoverLink.toString())
+                    val painter = rememberImagePainter(data = albumArtResult)
                     Row(modifier = Modifier.height(72.dp)) {
                         Image(
                             painter = painter,
@@ -123,9 +127,9 @@ fun BrowseScreen(viewModel: MainViewModel) {
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.Top) {
-                            MarqueeText(text = queryResult.songName.toString(), fontSize = 18.sp)
+                            MarqueeText(text = songResult, fontSize = 18.sp)
                             Spacer(modifier = Modifier.weight(1f))
-                            MarqueeText(text = queryResult.artistName.toString(), fontSize = 14.sp)
+                            MarqueeText(text = artistResult, fontSize = 14.sp)
                         }
                     }
                 }
