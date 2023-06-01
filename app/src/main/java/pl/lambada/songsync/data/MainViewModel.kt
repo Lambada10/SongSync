@@ -22,7 +22,14 @@ class MainViewModel: ViewModel() {
      */
     private var spotifyClientID = BuildConfig.SPOTIFY_CLIENT_ID
     private var spotifyClientSecret = BuildConfig.SPOTIFY_CLIENT_SECRET
-    var spotifyToken = ""
+    private var spotifyToken = ""
+
+    /*
+    Used for storing responses, used in Alert Dialogs (show response)
+    I won't refactor functions to return responses. So we have this instead.
+     */
+    var spotifyResponse = ""
+    var lyricsResponse = ""
 
     /*
     Checks if token is valid by sending a request to Spotify API.
@@ -97,6 +104,9 @@ class MainViewModel: ViewModel() {
         val response = connection.inputStream.bufferedReader().use(BufferedReader::readText)
 
         connection.disconnect()
+
+        this.spotifyResponse = response
+
         val json = JSONObject(response)
         val track = json.getJSONObject("tracks").getJSONArray("items").getJSONObject(0)
 
@@ -130,5 +140,33 @@ class MainViewModel: ViewModel() {
         return ((1 - distance.toDouble() / maxLength) * 10000).toInt().toDouble() / 100
     }
 
+    /*
+    Gets synced lyrics using song link, and returns them as a string (formatted as LRC file).
+     */
+    fun getSyncedLyrics(songLink: String): String {
+        val url = URL("https://spotify-lyric-api.herokuapp.com/?url=$songLink&format=lrc")
+        val connection = url.openConnection() as HttpURLConnection
 
+        connection.requestMethod = "GET"
+
+        val response = connection.inputStream.bufferedReader().use(BufferedReader::readText)
+
+        connection.disconnect()
+
+        this.lyricsResponse = response
+
+        val json = JSONObject(response)
+
+        if(json.getBoolean("error"))
+            return "No lyrics found."
+
+        val lines = json.getJSONArray("lines")
+        val syncedLyrics = StringBuilder()
+        for (i in 0 until lines.length()) {
+            val currentLine = lines.getJSONObject(i)
+            syncedLyrics.append("[${currentLine.getString("timeTag")}").append("]").append(currentLine.getString("words")).append("\n")
+        }
+
+        return syncedLyrics.toString()
+    }
 }
