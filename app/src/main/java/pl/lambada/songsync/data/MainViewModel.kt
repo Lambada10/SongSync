@@ -1,13 +1,23 @@
 package pl.lambada.songsync.data
 
+import android.content.ContentResolver
+import android.content.ContentUris
+import android.content.ContentValues
+import android.content.Context
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
-import androidx.compose.ui.platform.LocalUriHandler
+import android.webkit.MimeTypeMap
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import org.apache.commons.text.similarity.LevenshteinDistance
 import org.json.JSONObject
 import pl.lambada.songsync.BuildConfig
 import java.io.BufferedReader
+import java.io.File
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
@@ -90,6 +100,8 @@ class MainViewModel: ViewModel() {
         if(!checkToken())
             refreshToken()
 
+        Log.d("SongSync", "Searching for ${query.songName} by ${query.artistName}")
+
         val endpoint = "https://api.spotify.com/v1/search"
         val search = URLEncoder.encode(
             "${query.songName} ${query.artistName}",
@@ -107,6 +119,8 @@ class MainViewModel: ViewModel() {
 
         this.spotifyResponse = response
 
+        Log.d("SongSync", "Response: $response")
+
         val json = JSONObject(response)
         val track = json.getJSONObject("tracks").getJSONArray("items").getJSONObject(0)
 
@@ -120,6 +134,10 @@ class MainViewModel: ViewModel() {
         val albumArtURL = track.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url")
 
         val spotifyURL: String = track.getJSONObject("external_urls").getString("spotify")
+
+        Log.d( "SongSync",
+            "Returning ${track.getString("name")} by ${artists.toString().dropLast(1)}($spotifyURL)"
+        )
 
         return SongInfo(
             track.getString("name"),
@@ -169,4 +187,60 @@ class MainViewModel: ViewModel() {
 
         return syncedLyrics.toString()
     }
+
+    /*
+    Loads songs from MediaStore.
+     */
+    fun getAllSongs(context: Context): List<Song> {
+        val selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
+        val projection = arrayOf(
+            MediaStore.Audio.Media._ID,
+            MediaStore.Audio.Media.TITLE,
+            MediaStore.Audio.Media.ARTIST,
+            MediaStore.Audio.Media.DATA,
+            MediaStore.Audio.Media.ALBUM_ID,
+        )
+        val sortOrder = MediaStore.Audio.Media.TITLE + " ASC"
+
+        val songs = mutableListOf<Song>()
+        val cursor = context.contentResolver.query(
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            selection,
+            null,
+            sortOrder
+        )
+
+        cursor?.use {
+            val idColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+            val titleColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+            val artistColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+            val albumIdColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+            val pathColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+
+            while (it.moveToNext()) {
+                val id = it.getLong(idColumn)
+                val title = it.getString(titleColumn)
+                val artist = it.getString(artistColumn)
+                val albumId = it.getLong(albumIdColumn)
+                val filePath = it.getString(pathColumn)
+
+                val sArtworkUri = Uri.parse("content://media/external/audio/albumart")
+                val imgUri = ContentUris.withAppendedId(
+                    sArtworkUri,
+                    albumId
+                )
+
+                val file = File(filePath)
+                val fileName = file.name
+
+                val song = Song(id, title, artist, imgUri, filePath, fileName)
+                songs.add(song)
+            }
+        }
+        cursor?.close()
+
+        return songs
+    }
+
 }

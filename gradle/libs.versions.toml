@@ -9,6 +9,7 @@ lifecycle-runtime-ktx = "2.6.1"
 activity-compose = "1.7.2"
 compose-bom = "2023.03.00"
 navigation-runtime-ktx = "2.5.3"
+paging-common-ktx = "3.1.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -26,6 +27,7 @@ ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 material3 = { group = "androidx.compose.material3", name = "material3", version = "1.2.0-alpha02" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigation-runtime-ktx" }
+androidx-paging-common-ktx = { group = "androidx.paging", name = "paging-common-ktx", version.ref = "paging-common-ktx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

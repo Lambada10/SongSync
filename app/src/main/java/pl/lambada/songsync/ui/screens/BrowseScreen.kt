@@ -48,7 +48,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(start = 16.dp, top = 8.dp, end = 8.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -134,7 +134,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                     .height(72.dp)
                                     .aspectRatio(1f),
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(2.dp))
                             Column(
                                 modifier = Modifier.padding(12.dp),
                                 verticalArrangement = Arrangement.Top
@@ -233,6 +233,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                             ) {
                                 Text(text = "Save .lrc file")
                             }
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                         "Failed" -> {
                             Spacer(modifier = Modifier.height(8.dp))

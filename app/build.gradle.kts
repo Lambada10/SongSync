@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.paging.common.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -87,4 +88,6 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.5.3")
     implementation("io.coil-kt:coil-compose:2.1.0")
     implementation("androidx.compose.material:material-icons-extended:1.5.0-beta01")
+    implementation("com.google.accompanist:accompanist-permissions:0.31.3-beta")
+    implementation("com.google.accompanist:accompanist-coil:0.15.0")
 }
