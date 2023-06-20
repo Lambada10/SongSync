@@ -8,7 +8,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -46,9 +45,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import coil.imageLoader
+import org.json.JSONException
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.Song
 import pl.lambada.songsync.data.SongInfo
@@ -56,10 +55,12 @@ import pl.lambada.songsync.ui.common.MarqueeText
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.Locale
+import java.util.concurrent.Executors
+import kotlin.math.roundToInt
 
 
 @Composable
-fun HomeScreen(viewModel: MainViewModel, navController: NavController) {
+fun HomeScreen(viewModel: MainViewModel) {
     var uiState by rememberSaveable { mutableStateOf("Loading") }
     val context = LocalContext.current
     var songs: List<Song> by rememberSaveable { mutableStateOf(listOf()) }
@@ -77,66 +78,76 @@ fun HomeScreen(viewModel: MainViewModel, navController: NavController) {
                 }.start()
             }
         "Loaded" ->
-            HomeScreenLoaded(viewModel = viewModel, navController = navController, songs = songs)
+            HomeScreenLoaded(viewModel = viewModel, songs = songs)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun HomeScreenLoaded(viewModel: MainViewModel, navController: NavController, songs: List<Song>) {
+fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
     var showSearch by rememberSaveable { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
+
+    var isBatchDownload by rememberSaveable { mutableStateOf(false) }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, top = 8.dp, end = 8.dp)
-            .animateContentSize(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioLowBouncy,
-                    stiffness = Spring.StiffnessLow
-                )
-            ),
+            .padding(start = 16.dp, top = 8.dp, end = 8.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
             Spacer(modifier = Modifier.height(16.dp))
-            Row {
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Batch download lyrics")
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick = { showSearch =! showSearch}) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Divider()
-        }
-
-        if(showSearch)
-        item {
-            val keyboardController = LocalSoftwareKeyboardController.current
-            SearchBar(
-                query = query,
-                onQueryChange = { query = it},
-                onSearch = { keyboardController?.hide() },
-                active = false,
-                onActiveChange = {},
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                    )
-                },
+            Column (
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(0.dp)
+                    .animateContentSize(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioLowBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    ),
             ) {
-                
+                Row {
+                    Button(onClick = { isBatchDownload = true }) {
+                        Text(text = "Batch download lyrics")
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(onClick = { showSearch = !showSearch }) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search",
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Divider()
+
+                if (isBatchDownload)
+                    BatchDownloadLyrics(
+                        songs = songs,
+                        viewModel = viewModel,
+                        onDone = { isBatchDownload = false })
+
+                if (showSearch) {
+                    val keyboardController = LocalSoftwareKeyboardController.current
+                    SearchBar(
+                        query = query,
+                        onQueryChange = { query = it },
+                        onSearch = { keyboardController?.hide() },
+                        active = false,
+                        onActiveChange = {},
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search",
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(0.dp),
+                        content = {}
+                    )
+                }
             }
         }
         
@@ -144,7 +155,7 @@ fun HomeScreenLoaded(viewModel: MainViewModel, navController: NavController, son
             item {
                 if(song.title!!.lowercase(Locale.getDefault()).contains(query.lowercase(Locale.getDefault()))
                     || song.artist!!.lowercase(Locale.getDefault()).contains(query.lowercase(Locale.getDefault()))) {
-                    SongItem(song = song, viewModel = viewModel, navController = navController)
+                    SongItem(song = song, viewModel = viewModel)
                 }
             }
         }
@@ -155,7 +166,7 @@ fun HomeScreenLoaded(viewModel: MainViewModel, navController: NavController, son
 }
 
 @Composable
-fun SongItem(song: Song, viewModel: MainViewModel, navController: NavController) {
+fun SongItem(song: Song, viewModel: MainViewModel) {
     val context = LocalContext.current
     var fetch by rememberSaveable { mutableStateOf(false) }
     OutlinedCard(
@@ -442,6 +453,186 @@ fun SongItem(song: Song, viewModel: MainViewModel, navController: NavController)
                 )
             }
             else -> fetch = false
+        }
+    }
+}
+
+@Composable
+fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () -> Unit) {
+    var uiState by rememberSaveable { mutableStateOf("Warning") }
+
+    var failedCount by rememberSaveable { mutableIntStateOf(0) }
+    var successCount by rememberSaveable { mutableIntStateOf(0) }
+    val total = songs.size
+
+    when (uiState) {
+        "Cancelled" -> {
+            onDone()
+        }
+        "Warning" -> {
+            AlertDialog(
+                title = {
+                    Text(text = "Batch download lyrics")
+                },
+                text = {
+                    Column {
+                        Text(text = "This will download lyrics for all songs")
+                        Text(text = "Existing lyrics for songs will be overwritten with new ones")
+                        Text(text = "This may be less accurate than downloading lyrics one by one")
+                        Text(text = "Are you sure you want to continue?")
+                    }
+                },
+                onDismissRequest = {
+                    uiState = "Cancelled"
+                },
+                confirmButton = {
+                    Button(
+                        onClick = { uiState = "Pending" }
+                    ) {
+                        Text(text = "Yes")
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(
+                        onClick = { uiState = "Cancelled" }
+                    ) {
+                        Text(text = "No")
+                    }
+                }
+            )
+        }
+        "Pending" -> {
+            AlertDialog(
+                title = {
+                    Text(text = "Batch download lyrics")
+                },
+                text = {
+                    Column {
+                        Text(text = "Downloading lyrics")
+                        MarqueeText("Song: ${songs[(successCount + failedCount) % total].title}") // marquee cuz long
+                        Text(text = "Progress: ${successCount + failedCount}/$total " +
+                            "(${((successCount + failedCount) / total.toFloat() * 100).roundToInt()}%)")
+                        Text(text = "Success: $successCount, Failed: $failedCount")
+                        Text(text = "Please do not close the app, this may take a while")
+                    }
+                },
+                onDismissRequest = {
+                    uiState = "Cancelled"
+                },
+                confirmButton = {
+                    // no button but compose cries when i don't use confirmButton
+                },
+                dismissButton = {
+                    OutlinedButton(
+                        onClick = { uiState = "Cancelled" }
+                    ) {
+                        Text(text = "Cancel")
+                    }
+                }
+            )
+            val executor = Executors.newSingleThreadExecutor() // blame spotify for single thread
+            var notFoundInARow = 0 // detect rate limit
+            executor.execute {
+                for (song in songs) {
+                    if (uiState == "Cancelled") {
+                        executor.shutdown()
+                        return@execute
+                    }
+
+                    if (successCount + failedCount >= total) {
+                        uiState = "Done"
+                        executor.shutdown()
+                        return@execute
+                    }
+
+                    val query = SongInfo(song.title, song.artist)
+                    var queryResult: SongInfo? = null
+                    try {
+                        queryResult = viewModel.getSongInfo(query)
+                    } catch (e: Exception) {
+                        if (e is FileNotFoundException) { // no such song OR rate limited
+                            notFoundInARow++
+                            failedCount++
+                            if (notFoundInARow >= 5) {
+                                uiState = "RateLimited"
+                                return@execute
+                            }
+                            continue
+                        }
+                        if (e is JSONException) { // no such song
+                            failedCount++
+                            continue
+                        }
+                    } finally {
+                        notFoundInARow = 0
+                    }
+                    val lyricsResult: String
+                    try {
+                        lyricsResult = viewModel.getSyncedLyrics(queryResult?.songLink!!)
+                    } catch (e: FileNotFoundException) { // no lyrics
+                        failedCount++
+                        continue
+                    }
+                    val lrc =
+                        "[ti:${queryResult.songName}]\n" +
+                        "[ar:${queryResult.artistName}]\n" +
+                        "[by:Generated using SongSync]\n" +
+                        lyricsResult
+                    val file = File(
+                        song.filePath!!.dropLast(4) + ".lrc"
+                    )
+                    file.writeText(lrc)
+                    successCount++
+                }
+                uiState = "Done"
+            }
+        }
+        "Done" -> {
+            AlertDialog(
+                title = {
+                    Text(text = "Batch download lyrics")
+                },
+                text = {
+                    Column {
+                        Text(text = "Download complete")
+                        Text(text = "Success: $successCount")
+                        Text(text = "Failed: $failedCount")
+                    }
+                },
+                onDismissRequest = {
+                    uiState = "Cancelled"
+                },
+                confirmButton = {
+                    Button(
+                        onClick = { uiState = "Cancelled" }
+                    ) {
+                        Text(text = "OK")
+                    }
+                }
+            )
+        }
+        "RateLimited" -> {
+            AlertDialog(
+                title = {
+                    Text(text = "Batch download lyrics")
+                },
+                text = {
+                    Column {
+                        Text(text = "Spotify API rate limit reached")
+                        Text(text = "Please try again later")
+                    }
+                },
+                onDismissRequest = {
+                    uiState = "Cancelled"
+                },
+                confirmButton = {
+                    Button(
+                        onClick = { uiState = "Cancelled" }
+                    ) {
+                        Text(text = "OK")
+                    }
+                }
+            )
         }
     }
 }

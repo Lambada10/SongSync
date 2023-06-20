@@ -1,15 +1,9 @@
 package pl.lambada.songsync.data
 
-import android.content.ContentResolver
 import android.content.ContentUris
-import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
-import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
-import android.webkit.MimeTypeMap
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import org.apache.commons.text.similarity.LevenshteinDistance
 import org.json.JSONObject
@@ -17,7 +11,6 @@ import pl.lambada.songsync.BuildConfig
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileNotFoundException
-import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
@@ -97,10 +90,10 @@ class MainViewModel: ViewModel() {
         * offset (optional), used for trying to find a better match/searching again
      */
     fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
+        /*
         if(!checkToken())
             refreshToken()
-
-        Log.d("SongSync", "Searching for ${query.songName} by ${query.artistName}")
+         */ // one token should be enough for one session, i have to limit API calls somehow
 
         val endpoint = "https://api.spotify.com/v1/search"
         val search = URLEncoder.encode(
@@ -119,8 +112,6 @@ class MainViewModel: ViewModel() {
 
         this.spotifyResponse = response
 
-        Log.d("SongSync", "Response: $response")
-
         val json = JSONObject(response)
         val track = json.getJSONObject("tracks").getJSONArray("items").getJSONObject(0)
 
@@ -135,9 +126,6 @@ class MainViewModel: ViewModel() {
 
         val spotifyURL: String = track.getJSONObject("external_urls").getString("spotify")
 
-        Log.d( "SongSync",
-            "Returning ${track.getString("name")} by ${artists.toString().dropLast(1)}($spotifyURL)"
-        )
 
         return SongInfo(
             track.getString("name"),
@@ -164,7 +152,6 @@ class MainViewModel: ViewModel() {
     fun getSyncedLyrics(songLink: String): String {
         val url = URL("https://spotify-lyric-api.herokuapp.com/?url=$songLink&format=lrc")
         val connection = url.openConnection() as HttpURLConnection
-
         connection.requestMethod = "GET"
 
         val response = connection.inputStream.bufferedReader().use(BufferedReader::readText)

@@ -14,7 +14,7 @@ import pl.lambada.songsync.ui.screens.SettingsScreen
 fun Navigator(navController: NavHostController, viewModel: MainViewModel) {
     NavHost(navController = navController, startDestination = Screens.Home.name) {
         composable(Screens.Home.name) {
-            HomeScreen(viewModel = viewModel, navController = navController)
+            HomeScreen(viewModel = viewModel)
         }
         composable(Screens.Browse.name) {
             BrowseScreen(viewModel = viewModel)
