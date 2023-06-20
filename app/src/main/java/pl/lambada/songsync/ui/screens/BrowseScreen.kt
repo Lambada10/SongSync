@@ -1,6 +1,7 @@
 package pl.lambada.songsync.ui.screens
 
 import android.os.Environment
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -155,10 +156,14 @@ fun BrowseScreen(viewModel: MainViewModel) {
                         OutlinedButton(
                             onClick = {
                                 offset += 1
+                                val query = SongInfo(
+                                    songName = querySong,
+                                    artistName = queryArtist
+                                )
                                 Thread {
                                     queryStatus = "Pending"
                                     try {
-                                        queryResult = viewModel.getSongInfo(queryResult, offset)
+                                        queryResult = viewModel.getSongInfo(query, offset)
                                         queryStatus = "Success"
                                     } catch (e: Exception) {
                                         queryStatus = "Failed"
