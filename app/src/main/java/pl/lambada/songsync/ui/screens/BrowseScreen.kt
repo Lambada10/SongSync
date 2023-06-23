@@ -1,7 +1,6 @@
 package pl.lambada.songsync.ui.screens
 
 import android.os.Environment
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -249,7 +248,6 @@ fun BrowseScreen(viewModel: MainViewModel) {
                 }
 
                 "Failed" -> {
-                    var showSpotifyResponse by rememberSaveable { mutableStateOf(false) }
                     AlertDialog(
                         onDismissRequest = { queryStatus = "Not submitted" },
                         confirmButton = {
@@ -257,25 +255,12 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                 Text(text = "OK")
                             }
                         },
-                        dismissButton = {
-                            if(!failReason.contains("FileNotFoundException")) {
-                                if (showSpotifyResponse)
-                                    OutlinedButton(onClick = { showSpotifyResponse = false }) {
-                                        Text(text = "Hide response")
-                                    }
-                                else
-                                    OutlinedButton(onClick = { showSpotifyResponse = true }) {
-                                        Text(text = "Show response")
-                                    }
-                            }
-                        },
                         title = { Text(text = "Error") },
                         text = {
-                            val response by rememberSaveable { mutableStateOf(viewModel.spotifyResponse) }
-                            if(!showSpotifyResponse)
-                                Text(text = failReason)
+                            if (failReason.contains("NotFound") || failReason.contains("JSON"))
+                                Text(text = "No results")
                             else
-                                Text(text = response)
+                                Text(text = "An error occurred: $failReason")
                         }
                     )
                 }

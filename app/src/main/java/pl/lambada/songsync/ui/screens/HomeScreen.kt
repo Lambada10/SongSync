@@ -424,7 +424,6 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                 )
             }
             "Failed" -> {
-                var showSpotifyResponse by rememberSaveable { mutableStateOf(false) }
                 AlertDialog(
                     onDismissRequest = { queryStatus = "Cancelled" },
                     confirmButton = {
@@ -432,25 +431,12 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                             Text(text = "OK")
                         }
                     },
-                    dismissButton = {
-                        if(!failReason.contains("FileNotFoundException")) {
-                            if (showSpotifyResponse)
-                                OutlinedButton(onClick = { showSpotifyResponse = false }) {
-                                    Text(text = "Hide response")
-                                }
-                            else
-                                OutlinedButton(onClick = { showSpotifyResponse = true }) {
-                                    Text(text = "Show response")
-                                }
-                        }
-                    },
                     title = { Text(text = "Error") },
                     text = {
-                        val response by rememberSaveable { mutableStateOf(viewModel.spotifyResponse) }
-                        if(!showSpotifyResponse)
-                            Text(text = failReason)
+                        if (failReason.contains("NotFound") || failReason.contains("JSON"))
+                            Text(text = "No results")
                         else
-                            Text(text = response)
+                            Text(text = "An error occurred: $failReason")
                     }
                 )
             }
