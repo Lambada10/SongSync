@@ -284,14 +284,16 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                 )
             }
             "Success" -> {
+                val songNameResult by rememberSaveable { mutableStateOf(queryResult.songName) }
+                val artistNameResult by rememberSaveable { mutableStateOf(queryResult.artistName) }
                 AlertDialog(
                     title = {
                         Text(text = "Song info fetched")
                     },
                     text = {
                         Column {
-                            Text(text = "Song name: ${queryResult.songName}")
-                            Text(text = "Artist name: ${queryResult.artistName}")
+                            Text(text = "Song name: ${songNameResult}")
+                            Text(text = "Artist name: ${artistNameResult}")
                             Text(text = "Is that correct?")
                         }
                     },
