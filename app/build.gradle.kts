@@ -17,7 +17,7 @@ android {
         applicationId = "pl.lambada.songsync"
         minSdk = 30
         targetSdk = 33
-        versionCode = 1
+        versionCode = 10
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
