@@ -6,5 +6,5 @@ Enum class for navigation
 enum class Screens {
     Home,
     Browse,
-    Settings;
+    About;
 }

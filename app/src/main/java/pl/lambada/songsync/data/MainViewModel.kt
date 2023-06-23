@@ -2,6 +2,7 @@ package pl.lambada.songsync.data
 
 import android.content.ContentUris
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
@@ -230,4 +231,31 @@ class MainViewModel: ViewModel() {
         return songs
     }
 
+    /*
+    Contributors info:
+        - name
+        - additional info (optional)
+        - github link (optional but you probably have one)
+        - telegram link (optional)
+     */
+    fun getContributorsInfo(): List<Map<String, String>> {
+        val lambada10 = mapOf(
+            "name" to "Lambada10",
+            "additionalInfo" to "Lead developer",
+            "github" to "https://github.com/Lambada10",
+            "telegram" to "https://t.me/Lambada10"
+        )
+
+        return listOf(
+            lambada10
+        )
+    }
+
+    /*
+    Get app version.
+     */
+    fun getVersion(context: Context): String {
+        val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        return pInfo.versionName
+    }
 }

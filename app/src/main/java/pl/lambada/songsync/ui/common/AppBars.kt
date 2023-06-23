@@ -47,7 +47,7 @@ fun BottomBar(navController: NavController) {
                             when(screen) {
                                 Screens.Home -> if(currentRoute == screen.name) Icons.Filled.Home else Icons.Outlined.Home
                                 Screens.Browse -> if(currentRoute == screen.name) Icons.Filled.Search else Icons.Outlined.Search
-                                Screens.Settings -> if(currentRoute == screen.name) Icons.Filled.Settings else Icons.Outlined.Settings
+                                Screens.About -> if(currentRoute == screen.name) Icons.Filled.Info else Icons.Outlined.Info
                           },
                         contentDescription = screen.name)
                 },
