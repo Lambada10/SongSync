@@ -63,7 +63,7 @@ import kotlin.math.roundToInt
 fun HomeScreen(viewModel: MainViewModel) {
     var uiState by rememberSaveable { mutableStateOf("Loading") }
     val context = LocalContext.current
-    var songs: List<Song> by rememberSaveable { mutableStateOf(listOf()) }
+    var songs: List<Song> = viewModel.getAllSongs(context)
     when(uiState) {
         "Loading" ->
             Column(
