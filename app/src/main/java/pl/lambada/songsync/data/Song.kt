@@ -1,6 +1,8 @@
 package pl.lambada.songsync.data
 
 import android.net.Uri
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.SaverScope
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -8,8 +10,10 @@ import kotlinx.serialization.Serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class Song(
@@ -20,6 +24,17 @@ data class Song(
     val filePath: String?,
     val fileName: String?
 )
+
+object SongSaver: Saver<Song, String> {
+    override fun restore(value: String): Song {
+        return Json.decodeFromString(value)
+    }
+
+    override fun SaverScope.save(value: Song): String {
+        return Json.encodeToString(value)
+    }
+
+}
 
 //Uri serializer
 @OptIn(ExperimentalSerializationApi::class)

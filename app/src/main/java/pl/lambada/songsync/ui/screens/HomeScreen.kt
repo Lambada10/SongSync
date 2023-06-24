@@ -54,6 +54,7 @@ import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.Song
 import pl.lambada.songsync.data.SongInfo
+import pl.lambada.songsync.data.SongSaver
 import pl.lambada.songsync.data.ext.lowercaseWithLocale
 import pl.lambada.songsync.ui.common.MarqueeText
 import java.io.File
@@ -187,7 +188,7 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                     placeholder(0)
                 }).build(), imageLoader = LocalContext.current.imageLoader
         )
-        val savedSong by rememberSaveable {
+        val savedSong by rememberSaveable(stateSaver = SongSaver) {
             mutableStateOf(song)
         }
         Row(modifier = Modifier.height(72.dp)) {

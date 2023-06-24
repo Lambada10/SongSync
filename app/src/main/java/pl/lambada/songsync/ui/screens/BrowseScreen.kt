@@ -18,6 +18,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -65,7 +66,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
             var offset by rememberSaveable { mutableIntStateOf(0) }
 
             // queryResult - used to store result of query, failReason - used to store error message if error occurs
-            var queryResult by rememberSaveable(stateSaver = SongInfoSaver) {
+            var queryResult by rememberSaveable(stateSaver = SongInfoSaver, key = "queryResult") {
                 mutableStateOf(
                     SongInfo()
                 )
@@ -152,23 +153,25 @@ fun BrowseScreen(viewModel: MainViewModel) {
                         }
                     }
 
-                    // lyrics
-                    var lyricsResult by rememberSaveable { mutableStateOf("") }
+                    //variable that saves lyrics result
+                    var lyricsResult by rememberSaveable(key = "lyricsResultKey") { mutableStateOf("") }
                     var lyricSuccess by rememberSaveable { mutableStateOf(LyricsStatus.NotSubmitted) }
-                    Thread {
-                        try {
-                            if (queryResult.songLink == null) throw Exception("Song link is empty")
-                            lyricsResult =
-                                viewModel.getSyncedLyrics(queryResult.songLink!!)
-                            lyricSuccess = LyricsStatus.Success
-                        } catch (e: Exception) {
-                            lyricsResult = e.toString()
-                            lyricSuccess = LyricsStatus.Failed
-                            if (e is FileNotFoundException) {
-                                lyricsResult = "Lyrics not found"
+
+                    LaunchedEffect(true) {
+                        Thread {
+                            try {
+                                if (queryResult.songLink == null) throw Exception("Song link is empty")
+                                if(lyricsResult == "") lyricsResult = viewModel.getSyncedLyrics(queryResult.songLink!!)
+                                lyricSuccess = LyricsStatus.Success
+                            } catch (e: Exception) {
+                                lyricsResult = e.toString()
+                                lyricSuccess = LyricsStatus.Failed
+                                if (e is FileNotFoundException) {
+                                    lyricsResult = "Lyrics not found"
+                                }
                             }
-                        }
-                    }.start()
+                        }.start()
+                    }
 
                     when (lyricSuccess) {
                         LyricsStatus.NotSubmitted -> {
