@@ -39,6 +39,7 @@ import pl.lambada.songsync.ui.common.CommonTextField
 import pl.lambada.songsync.ui.components.SongCard
 import java.io.File
 import java.io.FileNotFoundException
+import java.net.UnknownHostException
 
 @Composable
 fun BrowseScreen(viewModel: MainViewModel) {
@@ -99,8 +100,16 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                 queryResult = viewModel.getSongInfo(query, offset)
                                 queryStatus = QueryStatus.Success
                             } catch (e: Exception) {
-                                queryStatus = QueryStatus.Failed
-                                failReason = e.toString()
+                                when (e) {
+                                    is UnknownHostException -> {
+                                        queryStatus = QueryStatus.NoConnection
+                                    }
+
+                                    else -> {
+                                        queryStatus = QueryStatus.Failed
+                                        failReason = e.toString()
+                                    }
+                                }
                             }
                         }.start()
                     }) {
@@ -161,7 +170,8 @@ fun BrowseScreen(viewModel: MainViewModel) {
                         Thread {
                             try {
                                 if (queryResult.songLink == null) throw Exception("Song link is empty")
-                                if(lyricsResult == "") lyricsResult = viewModel.getSyncedLyrics(queryResult.songLink!!)
+                                if (lyricsResult == "") lyricsResult =
+                                    viewModel.getSyncedLyrics(queryResult.songLink!!)
                                 lyricSuccess = LyricsStatus.Success
                             } catch (e: Exception) {
                                 lyricsResult = e.toString()
@@ -235,6 +245,21 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                 Text(text = stringResource(R.string.error, failReason))
                             }
                         })
+                }
+
+                QueryStatus.NoConnection -> {
+                    AlertDialog(
+                        onDismissRequest = { queryStatus = QueryStatus.NotSubmitted },
+                        confirmButton = {
+                            Button(onClick = { queryStatus = QueryStatus.NotSubmitted }) {
+                                Text(text = stringResource(id = R.string.ok))
+                            }
+                        },
+                        title = { Text(text = stringResource(id = R.string.error)) },
+                        text = {
+                            Text(text = stringResource(id = R.string.no_internet_server))
+                        }
+                    )
                 }
 
                 else -> {

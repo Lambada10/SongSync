@@ -41,4 +41,5 @@
     <string name="listen_on_spotify">Listen on Spotify</string>
     <string name="save_lrc_file">Save .lrc file</string>
     <string name="no_results">No results</string>
+    <string name="no_internet_server">No internet connection or server is down</string>
 </resources>

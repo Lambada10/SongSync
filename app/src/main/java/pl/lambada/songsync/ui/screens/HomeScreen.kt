@@ -59,6 +59,7 @@ import pl.lambada.songsync.data.ext.lowercaseWithLocale
 import pl.lambada.songsync.ui.common.MarqueeText
 import java.io.File
 import java.io.FileNotFoundException
+import java.net.UnknownHostException
 import java.util.concurrent.Executors
 import kotlin.math.roundToInt
 
@@ -255,8 +256,15 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                                 queryResult = viewModel.getSongInfo(query, offset)
                                 queryStatus = QueryStatus.Success
                             } catch (e: Exception) {
-                                failReason = e.toString()
-                                queryStatus = QueryStatus.Failed
+                                when(e){
+                                    is UnknownHostException -> {
+                                        queryStatus = QueryStatus.NoConnection
+                                    }
+                                    else -> {
+                                        failReason = e.toString()
+                                        queryStatus = QueryStatus.Failed
+                                    }
+                                }
                             }
                         }.start()
                     }) {
@@ -422,7 +430,23 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                             text = "No results"
                         )
                         else Text(text = stringResource(R.string.an_error_occurred, failReason))
-                    })
+                    }
+                )
+
+            }
+            QueryStatus.NoConnection -> {
+                AlertDialog(
+                    onDismissRequest = { queryStatus = QueryStatus.Cancelled },
+                    confirmButton = {
+                        Button(onClick = { queryStatus = QueryStatus.Cancelled }) {
+                            Text(text = stringResource(id = R.string.ok))
+                        }
+                    },
+                    title = { Text(text = stringResource(id = R.string.error)) },
+                    text = {
+                        Text(text = stringResource(R.string.no_internet_server))
+                    }
+                )
             }
         }
     }
@@ -598,7 +622,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
 
 // queryStatus: "Not submitted", "Pending", "Success", "Failed" - used to show different UI
 enum class QueryStatus {
-    NotSubmitted, Pending, Success, Failed, Cancelled, LyricsPending, LyricsSuccess, LyricsFailed
+    NotSubmitted, Pending, Success, Failed, Cancelled, LyricsPending, LyricsSuccess, LyricsFailed, NoConnection
 }
 
 enum class UiState {
