@@ -4,6 +4,8 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    //kotlinx serialization plugin
+    kotlin("plugin.serialization")
 }
 
 val spotifyClientID = gradleLocalProperties(rootDir).getProperty("spotify_client_id")!!
@@ -90,4 +92,6 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.5.0-beta01")
     implementation("com.google.accompanist:accompanist-permissions:0.31.3-beta")
     implementation("com.google.accompanist:accompanist-coil:0.15.0")
+    //kotlinx serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 }
