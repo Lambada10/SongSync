@@ -42,6 +42,7 @@ import pl.lambada.songsync.ui.common.CommonTextField
 import pl.lambada.songsync.ui.common.MarqueeText
 import java.io.File
 import java.io.FileNotFoundException
+import java.net.UnknownHostException
 
 @Composable
 fun BrowseScreen(viewModel: MainViewModel) {
@@ -99,8 +100,12 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                 queryResult = viewModel.getSongInfo(query, offset)
                                 queryStatus = "Success"
                             } catch (e: Exception) {
-                                queryStatus = "Failed"
-                                failReason = e.toString()
+                                if (e is UnknownHostException)
+                                    queryStatus = "NoConnection"
+                                else {
+                                    queryStatus = "Failed"
+                                    failReason = e.toString()
+                                }
                             }
                         }.start()
                     }) {
@@ -261,6 +266,21 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                 Text(text = "No results")
                             else
                                 Text(text = "An error occurred: $failReason")
+                        }
+                    )
+                }
+
+                "NoConnection" -> {
+                    AlertDialog(
+                        onDismissRequest = { queryStatus = "Not submitted" },
+                        confirmButton = {
+                            Button(onClick = { queryStatus = "Not submitted" }) {
+                                Text(text = "OK")
+                            }
+                        },
+                        title = { Text(text = "Error") },
+                        text = {
+                            Text(text = "No internet connection or server is down")
                         }
                     )
                 }

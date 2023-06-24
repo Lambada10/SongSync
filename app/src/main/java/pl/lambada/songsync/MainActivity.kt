@@ -26,6 +26,7 @@ import pl.lambada.songsync.ui.Navigator
 import pl.lambada.songsync.ui.common.BottomBar
 import pl.lambada.songsync.ui.common.TopBar
 import pl.lambada.songsync.ui.theme.SongSyncTheme
+import java.net.UnknownHostException
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,10 +36,15 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             var hasPermissions by rememberSaveable { mutableStateOf(false) }
             val context = LocalContext.current
+            var internetConnection by rememberSaveable { mutableStateOf(true) }
 
             // Get token upon app start
             Thread {
-                viewModel.refreshToken()
+                try {
+                    viewModel.refreshToken()
+                } catch (e: UnknownHostException) {
+                    internetConnection = false
+                }
             }.start()
 
             // Request permissions and wait with check
@@ -67,9 +73,7 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .padding(paddingValues)
                     ) {
-                        if (hasPermissions)
-                            Navigator(navController = navController, viewModel = viewModel)
-                        else {
+                        if (!hasPermissions) {
                             AlertDialog(
                                 onDismissRequest = { /* don't dismiss */ },
                                 confirmButton = {
@@ -89,6 +93,31 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             )
+                        }
+                        else if (!internetConnection) {
+                            AlertDialog(
+                                onDismissRequest = { /* don't dismiss */ },
+                                confirmButton = {
+                                    Button(
+                                        onClick = {
+                                            finishAndRemoveTask()
+                                        }
+                                    ) {
+                                        Text("Close app")
+                                    }
+                                },
+                                title = { Text("No internet connection") },
+                                text = {
+                                    Column {
+                                        Text("You need internet connection to use this app.")
+                                        Text("Please check your connection and try again.")
+                                        Text("If you are connected, Spotify might be down. Please try again later.")
+                                    }
+                                }
+                            )
+                        }
+                        else {
+                            Navigator(navController = navController, viewModel = viewModel)
                         }
                     }
                 }

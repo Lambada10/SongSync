@@ -54,6 +54,7 @@ import pl.lambada.songsync.data.SongInfo
 import pl.lambada.songsync.ui.common.MarqueeText
 import java.io.File
 import java.io.FileNotFoundException
+import java.net.UnknownHostException
 import java.util.Locale
 import java.util.concurrent.Executors
 import kotlin.math.roundToInt
@@ -256,8 +257,12 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                                     queryResult = viewModel.getSongInfo(query, offset)
                                     queryStatus = "Success"
                                 } catch (e: Exception) {
-                                    failReason = e.toString()
-                                    queryStatus = "Failed"
+                                    if (e is UnknownHostException)
+                                        queryStatus = "NoConnection"
+                                    else {
+                                        failReason = e.toString()
+                                        queryStatus = "Failed"
+                                   }
                                 }
                             }.start()
                         }
@@ -329,8 +334,12 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                                     queryResult = viewModel.getSongInfo(query, offset)
                                     queryStatus = "Success"
                                 } catch (e: Exception) {
-                                    failReason = e.toString()
-                                    queryStatus = "Failed"
+                                    if (e is UnknownHostException)
+                                        queryStatus = "NoConnection"
+                                    else {
+                                        failReason = e.toString()
+                                        queryStatus = "Failed"
+                                    }
                                 }
                             }.start()
                         }
@@ -437,6 +446,20 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                             Text(text = "No results")
                         else
                             Text(text = "An error occurred: $failReason")
+                    }
+                )
+            }
+            "NoConnection" -> {
+                AlertDialog(
+                    onDismissRequest = { queryStatus = "Cancelled" },
+                    confirmButton = {
+                        Button(onClick = { queryStatus = "Cancelled" }) {
+                            Text(text = "OK")
+                        }
+                    },
+                    title = { Text(text = "Error") },
+                    text = {
+                        Text(text = "No internet connection or server is down")
                     }
                 )
             }
