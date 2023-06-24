@@ -42,4 +42,24 @@
     <string name="save_lrc_file">Save .lrc file</string>
     <string name="no_results">No results</string>
     <string name="no_internet_server">No internet connection or server is down</string>
+    <string name="lyrics_not_found">Lyrics not found</string>
+    <string name="unknown">Unknown</string>
+    <string name="lyrics_saved_to">Lyrics saved to</string>
+    <string name="generated_using">Generated using SongSync</string>
+    <string name="what_is_songsync">SongSync is an app that lets you to download synced lyrics (.lrc files) for your local music library.</string>
+    <string name="extra_what_is_songsync">You can also search for specific songs to get their lyrics (and save them to downloads).</string>
+    <string name="app_version">\nApp version: %1$s</string>
+    <string name="what_it_uses">SongSync uses Spotify API to get song data. You can find more information about Spotify API on their website.</string>
+    <string name="spotify_for_developers">Spotify for Developers</string>
+    <string name="spotifylyrics_api">SpotifyLyrics API</string>
+    <string name="about_songsync">About SongSync</string>
+    <string name="how_we_get_lyrics">SongSync uses SpotifyLyrics API to get lyrics for songs. You can find more information about SpotifyLyrics API on their GitHub page.</string>
+    <string name="view_on_github">View on GitHub</string>
+    <string name="we_are_open_source">SongSync is an open-source project. You can find the source code on GitHub.</string>
+    <string name="contributors">Contributors</string>
+    <string name="github">GitHub</string>
+    <string name="telegram">Telegram</string>
+    <string name="bugs_or_suggestions_contact_us">Found a bug? Have a suggestion? Want to contribute? Feel free to contact me on my Telegram group.</string>
+    <string name="telegram_group">Telegram group</string>
+    <string name="create_issue">You can also create an issue on GitHub (link above).</string>
 </resources>

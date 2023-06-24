@@ -58,6 +58,8 @@ fun BrowseScreen(viewModel: MainViewModel) {
             // context - for toast
             val context = LocalContext.current
 
+            val generatedUsingString = stringResource(id = R.string.generated_using)
+
             // queryStatus: "Not submitted", "Pending", "Success", "Failed" - used to show different UI
             var queryStatus by rememberSaveable { mutableStateOf(QueryStatus.NotSubmitted) }
 
@@ -177,7 +179,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                 lyricsResult = e.toString()
                                 lyricSuccess = LyricsStatus.Failed
                                 if (e is FileNotFoundException) {
-                                    lyricsResult = "Lyrics not found"
+                                    lyricsResult = context.getString(R.string.lyrics_not_found)
                                 }
                             }
                         }.start()
@@ -202,7 +204,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
 
                             Button(onClick = {
                                 val lrc =
-                                    "[ti:${queryResult.songName}]\n" + "[ar:${queryResult.artistName}]\n" + "[by:Generated using SongSync]\n" + lyricsResult
+                                    "[ti:${queryResult.songName}]\n" + "[ar:${queryResult.artistName}]\n" + "[by:$generatedUsingString]\n" + lyricsResult
                                 val file = File(
                                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                                     "${queryResult.songName} - ${queryResult.artistName}.lrc"

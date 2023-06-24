@@ -18,7 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 
 @Composable
@@ -33,7 +35,7 @@ fun AboutScreen(viewModel: MainViewModel) {
     ) {
         val version = viewModel.getVersion(context)
         item {
-            AboutCard("About SongSync") {
+            AboutCard(stringResource(R.string.about_songsync)) {
                 Column(
                     modifier = Modifier.padding(
                         start = 8.dp,
@@ -42,9 +44,9 @@ fun AboutScreen(viewModel: MainViewModel) {
                         bottom = 8.dp
                     )
                 ) {
-                    Text("SongSync is an app that lets you to download synced lyrics (.lrc files) for your local music library.")
-                    Text("You can also search for specific songs to get their lyrics (and save them to downloads).")
-                    Text("\nApp version: $version")
+                    Text(stringResource(R.string.what_is_songsync))
+                    Text(stringResource(R.string.extra_what_is_songsync))
+                    Text(stringResource(R.string.app_version, version))
                 }
             }
         }
@@ -58,8 +60,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                         bottom = 8.dp
                     )
                 ) {
-                    Text("SongSync uses Spotify API to get song data. " +
-                        "You can find more information about Spotify API on their website.")
+                    Text(stringResource(R.string.what_it_uses))
                     Row {
                         Spacer(modifier = Modifier.weight(1f))
                         Button(
@@ -68,14 +69,14 @@ fun AboutScreen(viewModel: MainViewModel) {
                                 uriHandler.openUri("https://developer.spotify.com/documentation/web-api")
                             }
                         ) {
-                            Text("Spotify for Developers")
+                            Text(stringResource(R.string.spotify_for_developers))
                         }
                     }
                 }
             }
         }
         item {
-            AboutCard("SpotifyLyrics API") {
+            AboutCard(stringResource(R.string.spotifylyrics_api)) {
                 Column(
                     modifier = Modifier.padding(
                         start = 8.dp,
@@ -84,8 +85,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                         bottom = 8.dp
                     )
                 ) {
-                    Text("SongSync uses SpotifyLyrics API to get lyrics for songs. " +
-                            "You can find more information about SpotifyLyrics API on their GitHub page.")
+                    Text(stringResource(R.string.how_we_get_lyrics))
                     Row {
                         Spacer(modifier = Modifier.weight(1f))
                         Button(
@@ -94,7 +94,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                                 uriHandler.openUri("https://github.com/akashrchandran/spotify-lyrics-api")
                             }
                         ) {
-                            Text("View on GitHub")
+                            Text(stringResource(R.string.view_on_github))
                         }
                     }
                 }
@@ -110,7 +110,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                         bottom = 8.dp
                     )
                 ) {
-                    Text("SongSync is an open-source project. You can find the source code on GitHub.")
+                    Text(stringResource(R.string.we_are_open_source))
                     Row {
                         Spacer(modifier = Modifier.weight(1f))
                         Button(
@@ -119,14 +119,14 @@ fun AboutScreen(viewModel: MainViewModel) {
                                 uriHandler.openUri("https://github.com/Lambada10/SongSync")
                             }
                         ) {
-                            Text("View on GitHub")
+                            Text(stringResource(id = R.string.view_on_github))
                         }
                     }
                 }
             }
         }
         item {
-            AboutCard("Contributors") {
+            AboutCard(stringResource(R.string.contributors)) {
                 val contributors = viewModel.getContributorsInfo()
                 Column(
                     modifier = Modifier.padding(
@@ -161,7 +161,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                                     uriHandler.openUri(github)
                                 }
                             ) {
-                                Text("GitHub")
+                                Text(stringResource(R.string.github))
                             }
                             var telegram = ""
                             try {
@@ -177,7 +177,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                                         uriHandler.openUri(telegram)
                                     }
                                 ) {
-                                    Text("Telegram")
+                                    Text(stringResource(R.string.telegram))
                                 }
                             }
                         }
@@ -195,8 +195,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                         bottom = 8.dp
                     )
                 ) {
-                    Text("Found a bug? Have a suggestion? Want to contribute? " +
-                        "Feel free to contact me on my Telegram group.")
+                    Text(stringResource(R.string.bugs_or_suggestions_contact_us))
                     Row {
                         Spacer(modifier = Modifier.weight(1f))
                         Button(
@@ -205,10 +204,10 @@ fun AboutScreen(viewModel: MainViewModel) {
                                 uriHandler.openUri("https://t.me/LambadaOT")
                             }
                         ) {
-                            Text("Telegram group")
+                            Text(stringResource(R.string.telegram_group))
                         }
                     }
-                    Text("You can also create an issue on GitHub (link above).")
+                    Text(stringResource(R.string.create_issue))
                 }
             }
         }
