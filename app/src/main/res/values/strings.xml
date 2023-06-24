@@ -45,7 +45,7 @@
     <string name="lyrics_not_found">Lyrics not found</string>
     <string name="unknown">Unknown</string>
     <string name="lyrics_saved_to">Lyrics saved to</string>
-    <string name="generated_using">Generated using SongSync</string>
+    <string name="generated_using" translatable="false">Generated using SongSync</string>
     <string name="what_is_songsync">SongSync is an app that lets you to download synced lyrics (.lrc files) for your local music library.</string>
     <string name="extra_what_is_songsync">You can also search for specific songs to get their lyrics (and save them to downloads).</string>
     <string name="app_version">\nApp version: %1$s</string>
