@@ -47,7 +47,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import org.json.JSONException
@@ -55,10 +54,10 @@ import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.Song
 import pl.lambada.songsync.data.SongInfo
+import pl.lambada.songsync.data.ext.lowercaseWithLocale
 import pl.lambada.songsync.ui.common.MarqueeText
 import java.io.File
 import java.io.FileNotFoundException
-import java.util.Locale
 import java.util.concurrent.Executors
 import kotlin.math.roundToInt
 
@@ -69,21 +68,19 @@ fun HomeScreen(viewModel: MainViewModel) {
     val context = LocalContext.current
     var songs: List<Song> = viewModel.getAllSongs(context)
     when (uiState) {
-        UiState.Loading ->
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CircularProgressIndicator()
-                Thread {
-                    songs = viewModel.getAllSongs(context)
-                    uiState = UiState.Loaded
-                }.start()
-            }
+        UiState.Loading -> Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator()
+            Thread {
+                songs = viewModel.getAllSongs(context)
+                uiState = UiState.Loaded
+            }.start()
+        }
 
-        UiState.Loaded ->
-            HomeScreenLoaded(viewModel = viewModel, songs = songs)
+        UiState.Loaded -> HomeScreenLoaded(viewModel = viewModel, songs = songs)
 
         else -> {
             Text(text = stringResource(id = R.string.unreachable_state))
@@ -108,13 +105,11 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
         item {
             Spacer(modifier = Modifier.height(16.dp))
             Column(
-                modifier = Modifier
-                    .animateContentSize(
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioLowBouncy,
-                            stiffness = Spring.StiffnessLow
-                        )
-                    ),
+                modifier = Modifier.animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow
+                    )
+                ),
             ) {
                 Row {
                     Button(onClick = { isBatchDownload = true }) {
@@ -131,11 +126,9 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Divider()
 
-                if (isBatchDownload)
-                    BatchDownloadLyrics(
-                        songs = songs,
-                        viewModel = viewModel,
-                        onDone = { isBatchDownload = false })
+                if (isBatchDownload) BatchDownloadLyrics(songs = songs,
+                    viewModel = viewModel,
+                    onDone = { isBatchDownload = false })
 
                 if (showSearch) {
                     val keyboardController = LocalSoftwareKeyboardController.current
@@ -151,24 +144,24 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
                                 contentDescription = "Search",
                             )
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(0.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         content = {}
                     )
                 }
             }
         }
 
-        songs.forEach { song ->
-            item {
-                if (song.title!!.lowercase(Locale.getDefault())
-                        .contains(query.lowercase(Locale.getDefault()))
-                    || song.artist!!.lowercase(Locale.getDefault())
-                        .contains(query.lowercase(Locale.getDefault()))
-                ) {
-                    SongItem(song = song, viewModel = viewModel)
-                }
+        items(songs.size) {
+            val song = songs[it]
+            val songTitleLowercase = song.title!!.lowercaseWithLocale()
+            val songArtistLowercase = song.artist!!.lowercaseWithLocale()
+            val queryLowercase = query.lowercaseWithLocale()
+
+
+            if (songTitleLowercase.contains(queryLowercase) || songArtistLowercase.lowercaseWithLocale()
+                    .contains(queryLowercase)
+            ) {
+                SongItem(song = song, viewModel = viewModel)
             }
         }
         item {
@@ -181,31 +174,21 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
 fun SongItem(song: Song, viewModel: MainViewModel) {
     val context = LocalContext.current
     var fetch by rememberSaveable { mutableStateOf(false) }
-    OutlinedCard(
-        shape = RoundedCornerShape(10.dp),
+    OutlinedCard(shape = RoundedCornerShape(10.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
                 fetch = true
-            }
-    ) {
+            }) {
         val painter = rememberAsyncImagePainter(
             ImageRequest.Builder(LocalContext.current).data(data = song.imgUri)
                 .apply(block = fun ImageRequest.Builder.() {
                     placeholder(0)
                 }).build(), imageLoader = LocalContext.current.imageLoader
         )
-        // I hate this
-        val songName by rememberSaveable {
-            mutableStateOf(
-                song.title
-            )
-        }
-        val artistName by rememberSaveable {
-            mutableStateOf(
-                song.artist
-            )
+        val savedSong by rememberSaveable {
+            mutableStateOf(song)
         }
         Row(modifier = Modifier.height(72.dp)) {
             Image(
@@ -217,12 +200,11 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
             )
             Spacer(modifier = Modifier.width(2.dp))
             Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.Top
+                modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.Top
             ) {
-                MarqueeText(text = songName!!, fontSize = 18.sp)
+                MarqueeText(text = savedSong.title!!, fontSize = 18.sp)
                 Spacer(modifier = Modifier.weight(1f))
-                MarqueeText(text = artistName!!, fontSize = 14.sp)
+                MarqueeText(text = savedSong.artist!!, fontSize = 14.sp)
             }
         }
     }
@@ -235,8 +217,7 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
 
         // query and offset for API
         val query = SongInfo(
-            songName = song.title ?: "",
-            artistName = song.artist ?: ""
+            songName = song.title ?: "", artistName = song.artist ?: ""
         )
         var offset by rememberSaveable { mutableIntStateOf(0) }
 
@@ -253,226 +234,194 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
             }
 
             QueryStatus.NotSubmitted -> {
-                AlertDialog(
-                    title = {
-                        Text(text = stringResource(R.string.get_lyrics))
-                    },
-                    text = {
-                        Text(text = stringResource(
+                AlertDialog(title = {
+                    Text(text = stringResource(R.string.get_lyrics))
+                }, text = {
+                    Text(
+                        text = stringResource(
                             R.string.selected_song_by,
                             song.title ?: "Unknown",
                             song.artist ?: "Unknown"
-                        ))
-                    },
-                    onDismissRequest = {
-                        queryStatus = QueryStatus.Cancelled
-                    },
-                    confirmButton = {
-                        Button(onClick = {
-                            Thread {
-                                queryStatus = QueryStatus.Pending
-                                try {
-                                    queryResult = viewModel.getSongInfo(query, offset)
-                                    queryStatus = QueryStatus.Success
-                                } catch (e: Exception) {
-                                    failReason = e.toString()
-                                    queryStatus = QueryStatus.Failed
-                                }
-                            }.start()
-                        }
-                        ) {
-                            Text(text = stringResource(R.string.get_song_info))
-                        }
+                        )
+                    )
+                }, onDismissRequest = {
+                    queryStatus = QueryStatus.Cancelled
+                }, confirmButton = {
+                    Button(onClick = {
+                        Thread {
+                            queryStatus = QueryStatus.Pending
+                            try {
+                                queryResult = viewModel.getSongInfo(query, offset)
+                                queryStatus = QueryStatus.Success
+                            } catch (e: Exception) {
+                                failReason = e.toString()
+                                queryStatus = QueryStatus.Failed
+                            }
+                        }.start()
+                    }) {
+                        Text(text = stringResource(R.string.get_song_info))
                     }
-                )
+                })
             }
 
             QueryStatus.Pending -> {
-                AlertDialog(
-                    title = {
-                        Text(text = stringResource(R.string.fetching_song_info))
-                    },
-                    text = {
-                        Text(text = stringResource(
+                AlertDialog(title = {
+                    Text(text = stringResource(R.string.fetching_song_info))
+                }, text = {
+                    Text(
+                        text = stringResource(
                             R.string.fetching_song_info_for_by,
                             song.title ?: "Unknown",
                             song.artist ?: "Unknown"
-                        ))
-                    },
-                    onDismissRequest = {
-                        queryStatus = QueryStatus.Cancelled
-                    },
-                    confirmButton = {
-                        // no button but compose cries when i don't use confirmButton
-                    }
-                )
+                        )
+                    )
+                }, onDismissRequest = {
+                    queryStatus = QueryStatus.Cancelled
+                }, confirmButton = {
+                    // no button but compose cries when i don't use confirmButton
+                })
             }
 
             QueryStatus.Success -> {
                 val songNameResult by rememberSaveable { mutableStateOf(queryResult.songName) }
                 val artistNameResult by rememberSaveable { mutableStateOf(queryResult.artistName) }
-                AlertDialog(
-                    title = {
-                        Text(text = stringResource(R.string.song_info_fetched))
-                    },
-                    text = {
-                        Column {
-                            Text(text = stringResource(R.string.song_name, songNameResult ?: "Unknown"))
-                            Text(text = stringResource(R.string.artist_name, artistNameResult ?: "Unknown"))
-                            Text(text = stringResource(R.string.is_that_correct))
-                        }
-                    },
-                    onDismissRequest = {
-                        queryStatus = QueryStatus.Cancelled
-                    },
-                    confirmButton = {
-                        Button(onClick = {
-                            Thread {
-                                queryStatus = QueryStatus.LyricsPending
-                                try {
-                                    lyricsResult =
-                                        viewModel.getSyncedLyrics(queryResult.songLink.toString())
-                                    queryStatus = QueryStatus.LyricsSuccess
-                                } catch (e: Exception) {
-                                    if (e is FileNotFoundException)
-                                        lyricsResult = "No lyrics found"
-                                    else
-                                        failReason = e.toString()
-                                    queryStatus = QueryStatus.LyricsFailed
-                                }
-                            }.start()
-                        }
-                        ) {
-                            Text(text = stringResource(id = R.string.get_lyrics))
-                        }
-                    },
-                    dismissButton = {
-                        OutlinedButton(onClick = {
-                            offset += 1
-                            Thread {
-                                queryStatus = QueryStatus.Pending
-                                try {
-                                    queryResult = viewModel.getSongInfo(query, offset)
-                                    queryStatus = QueryStatus.Success
-                                } catch (e: Exception) {
-                                    failReason = e.toString()
-                                    queryStatus = QueryStatus.Failed
-                                }
-                            }.start()
-                        }
-                        ) {
-                            Text(text = stringResource(R.string.try_again))
-                        }
+                AlertDialog(title = {
+                    Text(text = stringResource(R.string.song_info_fetched))
+                }, text = {
+                    Column {
+                        Text(
+                            text = stringResource(
+                                R.string.song_name, songNameResult ?: "Unknown"
+                            )
+                        )
+                        Text(
+                            text = stringResource(
+                                R.string.artist_name, artistNameResult ?: "Unknown"
+                            )
+                        )
+                        Text(text = stringResource(R.string.is_that_correct))
                     }
-                )
+                }, onDismissRequest = {
+                    queryStatus = QueryStatus.Cancelled
+                }, confirmButton = {
+                    Button(onClick = {
+                        Thread {
+                            queryStatus = QueryStatus.LyricsPending
+                            try {
+                                lyricsResult =
+                                    viewModel.getSyncedLyrics(queryResult.songLink.toString())
+                                queryStatus = QueryStatus.LyricsSuccess
+                            } catch (e: Exception) {
+                                if (e is FileNotFoundException) lyricsResult = "No lyrics found"
+                                else failReason = e.toString()
+                                queryStatus = QueryStatus.LyricsFailed
+                            }
+                        }.start()
+                    }) {
+                        Text(text = stringResource(id = R.string.get_lyrics))
+                    }
+                }, dismissButton = {
+                    OutlinedButton(onClick = {
+                        offset += 1
+                        Thread {
+                            queryStatus = QueryStatus.Pending
+                            try {
+                                queryResult = viewModel.getSongInfo(query, offset)
+                                queryStatus = QueryStatus.Success
+                            } catch (e: Exception) {
+                                failReason = e.toString()
+                                queryStatus = QueryStatus.Failed
+                            }
+                        }.start()
+                    }) {
+                        Text(text = stringResource(R.string.try_again))
+                    }
+                })
             }
 
             QueryStatus.LyricsPending -> {
-                AlertDialog(
-                    title = {
-                        Text(text = stringResource(R.string.fetching_lyrics))
-                    },
-                    text = {
-                        Text(text = stringResource(
+                AlertDialog(title = {
+                    Text(text = stringResource(R.string.fetching_lyrics))
+                }, text = {
+                    Text(
+                        text = stringResource(
                             R.string.fetching_lyrics_for_by,
                             queryResult.songName ?: "Unknown",
                             queryResult.artistName ?: "Unknown"
-                        ))
-                    },
-                    onDismissRequest = {
-                        queryStatus = QueryStatus.Cancelled
-                    },
-                    confirmButton = {
-                        // no button but compose cries when i don't use confirmButton
-                    }
-                )
+                        )
+                    )
+                }, onDismissRequest = {
+                    queryStatus = QueryStatus.Cancelled
+                }, confirmButton = {
+                    // no button but compose cries when i don't use confirmButton
+                })
             }
 
             QueryStatus.LyricsSuccess -> {
-                AlertDialog(
-                    title = {
-                        Text(text = stringResource(R.string.lyrics_fetched))
-                    },
-                    text = {
-                        Column {
-                            Text(text = stringResource(R.string.first_line_of_lyrics))
-                            Text(text = lyricsResult.split("\n")[0])
-                            Text(text = stringResource(id = R.string.is_that_correct))
-                        }
-                    },
-                    onDismissRequest = {
-                        queryStatus = QueryStatus.Cancelled
-                    },
-                    confirmButton = {
-                        Button(onClick = {
-                            val lrc =
-                                "[ti:${queryResult.songName}]\n" +
-                                        "[ar:${queryResult.artistName}]\n" +
-                                        "[by:Generated using SongSync]\n" +
-                                        lyricsResult
-                            val file = File(
-                                song.filePath?.dropLast(4) + ".lrc"
-                            )
-                            file.writeText(lrc)
-
-                            Toast.makeText(
-                                context,
-                                "Lyrics saved to ${file.path}",
-                                Toast.LENGTH_LONG
-                            ).show()
-
-                            queryStatus = QueryStatus.Cancelled
-                        }
-                        ) {
-                            Text(text = stringResource(R.string.save_lyrics))
-                        }
-                    },
-                    dismissButton = {
-                        OutlinedButton(onClick = {
-                            queryStatus = QueryStatus.Cancelled
-                        }
-                        ) {
-                            Text(text = stringResource(R.string.cancel))
-                        }
+                AlertDialog(title = {
+                    Text(text = stringResource(R.string.lyrics_fetched))
+                }, text = {
+                    Column {
+                        Text(text = stringResource(R.string.first_line_of_lyrics))
+                        Text(text = lyricsResult.split("\n")[0])
+                        Text(text = stringResource(id = R.string.is_that_correct))
                     }
-                )
+                }, onDismissRequest = {
+                    queryStatus = QueryStatus.Cancelled
+                }, confirmButton = {
+                    Button(onClick = {
+                        val lrc =
+                            "[ti:${queryResult.songName}]\n" + "[ar:${queryResult.artistName}]\n" + "[by:Generated using SongSync]\n" + lyricsResult
+                        val file = File(
+                            song.filePath?.dropLast(4) + ".lrc"
+                        )
+                        file.writeText(lrc)
+
+                        Toast.makeText(
+                            context, "Lyrics saved to ${file.path}", Toast.LENGTH_LONG
+                        ).show()
+
+                        queryStatus = QueryStatus.Cancelled
+                    }) {
+                        Text(text = stringResource(R.string.save_lyrics))
+                    }
+                }, dismissButton = {
+                    OutlinedButton(onClick = {
+                        queryStatus = QueryStatus.Cancelled
+                    }) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                })
             }
 
             QueryStatus.LyricsFailed -> {
-                AlertDialog(
-                    title = {
-                        Text(text = stringResource(R.string.error))
-                    },
-                    text = {
-                        Text(text = stringResource(R.string.this_track_has_no_lyrics))
-                    },
-                    onDismissRequest = {
-                        queryStatus = QueryStatus.Cancelled
-                    },
-                    confirmButton = {
-                        Button(onClick = { queryStatus = QueryStatus.Cancelled }) {
-                            Text(text = stringResource(R.string.ok))
-                        }
+                AlertDialog(title = {
+                    Text(text = stringResource(R.string.error))
+                }, text = {
+                    Text(text = stringResource(R.string.this_track_has_no_lyrics))
+                }, onDismissRequest = {
+                    queryStatus = QueryStatus.Cancelled
+                }, confirmButton = {
+                    Button(onClick = { queryStatus = QueryStatus.Cancelled }) {
+                        Text(text = stringResource(R.string.ok))
                     }
-                )
+                })
             }
 
             QueryStatus.Failed -> {
-                AlertDialog(
-                    onDismissRequest = { queryStatus = QueryStatus.Cancelled },
+                AlertDialog(onDismissRequest = { queryStatus = QueryStatus.Cancelled },
                     confirmButton = {
                         Button(onClick = { queryStatus = QueryStatus.Cancelled }) {
                             Text(text = stringResource(id = R.string.ok))
                         }
                     },
-                    title = { Text(text = stringResource(id =R.string.error)) },
+                    title = { Text(text = stringResource(id = R.string.error)) },
                     text = {
-                        if (failReason.contains("NotFound") || failReason.contains("JSON"))
-                            Text(text = "No results")
-                        else
-                            Text(text = stringResource(R.string.an_error_occurred, failReason))
-                    }
-                )
+                        if (failReason.contains("NotFound") || failReason.contains("JSON")) Text(
+                            text = "No results"
+                        )
+                        else Text(text = stringResource(R.string.an_error_occurred, failReason))
+                    })
             }
         }
     }
@@ -492,81 +441,64 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
         }
 
         UiState.Warning -> {
-            AlertDialog(
-                title = {
-                    Text(text = stringResource(id = R.string.batch_download_lyrics))
-                },
-                text = {
-                    Column {
-                        Text(text = stringResource(R.string.this_will_download_lyrics_for_all_songs))
-                        Text(text = stringResource(R.string.existing_lyrics_for_songs_overwrite))
-                        Text(text = stringResource(R.string.less_accurate))
-                        Text(text = stringResource(R.string.sure_to_continue))
-                    }
-                },
-                onDismissRequest = {
-                    uiState = UiState.Cancelled
-                },
-                confirmButton = {
-                    Button(
-                        onClick = { uiState = UiState.Pending }
-                    ) {
-                        Text(text = stringResource(R.string.yes))
-                    }
-                },
-                dismissButton = {
-                    OutlinedButton(
-                        onClick = { uiState = UiState.Cancelled }
-                    ) {
-                        Text(text = stringResource(R.string.no))
-                    }
+            AlertDialog(title = {
+                Text(text = stringResource(id = R.string.batch_download_lyrics))
+            }, text = {
+                Column {
+                    Text(text = stringResource(R.string.this_will_download_lyrics_for_all_songs))
+                    Text(text = stringResource(R.string.existing_lyrics_for_songs_overwrite))
+                    Text(text = stringResource(R.string.less_accurate))
+                    Text(text = stringResource(R.string.sure_to_continue))
                 }
-            )
+            }, onDismissRequest = {
+                uiState = UiState.Cancelled
+            }, confirmButton = {
+                Button(onClick = { uiState = UiState.Pending }) {
+                    Text(text = stringResource(R.string.yes))
+                }
+            }, dismissButton = {
+                OutlinedButton(onClick = { uiState = UiState.Cancelled }) {
+                    Text(text = stringResource(R.string.no))
+                }
+            })
         }
 
         UiState.Pending -> {
-            AlertDialog(
-                title = {
-                    Text(text = stringResource(id = R.string.batch_download_lyrics))
-                },
-                text = {
-                    Column {
-                        Text(text = stringResource(R.string.downloading_lyrics))
-                        MarqueeText(
-                            stringResource(
-                                R.string.song,
-                                songs[(successCount + failedCount) % total].title ?: "Unknown",
-                            )) // marquee cuz long
-                        Text(
-                            text = stringResource(
-                                R.string.progress,
-                                successCount + failedCount,
-                                total,
-                                ((successCount + failedCount) / total.toFloat() * 100).roundToInt()
-                            )
+            AlertDialog(title = {
+                Text(text = stringResource(id = R.string.batch_download_lyrics))
+            }, text = {
+                Column {
+                    Text(text = stringResource(R.string.downloading_lyrics))
+                    MarqueeText(
+                        stringResource(
+                            R.string.song,
+                            songs[(successCount + failedCount) % total].title ?: "Unknown",
                         )
-                        Text(text = stringResource(
-                            R.string.success_failed,
-                            successCount,
-                            failedCount
-                        ))
-                        Text(text = stringResource(R.string.please_do_not_close_the_app_this_may_take_a_while))
-                    }
-                },
-                onDismissRequest = {
-                    uiState = UiState.Cancelled
-                },
-                confirmButton = {
-                    // no button but compose cries when i don't use confirmButton
-                },
-                dismissButton = {
-                    OutlinedButton(
-                        onClick = { uiState = UiState.Cancelled }
-                    ) {
-                        Text(text = "Cancel")
-                    }
+                    ) // marquee cuz long
+                    Text(
+                        text = stringResource(
+                            R.string.progress,
+                            successCount + failedCount,
+                            total,
+                            ((successCount + failedCount) / total.toFloat() * 100).roundToInt()
+                        )
+                    )
+                    Text(
+                        text = stringResource(
+                            R.string.success_failed, successCount, failedCount
+                        )
+                    )
+                    Text(text = stringResource(R.string.please_do_not_close_the_app_this_may_take_a_while))
                 }
-            )
+            }, onDismissRequest = {
+                uiState = UiState.Cancelled
+            }, confirmButton = {
+                // no button but compose cries when i don't use confirmButton
+            }, dismissButton = {
+                OutlinedButton(onClick = { uiState = UiState.Cancelled }) {
+                    Text(text = "Cancel")
+                }
+            })
             val executor = Executors.newSingleThreadExecutor() // blame spotify for single thread
             var notFoundInARow = 0 // detect rate limit
             executor.execute {
@@ -611,10 +543,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                         continue
                     }
                     val lrc =
-                        "[ti:${queryResult.songName}]\n" +
-                                "[ar:${queryResult.artistName}]\n" +
-                                "[by:Generated using SongSync]\n" +
-                                lyricsResult
+                        "[ti:${queryResult.songName}]\n" + "[ar:${queryResult.artistName}]\n" + "[by:Generated using SongSync]\n" + lyricsResult
                     val file = File(
                         song.filePath!!.dropLast(4) + ".lrc"
                     )
@@ -626,53 +555,40 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
         }
 
         UiState.Done -> {
-            AlertDialog(
-                title = {
-                    Text(text = stringResource(id = R.string.batch_download_lyrics))
-                },
-                text = {
-                    Column {
-                        Text(text = stringResource(R.string.download_complete))
-                        Text(text = stringResource(R.string.success, successCount))
-                        Text(text = stringResource(R.string.failed, failedCount))
-                    }
-                },
-                onDismissRequest = {
-                    uiState = UiState.Cancelled
-                },
-                confirmButton = {
-                    Button(
-                        onClick = { uiState = UiState.Cancelled }
-                    ) {
-                        Text(text = "OK")
-                    }
+            AlertDialog(title = {
+                Text(text = stringResource(id = R.string.batch_download_lyrics))
+            }, text = {
+                Column {
+                    Text(text = stringResource(R.string.download_complete))
+                    Text(text = stringResource(R.string.success, successCount))
+                    Text(text = stringResource(R.string.failed, failedCount))
                 }
-            )
+            }, onDismissRequest = {
+                uiState = UiState.Cancelled
+            }, confirmButton = {
+                Button(onClick = { uiState = UiState.Cancelled }) {
+                    Text(text = "OK")
+                }
+            })
         }
 
         UiState.RateLimited -> {
-            AlertDialog(
-                title = {
-                    Text(text = stringResource(id = R.string.batch_download_lyrics))
-                },
-                text = {
-                    Column {
-                        Text(text = stringResource(R.string.spotify_api_rate_limit_reached))
-                        Text(text = stringResource(R.string.please_try_again_later))
-                    }
-                },
-                onDismissRequest = {
-                    uiState = UiState.Cancelled
-                },
-                confirmButton = {
-                    Button(
-                        onClick = { uiState = UiState.Cancelled }
-                    ) {
-                        Text(text = "OK")
-                    }
+            AlertDialog(title = {
+                Text(text = stringResource(id = R.string.batch_download_lyrics))
+            }, text = {
+                Column {
+                    Text(text = stringResource(R.string.spotify_api_rate_limit_reached))
+                    Text(text = stringResource(R.string.please_try_again_later))
                 }
-            )
+            }, onDismissRequest = {
+                uiState = UiState.Cancelled
+            }, confirmButton = {
+                Button(onClick = { uiState = UiState.Cancelled }) {
+                    Text(text = stringResource(id = R.string.ok))
+                }
+            })
         }
+
         else -> {
             // nothing
         }
@@ -681,65 +597,9 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
 
 // queryStatus: "Not submitted", "Pending", "Success", "Failed" - used to show different UI
 enum class QueryStatus {
-    NotSubmitted, Pending, Success, Failed, Cancelled, LyricsPending, LyricsSuccess, LyricsFailed;
-
-    companion object {
-        fun fromString(string: String): QueryStatus {
-            return when (string) {
-                "Not submitted" -> NotSubmitted
-                "Pending" -> Pending
-                "Success" -> Success
-                "Failed" -> Failed
-                "Cancelled" -> Cancelled
-                "LyricsPending" -> LyricsPending
-                "LyricsSuccess" -> LyricsSuccess
-                "LyricsFailed" -> LyricsFailed
-                else -> throw IllegalArgumentException("Invalid string")
-            }
-        }
-
-        fun toString(status: QueryStatus): String {
-            return when (status) {
-                NotSubmitted -> "Not submitted"
-                Pending -> "Pending"
-                Success -> "Success"
-                Failed -> "Failed"
-                Cancelled -> "Cancelled"
-                LyricsPending -> "LyricsPending"
-                LyricsSuccess -> "LyricsSuccess"
-                LyricsFailed -> "LyricsFailed"
-            }
-        }
-    }
+    NotSubmitted, Pending, Success, Failed, Cancelled, LyricsPending, LyricsSuccess, LyricsFailed
 }
 
 enum class UiState {
-    Warning, Pending, Done, RateLimited, Cancelled, Loading, Loaded;
-
-    companion object {
-        fun fromString(string: String): UiState {
-            return when (string) {
-                "Warning" -> Warning
-                "Pending" -> Pending
-                "Done" -> Done
-                "RateLimited" -> RateLimited
-                "Cancelled" -> Cancelled
-                "Loading" -> Loading
-                "Loaded" -> Loaded
-                else -> throw IllegalArgumentException("Invalid string")
-            }
-        }
-
-        fun toString(state: UiState): String {
-            return when (state) {
-                Warning -> "Warning"
-                Pending -> "Pending"
-                Done -> "Done"
-                RateLimited -> "RateLimited"
-                Cancelled -> "Cancelled"
-                Loading -> "Loading"
-                Loaded -> "Loaded"
-            }
-        }
-    }
+    Warning, Pending, Done, RateLimited, Cancelled, Loading, Loaded
 }

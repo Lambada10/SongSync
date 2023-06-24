@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.SongInfo
@@ -155,16 +154,16 @@ fun BrowseScreen(viewModel: MainViewModel) {
 
                     // lyrics
                     var lyricsResult by rememberSaveable { mutableStateOf("") }
-                    var lyricSuccess by rememberSaveable { mutableStateOf("Not submitted") }
+                    var lyricSuccess by rememberSaveable { mutableStateOf(LyricsStatus.NotSubmitted) }
                     Thread {
                         try {
                             if (queryResult.songLink == null) throw Exception("Song link is empty")
                             lyricsResult =
                                 viewModel.getSyncedLyrics(queryResult.songLink!!)
-                            lyricSuccess = "Success"
+                            lyricSuccess = LyricsStatus.Success
                         } catch (e: Exception) {
                             lyricsResult = e.toString()
-                            lyricSuccess = "Failed"
+                            lyricSuccess = LyricsStatus.Failed
                             if (e is FileNotFoundException) {
                                 lyricsResult = "Lyrics not found"
                             }
@@ -172,12 +171,12 @@ fun BrowseScreen(viewModel: MainViewModel) {
                     }.start()
 
                     when (lyricSuccess) {
-                        "Not submitted" -> {
+                        LyricsStatus.NotSubmitted -> {
                             Spacer(modifier = Modifier.height(8.dp))
                             CircularProgressIndicator()
                         }
 
-                        "Success" -> {
+                        LyricsStatus.Success -> {
                             lyricsResult.dropLast(1) // drop last \n
                             Spacer(modifier = Modifier.height(8.dp))
                             OutlinedCard(
@@ -208,7 +207,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                             Spacer(modifier = Modifier.height(8.dp))
                         }
 
-                        "Failed" -> {
+                        LyricsStatus.Failed -> {
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(text = lyricsResult)
                         }
@@ -241,4 +240,8 @@ fun BrowseScreen(viewModel: MainViewModel) {
             }
         }
     }
+}
+
+enum class LyricsStatus {
+    NotSubmitted, Success, Failed
 }
