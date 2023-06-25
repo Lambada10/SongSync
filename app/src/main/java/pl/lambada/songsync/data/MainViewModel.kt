@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import org.apache.commons.text.similarity.LevenshteinDistance
 import org.json.JSONObject
 import pl.lambada.songsync.BuildConfig
+import pl.lambada.songsync.data.ext.lowercaseWithLocale
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileNotFoundException
@@ -145,8 +146,8 @@ class MainViewModel : ViewModel() {
     fun calculateStringSimilarity(string1: String, string2: String): Double {
         val levenshteinDistance = LevenshteinDistance()
         val distance = levenshteinDistance.apply(
-            string1.lowercase(Locale.getDefault()),
-            string2.lowercase(Locale.getDefault())
+            string1.lowercaseWithLocale(),
+            string2.lowercaseWithLocale()
         )
         val maxLength = maxOf(string1.length, string2.length)
         return ((1 - distance.toDouble() / maxLength) * 10000).toInt().toDouble() / 100
