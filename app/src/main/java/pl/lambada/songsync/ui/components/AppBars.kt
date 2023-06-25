@@ -15,6 +15,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import pl.lambada.songsync.data.Screens
@@ -24,8 +25,18 @@ import pl.lambada.songsync.data.Screens
 fun TopBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    val screens = Screens.values()
+
+    val currentScreen = screens.firstOrNull { it.name == currentRoute }.toString()
+
     CenterAlignedTopAppBar(
-        title = { currentRoute?.let { Text(text = it) } }
+        title = {
+            Text(
+                text = currentScreen,
+                fontWeight = FontWeight.Bold
+            )
+        },
     )
 }
 
@@ -38,19 +49,19 @@ fun BottomBar(navController: NavController) {
         screens.forEach { screen ->
             NavigationBarItem(
                 selected = currentRoute == screen.name,
-                onClick = { navController.navigate(screen.name) },
-                icon = {
-                    Icon(
-                        imageVector =
-                            when(screen) {
-                                Screens.Home -> if(currentRoute == screen.name) Icons.Filled.Home else Icons.Outlined.Home
-                                Screens.Browse -> if(currentRoute == screen.name) Icons.Filled.Search else Icons.Outlined.Search
-                                Screens.About -> if(currentRoute == screen.name) Icons.Filled.Info else Icons.Outlined.Info
-                          },
-                        contentDescription = screen.name)
+                onClick = {
+                    if (currentRoute != screen.name) navController.navigate(screen.name)
                 },
-                label = { Text(text = screen.name) }
-            )
+                icon = {
+                    val isSelected = currentRoute == screen.name
+                    val imageVector = when (screen) {
+                        Screens.Home -> if (isSelected) Icons.Default.Home else Icons.Outlined.Home
+                        Screens.Browse -> if (isSelected) Icons.Default.Search else Icons.Outlined.Search
+                        Screens.About -> if (isSelected) Icons.Default.Info else Icons.Outlined.Info
+                    }
+                    Icon(imageVector, contentDescription = screen.name)
+                },
+                label = { Text(text = screen.toString()) })
         }
     }
 }

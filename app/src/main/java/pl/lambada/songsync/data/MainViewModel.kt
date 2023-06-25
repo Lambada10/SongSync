@@ -9,10 +9,11 @@ import androidx.lifecycle.ViewModel
 import org.apache.commons.text.similarity.LevenshteinDistance
 import org.json.JSONObject
 import pl.lambada.songsync.BuildConfig
+import pl.lambada.songsync.R
 import pl.lambada.songsync.data.ext.lowercaseWithLocale
+import pl.lambada.songsync.getStringById
 import java.io.BufferedReader
 import java.io.File
-import java.io.FileNotFoundException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
@@ -223,17 +224,17 @@ class MainViewModel : ViewModel() {
         - github link (optional but you probably have one)
         - telegram link (optional)
      */
-    fun getContributorsInfo(): List<Map<String, String>> {
+    fun getContributorsInfo(): List<Map<ContributorsArgs, String>> {
         val lambada10 = mapOf(
-            "name" to "Lambada10",
-            "additionalInfo" to "Lead developer",
-            "github" to "https://github.com/Lambada10",
-            "telegram" to "https://t.me/Lambada10"
+            ContributorsArgs.NAME to "Lambada10",
+            ContributorsArgs.ADDITIONAL_INFO to ContributionLevel.LEAD_DEVELOPER.toString(),
+            ContributorsArgs.GITHUB to "https://github.com/Lambada10",
+            ContributorsArgs.TELEGRAM to "https://t.me/Lambada10"
         )
         val bobbyESP = mapOf(
-            "name" to "BobbyESP",
-            "additionalInfo" to "Contributor",
-            "github" to "https://github.com/BobbyESP",
+            ContributorsArgs.NAME to "BobbyESP",
+            ContributorsArgs.ADDITIONAL_INFO to ContributionLevel.CONTRIBUTOR.toString(),
+            ContributorsArgs.GITHUB to "https://github.com/BobbyESP",
         )
 
         return listOf(
@@ -248,5 +249,46 @@ class MainViewModel : ViewModel() {
     fun getVersion(context: Context): String {
         val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
         return pInfo.versionName
+    }
+}
+
+enum class ContributionLevel {
+    CONTRIBUTOR,
+    DEVELOPER,
+    LEAD_DEVELOPER;
+
+    override fun toString(): String {
+        return when (this) {
+            CONTRIBUTOR -> getStringById(R.string.contributor)
+            DEVELOPER -> getStringById(R.string.developer)
+            LEAD_DEVELOPER -> getStringById(R.string.lead_developer)
+        }
+    }
+
+    companion object {
+        fun fromString(string: String): ContributionLevel {
+            return when (string) {
+                getStringById(R.string.contributor) -> CONTRIBUTOR
+                getStringById(R.string.developer) -> DEVELOPER
+                getStringById(R.string.lead_developer) -> LEAD_DEVELOPER
+                else -> throw IllegalArgumentException("Invalid contribution level.")
+            }
+        }
+    }
+}
+
+enum class ContributorsArgs {
+    NAME,
+    ADDITIONAL_INFO,
+    GITHUB,
+    TELEGRAM;
+
+    override fun toString(): String {
+        return when (this) {
+            NAME -> "name"
+            ADDITIONAL_INFO -> "additionalInfo"
+            GITHUB -> "github"
+            TELEGRAM -> "telegram"
+        }
     }
 }

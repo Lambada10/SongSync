@@ -88,14 +88,14 @@ fun BrowseScreen(viewModel: MainViewModel) {
                     CommonTextField(
                         value = querySong,
                         onValueChange = { querySong = it.toString() },
-                        label = "Song name",
+                        label = stringResource(id = R.string.song_name_no_args),
                         imeAction = ImeAction.Next
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     CommonTextField(
                         value = queryArtist,
                         onValueChange = { queryArtist = it.toString() },
-                        label = "Artist name"
+                        label = stringResource(R.string.artist_name_no_args)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = {

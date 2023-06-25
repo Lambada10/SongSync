@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import pl.lambada.songsync.R
+import pl.lambada.songsync.data.ContributorsArgs
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.ui.components.AboutCard
 
@@ -135,18 +136,18 @@ fun AboutScreen(viewModel: MainViewModel) {
                     contributors.forEach {
                         var additionalInfo = ""
                         try {
-                            additionalInfo = it.getValue("additionalInfo")
+                            additionalInfo = it.getValue(ContributorsArgs.ADDITIONAL_INFO)
                         } catch (e: NoSuchElementException) { // no additional info
 
                         }
                         Text(
-                            text = it.getValue("name") + (if (additionalInfo != "") " ($additionalInfo)" else "")
+                            text = it.getValue(ContributorsArgs.NAME) + (if (additionalInfo != "") " ($additionalInfo)" else "")
                         )
                         Row {
                             Spacer(modifier = Modifier.weight(1f))
                             var github = ""
                             try {
-                                github = it.getValue("github")
+                                github = it.getValue(ContributorsArgs.GITHUB)
                             } catch (e: NoSuchElementException) {
                                 // no github link
                             }
@@ -160,7 +161,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                             }
                             var telegram = ""
                             try {
-                                telegram = it.getValue("telegram")
+                                telegram = it.getValue(ContributorsArgs.TELEGRAM)
                             } catch (e: NoSuchElementException) {
                                 // no telegram link
                             }
