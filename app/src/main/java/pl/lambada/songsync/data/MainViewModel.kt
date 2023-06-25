@@ -18,7 +18,7 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.Locale
 
-class MainViewModel: ViewModel() {
+class MainViewModel : ViewModel() {
     /*
     Spotify API credentials, can be overwritten by user.
     If you want to build this app yourself, you need to create your own Spotify API credentials
@@ -69,7 +69,8 @@ class MainViewModel: ViewModel() {
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
         connection.doOutput = true
 
-        val postData = "grant_type=client_credentials&client_id=$spotifyClientID&client_secret=$spotifyClientSecret"
+        val postData =
+            "grant_type=client_credentials&client_id=$spotifyClientID&client_secret=$spotifyClientSecret"
         val postDataBytes = postData.toByteArray(StandardCharsets.UTF_8)
 
         connection.outputStream.use {
@@ -123,7 +124,8 @@ class MainViewModel: ViewModel() {
             artists.append(currentArtist.getString("name")).append(",")
         }
 
-        val albumArtURL = track.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url")
+        val albumArtURL =
+            track.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url")
 
         val spotifyURL: String = track.getJSONObject("external_urls").getString("spotify")
 
@@ -142,7 +144,10 @@ class MainViewModel: ViewModel() {
      */
     fun calculateStringSimilarity(string1: String, string2: String): Double {
         val levenshteinDistance = LevenshteinDistance()
-        val distance = levenshteinDistance.apply(string1.lowercase(Locale.getDefault()), string2.lowercase(Locale.getDefault()))
+        val distance = levenshteinDistance.apply(
+            string1.lowercase(Locale.getDefault()),
+            string2.lowercase(Locale.getDefault())
+        )
         val maxLength = maxOf(string1.length, string2.length)
         return ((1 - distance.toDouble() / maxLength) * 10000).toInt().toDouble() / 100
     }
@@ -163,14 +168,15 @@ class MainViewModel: ViewModel() {
 
         val json = JSONObject(response)
 
-        if(json.getBoolean("error"))
+        if (json.getBoolean("error"))
             return "No lyrics found."
 
         val lines = json.getJSONArray("lines")
         val syncedLyrics = StringBuilder()
         for (i in 0 until lines.length()) {
             val currentLine = lines.getJSONObject(i)
-            syncedLyrics.append("[${currentLine.getString("timeTag")}").append("]").append(currentLine.getString("words")).append("\n")
+            syncedLyrics.append("[${currentLine.getString("timeTag")}").append("]")
+                .append(currentLine.getString("words")).append("\n")
         }
 
         return syncedLyrics.toString()

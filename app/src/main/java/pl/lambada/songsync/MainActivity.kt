@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -39,13 +40,15 @@ class MainActivity : ComponentActivity() {
             var internetConnection by rememberSaveable { mutableStateOf(true) }
 
             // Get token upon app start
-            Thread {
-                try {
-                    viewModel.refreshToken()
-                } catch (e: UnknownHostException) {
-                    internetConnection = false
-                }
-            }.start()
+            LaunchedEffect(true) {
+                Thread {
+                    try {
+                        viewModel.refreshToken()
+                    } catch (e: UnknownHostException) {
+                        internetConnection = false
+                    }
+                }.start()
+            }
 
             // Request permissions and wait with check
             if (!Environment.isExternalStorageManager()) {

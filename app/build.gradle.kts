@@ -4,6 +4,8 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    //kotlinx serialization plugin
+    kotlin("plugin.serialization")
 }
 
 val spotifyClientID = gradleLocalProperties(rootDir).getProperty("spotify_client_id")!!
@@ -82,12 +84,16 @@ dependencies {
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
 
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.3-beta")
-    implementation("org.json:json:20230227")
-    implementation("org.apache.commons:commons-text:1.9")
-    implementation("androidx.navigation:navigation-compose:2.5.3")
-    implementation("io.coil-kt:coil-compose:2.1.0")
-    implementation("androidx.compose.material:material-icons-extended:1.5.0-beta01")
-    implementation("com.google.accompanist:accompanist-permissions:0.31.3-beta")
-    implementation("com.google.accompanist:accompanist-coil:0.15.0")
+    implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.json)
+    implementation(libs.commons.text)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.coil.compose)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.accompanist.permissions)
+    implementation(libs.accompanist.coil)
+    //kotlinx serialization
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.kotlinx.coroutines.android)
 }
