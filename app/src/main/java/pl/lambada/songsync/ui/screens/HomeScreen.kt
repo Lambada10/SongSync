@@ -549,17 +549,19 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
             })
 
             var notFoundInARow by remember { mutableIntStateOf(0) }
-            var downloadJob by remember { mutableStateOf<Job?>(null) }
+            var downloadJob by remember { mutableStateOf<Job?>(null) } //We are gonna use this to be able to cancel the job
 
             LaunchedEffect(true) {
                 downloadJob = scope.launch(Dispatchers.IO) {
                     for (song in songs) {
                         if (uiState == UiState.Cancelled) {
+                            downloadJob?.cancel()
                             return@launch
                         }
 
                         if (successCount + failedCount >= total) {
                             uiState = UiState.Done
+                            downloadJob?.cancel()
                             return@launch
                         }
 
