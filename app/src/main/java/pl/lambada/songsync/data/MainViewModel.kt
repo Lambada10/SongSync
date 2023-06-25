@@ -27,6 +27,7 @@ class MainViewModel : ViewModel() {
     private var spotifyClientID = BuildConfig.SPOTIFY_CLIENT_ID
     private var spotifyClientSecret = BuildConfig.SPOTIFY_CLIENT_SECRET
     private var spotifyToken = ""
+    private var tokenTime: Long = 0
 
     /*
     Used for storing responses, used in Alert Dialogs (show response)
@@ -34,29 +35,6 @@ class MainViewModel : ViewModel() {
      */
     var spotifyResponse = ""
     var lyricsResponse = ""
-
-    /*
-    Checks if token is valid by sending a request to Spotify API.
-     */
-    fun checkToken(): Boolean {
-        try {
-            val endpoint = "https://api.spotify.com/v1/search"
-            val query = "test"
-            val type = "track"
-            val limit = 1
-            val url = URL("$endpoint?q=$query&type=$type&limit=$limit")
-            val connection = url.openConnection() as HttpURLConnection
-
-            connection.requestMethod = "GET"
-            connection.setRequestProperty("Authorization", "Bearer $spotifyToken")
-            if (connection.responseCode != 200) {
-                throw FileNotFoundException()
-            }
-        } catch (e: Exception) {
-            return false
-        }
-        return true
-    }
 
     /*
     Refreshes token by sending a request to Spotify API.
@@ -83,6 +61,7 @@ class MainViewModel : ViewModel() {
 
         val json = JSONObject(response)
         this.spotifyToken = json.getString("access_token")
+        this.tokenTime = System.currentTimeMillis()
     }
 
     /*
@@ -92,10 +71,10 @@ class MainViewModel : ViewModel() {
         * offset (optional), used for trying to find a better match/searching again
      */
     fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
-        /*
-        if(!checkToken())
+
+        if (System.currentTimeMillis() - this.tokenTime > 1800000) { // 30 minutes
             refreshToken()
-         */ // one token should be enough for one session, i have to limit API calls somehow
+        }
 
         val endpoint = "https://api.spotify.com/v1/search"
         val search = URLEncoder.encode(
