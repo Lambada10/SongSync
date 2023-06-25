@@ -30,7 +30,7 @@
     <string name="no">No</string>
     <string name="downloading_lyrics">Downloading lyrics</string>
     <string name="song">Song: %1$s</string>
-    <string name="progress">Progress: %1$s/%2$s (%3$s%)</string>
+    <string name="progress">Progress: %1$s/%2$s (%3$s)</string>
     <string name="success_failed">Success: %1$s, Failed: %2$s</string>
     <string name="please_do_not_close_the_app_this_may_take_a_while">Please do not close the app, this may take a while</string>
     <string name="download_complete">Download complete</string>

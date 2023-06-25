@@ -32,10 +32,12 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,6 +51,9 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.json.JSONException
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
@@ -60,7 +65,6 @@ import pl.lambada.songsync.ui.common.MarqueeText
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.UnknownHostException
-import java.util.concurrent.Executors
 import kotlin.math.roundToInt
 
 
@@ -76,10 +80,10 @@ fun HomeScreen(viewModel: MainViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CircularProgressIndicator()
-            Thread {
+            LaunchedEffect(Unit) { //using Unit instead of "true" makes the effect run only once (when the screen is created); if we used "true", it would run every time the screen is recomposed
                 songs = viewModel.getAllSongs(context)
                 uiState = UiState.Loaded
-            }.start()
+            }
         }
 
         UiState.Loaded -> HomeScreenLoaded(viewModel = viewModel, songs = songs)
@@ -128,14 +132,14 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Divider()
 
-                if (isBatchDownload) BatchDownloadLyrics(songs = songs,
+                if (isBatchDownload) BatchDownloadLyrics(
+                    songs = songs,
                     viewModel = viewModel,
                     onDone = { isBatchDownload = false })
 
                 if (showSearch) {
                     val keyboardController = LocalSoftwareKeyboardController.current
-                    SearchBar(
-                        query = query,
+                    SearchBar(query = query,
                         onQueryChange = { query = it },
                         onSearch = { keyboardController?.hide() },
                         active = false,
@@ -147,8 +151,7 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        content = {}
-                    )
+                        content = {})
                 }
             }
         }
@@ -175,7 +178,7 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
 @Composable
 fun SongItem(song: Song, viewModel: MainViewModel) {
     val context = LocalContext.current
-
+    val scope = rememberCoroutineScope()
     val unknownString = stringResource(id = R.string.unknown)
     val noLyricsString = stringResource(id = R.string.lyrics_not_found)
 
@@ -254,23 +257,24 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                     queryStatus = QueryStatus.Cancelled
                 }, confirmButton = {
                     Button(onClick = {
-                        Thread {
+                        scope.launch(Dispatchers.IO) {
                             queryStatus = QueryStatus.Pending
                             try {
                                 queryResult = viewModel.getSongInfo(query, offset)
                                 queryStatus = QueryStatus.Success
                             } catch (e: Exception) {
-                                when(e){
+                                when (e) {
                                     is UnknownHostException -> {
                                         queryStatus = QueryStatus.NoConnection
                                     }
+
                                     else -> {
                                         failReason = e.toString()
                                         queryStatus = QueryStatus.Failed
                                     }
                                 }
                             }
-                        }.start()
+                        }
                     }) {
                         Text(text = stringResource(R.string.get_song_info))
                     }
@@ -318,7 +322,7 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                     queryStatus = QueryStatus.Cancelled
                 }, confirmButton = {
                     Button(onClick = {
-                        Thread {
+                        scope.launch(Dispatchers.Default) {
                             queryStatus = QueryStatus.LyricsPending
                             try {
                                 lyricsResult =
@@ -329,14 +333,14 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                                 else failReason = e.toString()
                                 queryStatus = QueryStatus.LyricsFailed
                             }
-                        }.start()
+                        }
                     }) {
                         Text(text = stringResource(id = R.string.get_lyrics))
                     }
                 }, dismissButton = {
                     OutlinedButton(onClick = {
                         offset += 1
-                        Thread {
+                        scope.launch(Dispatchers.IO) {
                             queryStatus = QueryStatus.Pending
                             try {
                                 queryResult = viewModel.getSongInfo(query, offset)
@@ -345,7 +349,7 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                                 failReason = e.toString()
                                 queryStatus = QueryStatus.Failed
                             }
-                        }.start()
+                        }
                     }) {
                         Text(text = stringResource(R.string.try_again))
                     }
@@ -384,14 +388,20 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                 }, confirmButton = {
                     Button(onClick = {
                         val lrc =
-                            "[ti:${queryResult.songName}]\n" + "[ar:${queryResult.artistName}]\n" + "[by:${context.getString(R.string.generated_using)}]\n" + lyricsResult
+                            "[ti:${queryResult.songName}]\n" + "[ar:${queryResult.artistName}]\n" + "[by:${
+                                context.getString(
+                                    R.string.generated_using
+                                )
+                            }]\n" + lyricsResult
                         val file = File(
                             song.filePath?.dropLast(4) + ".lrc"
                         )
                         file.writeText(lrc)
 
                         Toast.makeText(
-                            context, "${context.getString(R.string.lyrics_saved_to)} ${file.path}", Toast.LENGTH_LONG
+                            context,
+                            "${context.getString(R.string.lyrics_saved_to)} ${file.path}",
+                            Toast.LENGTH_LONG
                         ).show()
 
                         queryStatus = QueryStatus.Cancelled
@@ -434,13 +444,12 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                             text = stringResource(id = R.string.no_results)
                         )
                         else Text(text = stringResource(R.string.an_error_occurred, failReason))
-                    }
-                )
+                    })
 
             }
+
             QueryStatus.NoConnection -> {
-                AlertDialog(
-                    onDismissRequest = { queryStatus = QueryStatus.Cancelled },
+                AlertDialog(onDismissRequest = { queryStatus = QueryStatus.Cancelled },
                     confirmButton = {
                         Button(onClick = { queryStatus = QueryStatus.Cancelled }) {
                             Text(text = stringResource(id = R.string.ok))
@@ -449,8 +458,7 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                     title = { Text(text = stringResource(id = R.string.error)) },
                     text = {
                         Text(text = stringResource(R.string.no_internet_server))
-                    }
-                )
+                    })
             }
         }
     }
@@ -458,6 +466,7 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
 
 @Composable
 fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () -> Unit) {
+    val scope = rememberCoroutineScope()
     val unknownString = stringResource(id = R.string.unknown)
     val generatedUsingString = stringResource(id = R.string.generated_using)
 
@@ -496,6 +505,13 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
         }
 
         UiState.Pending -> {
+            val totalCount = successCount + failedCount
+            val percentage = if (total != 0) {
+                (totalCount.toFloat() / total.toFloat() * 100).roundToInt()
+            } else {
+                0 // In other cases = 0
+            }
+
             AlertDialog(title = {
                 Text(text = stringResource(id = R.string.batch_download_lyrics))
             }, text = {
@@ -510,9 +526,9 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                     Text(
                         text = stringResource(
                             R.string.progress,
-                            successCount + failedCount,
+                            totalCount,
                             total,
-                            ((successCount + failedCount) / total.toFloat() * 100).roundToInt()
+                            percentage
                         )
                     )
                     Text(
@@ -531,58 +547,60 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                     Text(text = stringResource(id = R.string.cancel))
                 }
             })
-            val executor = Executors.newSingleThreadExecutor() // blame spotify for single thread
-            var notFoundInARow = 0 // detect rate limit
-            executor.execute {
-                for (song in songs) {
-                    if (uiState == UiState.Cancelled) {
-                        executor.shutdown()
-                        return@execute
-                    }
 
-                    if (successCount + failedCount >= total) {
-                        uiState = UiState.Done
-                        executor.shutdown()
-                        return@execute
-                    }
+            var notFoundInARow by remember { mutableIntStateOf(0) }
+            var downloadJob by remember { mutableStateOf<Job?>(null) }
 
-                    val query = SongInfo(song.title, song.artist)
-                    var queryResult: SongInfo? = null
-                    try {
-                        queryResult = viewModel.getSongInfo(query)
-                    } catch (e: Exception) {
-                        if (e is FileNotFoundException) { // no such song OR rate limited
-                            notFoundInARow++
-                            failedCount++
-                            if (notFoundInARow >= 5) {
-                                uiState = UiState.RateLimited
-                                return@execute
+            LaunchedEffect(true) {
+                downloadJob = scope.launch(Dispatchers.IO) {
+                    for (song in songs) {
+                        if (uiState == UiState.Cancelled) {
+                            return@launch
+                        }
+
+                        if (successCount + failedCount >= total) {
+                            uiState = UiState.Done
+                            return@launch
+                        }
+
+                        val query = SongInfo(song.title, song.artist)
+                        var queryResult: SongInfo? = null
+                        try {
+                            queryResult = viewModel.getSongInfo(query)
+                        } catch (e: Exception) {
+                            if (e is FileNotFoundException) { // no such song OR rate limited
+                                notFoundInARow++
+                                failedCount++
+                                if (notFoundInARow >= 5) {
+                                    uiState = UiState.RateLimited
+                                    return@launch
+                                }
+                                continue
                             }
-                            continue
+                            if (e is JSONException) { // no such song
+                                failedCount++
+                                continue
+                            }
+                        } finally {
+                            notFoundInARow = 0
                         }
-                        if (e is JSONException) { // no such song
+                        val lyricsResult: String
+                        try {
+                            lyricsResult = viewModel.getSyncedLyrics(queryResult?.songLink!!)
+                        } catch (e: FileNotFoundException) { // no lyrics
                             failedCount++
                             continue
                         }
-                    } finally {
-                        notFoundInARow = 0
+                        val lrc =
+                            "[ti:${queryResult.songName}]\n" + "[ar:${queryResult.artistName}]\n" + "[by:$generatedUsingString]\n" + lyricsResult
+                        val file = File(
+                            song.filePath!!.dropLast(4) + ".lrc"
+                        )
+                        file.writeText(lrc)
+                        successCount++
                     }
-                    val lyricsResult: String
-                    try {
-                        lyricsResult = viewModel.getSyncedLyrics(queryResult?.songLink!!)
-                    } catch (e: FileNotFoundException) { // no lyrics
-                        failedCount++
-                        continue
-                    }
-                    val lrc =
-                        "[ti:${queryResult.songName}]\n" + "[ar:${queryResult.artistName}]\n" + "[by:$generatedUsingString]\n" + lyricsResult
-                    val file = File(
-                        song.filePath!!.dropLast(4) + ".lrc"
-                    )
-                    file.writeText(lrc)
-                    successCount++
+                    uiState = UiState.Done
                 }
-                uiState = UiState.Done
             }
         }
 
@@ -622,7 +640,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
         }
 
         else -> {
-            // nothing
+            // nothing because we do not use the other states
         }
     }
 }

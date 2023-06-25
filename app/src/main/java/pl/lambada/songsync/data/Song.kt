@@ -25,17 +25,6 @@ data class Song(
     val fileName: String?
 )
 
-object SongSaver: Saver<Song, String> {
-    override fun restore(value: String): Song {
-        return Json.decodeFromString(value)
-    }
-
-    override fun SaverScope.save(value: Song): String {
-        return Json.encodeToString(value)
-    }
-
-}
-
 //Uri serializer
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(forClass = Uri::class)
@@ -49,4 +38,15 @@ object UriSerializer : KSerializer<Uri> {
     override fun deserialize(decoder: Decoder): Uri {
         return Uri.parse(decoder.decodeString())
     }
+}
+
+object SongSaver: Saver<Song, String> {
+    override fun restore(value: String): Song {
+        return Json.decodeFromString(value)
+    }
+
+    override fun SaverScope.save(value: Song): String {
+        return Json.encodeToString(value)
+    }
+
 }
