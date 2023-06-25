@@ -62,4 +62,7 @@
     <string name="bugs_or_suggestions_contact_us">Found a bug? Have a suggestion? Want to contribute? Feel free to contact me on my Telegram group.</string>
     <string name="telegram_group">Telegram group</string>
     <string name="create_issue">You can also create an issue on GitHub (link above).</string>
+    <string name="spotify_api">Spotify API</string>
+    <string name="source_code">Source code</string>
+    <string name="support">Support</string>
 </resources>

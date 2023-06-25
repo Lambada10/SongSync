@@ -47,7 +47,7 @@ fun AboutScreen(viewModel: MainViewModel) {
             }
         }
         item {
-            AboutCard("Spotify API") {
+            AboutCard(stringResource(R.string.spotify_api)) {
                 Column(
                     modifier = Modifier.padding(
                         start = 8.dp,
@@ -97,7 +97,7 @@ fun AboutScreen(viewModel: MainViewModel) {
             }
         }
         item {
-            AboutCard("Source code") {
+            AboutCard(stringResource(R.string.source_code)) {
                 Column(
                     modifier = Modifier.padding(
                         start = 8.dp,
@@ -150,8 +150,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                             } catch (e: NoSuchElementException) {
                                 // no github link
                             }
-                            if(github != "")
-                            Button(
+                            if (github != "") Button(
                                 modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
                                 onClick = {
                                     uriHandler.openUri(github)
@@ -165,7 +164,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                             } catch (e: NoSuchElementException) {
                                 // no telegram link
                             }
-                            if(telegram != "") {
+                            if (telegram != "") {
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Button(
                                     modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
@@ -182,7 +181,7 @@ fun AboutScreen(viewModel: MainViewModel) {
             }
         }
         item {
-            AboutCard(label = "Support") {
+            AboutCard(stringResource(R.string.support)) {
                 Column(
                     modifier = Modifier.padding(
                         start = 8.dp,
