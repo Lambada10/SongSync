@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SongSync</string>
+    <string name="app_name" translatable="false">SongSync</string>
     <string name="unreachable_state">Unreachable UI state</string>
     <string name="batch_download_lyrics">Batch download lyrics</string>
     <string name="get_lyrics">Get lyrics</string>
