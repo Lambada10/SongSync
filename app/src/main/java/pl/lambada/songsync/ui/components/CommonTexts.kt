@@ -1,4 +1,4 @@
-package pl.lambada.songsync.ui.common
+package pl.lambada.songsync.ui.components
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background

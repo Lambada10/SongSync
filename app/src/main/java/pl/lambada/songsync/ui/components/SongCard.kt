@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import pl.lambada.songsync.ui.common.MarqueeText
 
 @Composable
 fun SongCard(

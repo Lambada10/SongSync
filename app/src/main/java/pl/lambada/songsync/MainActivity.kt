@@ -24,8 +24,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.ui.Navigator
-import pl.lambada.songsync.ui.common.BottomBar
-import pl.lambada.songsync.ui.common.TopBar
+import pl.lambada.songsync.ui.components.BottomBar
+import pl.lambada.songsync.ui.components.TopBar
 import pl.lambada.songsync.ui.theme.SongSyncTheme
 import java.net.UnknownHostException
 

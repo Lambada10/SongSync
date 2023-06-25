@@ -61,7 +61,7 @@ import pl.lambada.songsync.data.Song
 import pl.lambada.songsync.data.SongInfo
 import pl.lambada.songsync.data.SongSaver
 import pl.lambada.songsync.data.ext.lowercaseWithLocale
-import pl.lambada.songsync.ui.common.MarqueeText
+import pl.lambada.songsync.ui.components.MarqueeText
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.UnknownHostException

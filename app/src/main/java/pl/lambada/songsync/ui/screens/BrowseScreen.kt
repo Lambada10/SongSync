@@ -38,7 +38,7 @@ import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.SongInfo
 import pl.lambada.songsync.data.SongInfoSaver
-import pl.lambada.songsync.ui.common.CommonTextField
+import pl.lambada.songsync.ui.components.CommonTextField
 import pl.lambada.songsync.ui.components.SongCard
 import java.io.File
 import java.io.FileNotFoundException

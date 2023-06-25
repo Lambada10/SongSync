@@ -1,4 +1,4 @@
-package pl.lambada.songsync.ui.common
+package pl.lambada.songsync.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
