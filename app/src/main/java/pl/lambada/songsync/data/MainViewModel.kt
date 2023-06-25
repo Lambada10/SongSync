@@ -17,7 +17,6 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.util.Locale
 
 class MainViewModel : ViewModel() {
     /*
@@ -252,9 +251,15 @@ class MainViewModel : ViewModel() {
             "github" to "https://github.com/Lambada10",
             "telegram" to "https://t.me/Lambada10"
         )
+        val bobbyESP = mapOf(
+            "name" to "BobbyESP",
+            "additionalInfo" to "Contributor",
+            "github" to "https://github.com/BobbyESP",
+        )
 
         return listOf(
-            lambada10
+            lambada10,
+            bobbyESP
         )
     }
 
