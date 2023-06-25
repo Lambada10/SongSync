@@ -1,7 +1,7 @@
 [versions]
 accompanist-coil = "0.15.0"
 accompanist-permissions = "0.31.3-beta"
-agp = "8.2.0-alpha08"
+agp = "8.2.0-alpha09"
 coil-compose = "2.1.0"
 json = "20230227"
 commons-text = "1.9"
