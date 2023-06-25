@@ -19,8 +19,8 @@ android {
         applicationId = "pl.lambada.songsync"
         minSdk = 30
         targetSdk = 33
-        versionCode = 11
-        versionName = "1.1"
+        versionCode = 12
+        versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
