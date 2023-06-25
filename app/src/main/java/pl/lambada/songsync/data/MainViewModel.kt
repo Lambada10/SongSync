@@ -6,10 +6,16 @@ import android.content.pm.PackageInfo
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
+import kotlinx.serialization.json.Json
 import org.apache.commons.text.similarity.LevenshteinDistance
-import org.json.JSONObject
 import pl.lambada.songsync.BuildConfig
+import pl.lambada.songsync.MainActivity.Companion.context
 import pl.lambada.songsync.R
+import pl.lambada.songsync.data.dto.AccessTokenResponse
+import pl.lambada.songsync.data.dto.Song
+import pl.lambada.songsync.data.dto.SongInfo
+import pl.lambada.songsync.data.dto.SyncedLinesResponse
+import pl.lambada.songsync.data.dto.TrackSearchResult
 import pl.lambada.songsync.data.ext.lowercaseWithLocale
 import pl.lambada.songsync.getStringById
 import java.io.BufferedReader
@@ -20,6 +26,11 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 class MainViewModel : ViewModel() {
+
+    val jsonDec = Json {
+        ignoreUnknownKeys = true
+    }
+
     /*
     Spotify API credentials, can be overwritten by user.
     If you want to build this app yourself, you need to create your own Spotify API credentials
@@ -34,8 +45,8 @@ class MainViewModel : ViewModel() {
     Used for storing responses, used in Alert Dialogs (show response)
     I won't refactor functions to return responses. So we have this instead.
      */
-    var spotifyResponse = ""
-    var lyricsResponse = ""
+    private var spotifyResponse = ""
+    private var lyricsResponse = ""
 
     /*
     Refreshes token by sending a request to Spotify API.
@@ -60,8 +71,8 @@ class MainViewModel : ViewModel() {
 
         connection.disconnect()
 
-        val json = JSONObject(response)
-        this.spotifyToken = json.getString("access_token")
+        val json = jsonDec.decodeFromString<AccessTokenResponse>(response)
+        this.spotifyToken = json.access_token
         this.tokenTime = System.currentTimeMillis()
     }
 
@@ -94,25 +105,19 @@ class MainViewModel : ViewModel() {
 
         this.spotifyResponse = response
 
-        val json = JSONObject(response)
-        val track = json.getJSONObject("tracks").getJSONArray("items").getJSONObject(0)
+        val json = jsonDec.decodeFromString<TrackSearchResult>(response)
+        val track = json.tracks.items[0]
 
-        val artistsArray = track.getJSONArray("artists")
-        val artists = StringBuilder()
-        for (i in 0 until artistsArray.length()) {
-            val currentArtist = artistsArray.getJSONObject(i)
-            artists.append(currentArtist.getString("name")).append(",")
-        }
+        val artists = track.artists.joinToString(", ") { it.name }
 
-        val albumArtURL =
-            track.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url")
+        val albumArtURL = track.album.images[0].url
 
-        val spotifyURL: String = track.getJSONObject("external_urls").getString("spotify")
+        val spotifyURL: String = track.externalUrls.spotify
 
 
         return SongInfo(
-            track.getString("name"),
-            artists.toString().dropLast(1),
+            track.name,
+            artists,
             spotifyURL,
             albumArtURL
         )
@@ -146,17 +151,15 @@ class MainViewModel : ViewModel() {
 
         this.lyricsResponse = response
 
-        val json = JSONObject(response)
+        val json = jsonDec.decodeFromString<SyncedLinesResponse>(response)
 
-        if (json.getBoolean("error"))
-            return "No lyrics found."
+        if (json.error) return context.getString(R.string.lyrics_not_found)
 
-        val lines = json.getJSONArray("lines")
+        val lines = json.lines
         val syncedLyrics = StringBuilder()
-        for (i in 0 until lines.length()) {
-            val currentLine = lines.getJSONObject(i)
-            syncedLyrics.append("[${currentLine.getString("timeTag")}").append("]")
-                .append(currentLine.getString("words")).append("\n")
+
+        for (line in lines) {
+            syncedLyrics.append("[${line.timeTag}]${line.words}\n")
         }
 
         return syncedLyrics.toString()
