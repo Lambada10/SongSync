@@ -466,7 +466,6 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
 
 @Composable
 fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () -> Unit) {
-    val scope = rememberCoroutineScope()
     val unknownString = stringResource(id = R.string.unknown)
     val generatedUsingString = stringResource(id = R.string.generated_using)
 
@@ -552,7 +551,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
             var downloadJob by remember { mutableStateOf<Job?>(null) } //We are gonna use this to be able to cancel the job
 
             LaunchedEffect(true) {
-                downloadJob = scope.launch(Dispatchers.IO) {
+                downloadJob = launch(Dispatchers.IO) {
                     for (song in songs) {
                         if (uiState == UiState.Cancelled) {
                             downloadJob?.cancel()

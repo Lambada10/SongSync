@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,6 +32,8 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.SongInfo
@@ -43,6 +46,9 @@ import java.net.UnknownHostException
 
 @Composable
 fun BrowseScreen(viewModel: MainViewModel) {
+
+    val scope= rememberCoroutineScope()
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -96,7 +102,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                         val query = SongInfo(
                             songName = querySong, artistName = queryArtist
                         )
-                        Thread {
+                        scope.launch(Dispatchers.IO) {
                             queryStatus = QueryStatus.Pending
                             try {
                                 queryResult = viewModel.getSongInfo(query, offset)
@@ -113,7 +119,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                     }
                                 }
                             }
-                        }.start()
+                        }
                     }) {
                         Text(text = stringResource(id = R.string.get_lyrics))
                     }
@@ -145,7 +151,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                 val query = SongInfo(
                                     songName = querySong, artistName = queryArtist
                                 )
-                                Thread {
+                                scope.launch(Dispatchers.IO) {
                                     queryStatus = QueryStatus.Pending
                                     try {
                                         queryResult = viewModel.getSongInfo(query, offset)
@@ -154,7 +160,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                         queryStatus = QueryStatus.Failed
                                         failReason = e.toString()
                                     }
-                                }.start()
+                                }
                             }) {
                             Text(text = stringResource(id = R.string.try_again))
                         }
@@ -169,7 +175,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                     var lyricSuccess by rememberSaveable { mutableStateOf(LyricsStatus.NotSubmitted) }
 
                     LaunchedEffect(true) {
-                        Thread {
+                        launch(Dispatchers.IO) {
                             try {
                                 if (queryResult.songLink == null) throw Exception("Song link is empty")
                                 if (lyricsResult == "") lyricsResult =
@@ -182,7 +188,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                     lyricsResult = context.getString(R.string.lyrics_not_found)
                                 }
                             }
-                        }.start()
+                        }
                     }
 
                     when (lyricSuccess) {
