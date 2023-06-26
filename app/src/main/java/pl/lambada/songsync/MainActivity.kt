@@ -1,5 +1,7 @@
 package pl.lambada.songsync
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
@@ -18,11 +20,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.ui.Navigator
 import pl.lambada.songsync.ui.components.BottomBar
 import pl.lambada.songsync.ui.components.TopBar
+import pl.lambada.songsync.ui.components.dialogs.NoInternetDialog
 import pl.lambada.songsync.ui.theme.SongSyncTheme
 import java.net.UnknownHostException
 
@@ -38,6 +44,7 @@ class MainActivity : ComponentActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        context = applicationContext
         setContent {
             val viewModel = MainViewModel()
             val navController = rememberNavController()
@@ -47,13 +54,13 @@ class MainActivity : ComponentActivity() {
 
             // Get token upon app start
             LaunchedEffect(true) {
-                Thread {
+                launch(Dispatchers.IO) {
                     try {
                         viewModel.refreshToken()
                     } catch (e: UnknownHostException) {
                         internetConnection = false
                     }
-                }.start()
+                }
             }
 
             // Request permissions and wait with check
@@ -94,38 +101,21 @@ class MainActivity : ComponentActivity() {
                                             finishAndRemoveTask()
                                         }
                                     ) {
-                                        Text("Close app")
+                                        Text(stringResource(R.string.close_app))
                                     }
                                 },
-                                title = { Text("Permission denied") },
+                                title = { Text(stringResource(R.string.permission_denied)) },
                                 text = {
                                     Column {
-                                        Text("This app requires storage access for scanning your music library and saving lyrics.")
-                                        Text("Already granted? Try restarting the app.")
+                                        Text(stringResource(R.string.requires_higher_storage_permissions))
+                                        Text(stringResource(R.string.already_granted_restart))
                                     }
                                 }
                             )
                         } else if (!internetConnection) {
-                            AlertDialog(
-                                onDismissRequest = { /* don't dismiss */ },
-                                confirmButton = {
-                                    Button(
-                                        onClick = {
-                                            finishAndRemoveTask()
-                                        }
-                                    ) {
-                                        Text("Close app")
-                                    }
-                                },
-                                title = { Text("No internet connection") },
-                                text = {
-                                    Column {
-                                        Text("You need internet connection to use this app.")
-                                        Text("Please check your connection and try again.")
-                                        Text("If you are connected, Spotify might be down. Please try again later.")
-                                    }
-                                }
-                            )
+                            NoInternetDialog {
+                                finishAndRemoveTask()
+                            }
                         } else {
                             Navigator(navController = navController, viewModel = viewModel)
                         }
@@ -134,4 +124,15 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    companion object {
+        const val TAG = "MainActivity"
+
+        @SuppressLint("StaticFieldLeak")
+        lateinit var context: Context
+    }
+}
+
+fun getStringById(id: Int): String {
+    return MainActivity.context.getString(id)
 }

@@ -36,8 +36,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
-import pl.lambada.songsync.data.SongInfo
-import pl.lambada.songsync.data.SongInfoSaver
+import pl.lambada.songsync.data.dto.SongInfo
+import pl.lambada.songsync.data.dto.SongInfoSaver
 import pl.lambada.songsync.ui.components.CommonTextField
 import pl.lambada.songsync.ui.components.SongCard
 import java.io.File
@@ -93,14 +93,14 @@ fun BrowseScreen(viewModel: MainViewModel) {
                     CommonTextField(
                         value = querySong,
                         onValueChange = { querySong = it.toString() },
-                        label = "Song name",
+                        label = stringResource(id = R.string.song_name_no_args),
                         imeAction = ImeAction.Next
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     CommonTextField(
                         value = queryArtist,
                         onValueChange = { queryArtist = it.toString() },
-                        label = "Artist name"
+                        label = stringResource(R.string.artist_name_no_args)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = {

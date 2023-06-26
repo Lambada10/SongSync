@@ -6,8 +6,17 @@ import android.content.pm.PackageInfo
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
-import org.json.JSONObject
+import kotlinx.serialization.json.Json
 import pl.lambada.songsync.BuildConfig
+import pl.lambada.songsync.MainActivity.Companion.context
+import pl.lambada.songsync.R
+import pl.lambada.songsync.data.dto.AccessTokenResponse
+import pl.lambada.songsync.data.dto.Song
+import pl.lambada.songsync.data.dto.SongInfo
+import pl.lambada.songsync.data.dto.SyncedLinesResponse
+import pl.lambada.songsync.data.dto.TrackSearchResult
+import pl.lambada.songsync.data.ext.lowercaseWithLocale
+import pl.lambada.songsync.getStringById
 import java.io.BufferedReader
 import java.io.File
 import java.net.HttpURLConnection
@@ -19,6 +28,11 @@ import java.nio.charset.StandardCharsets
  * ViewModel class for the main functionality of the app.
  */
 class MainViewModel : ViewModel() {
+
+    val jsonDec = Json {
+        ignoreUnknownKeys = true
+    }
+
     // Spotify API credentials
     private var spotifyClientID = BuildConfig.SPOTIFY_CLIENT_ID
     private var spotifyClientSecret = BuildConfig.SPOTIFY_CLIENT_SECRET
@@ -52,9 +66,9 @@ class MainViewModel : ViewModel() {
 
         connection.disconnect()
 
-        val json = JSONObject(response)
-        spotifyToken = json.getString("access_token")
-        tokenTime = System.currentTimeMillis()
+        val json = jsonDec.decodeFromString<AccessTokenResponse>(response)
+        this.spotifyToken = json.accessToken
+        this.tokenTime = System.currentTimeMillis()
     }
 
     /**
@@ -85,24 +99,18 @@ class MainViewModel : ViewModel() {
 
         spotifyResponse = response
 
-        val json = JSONObject(response)
-        val track = json.getJSONObject("tracks").getJSONArray("items").getJSONObject(0)
+        val json = jsonDec.decodeFromString<TrackSearchResult>(response)
+        val track = json.tracks.items[0]
 
-        val artistsArray = track.getJSONArray("artists")
-        val artists = StringBuilder()
-        for (i in 0 until artistsArray.length()) {
-            val currentArtist = artistsArray.getJSONObject(i)
-            artists.append(currentArtist.getString("name")).append(",")
-        }
+        val artists = track.artists.joinToString(", ") { it.name }
 
-        val albumArtURL =
-            track.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url")
+        val albumArtURL = track.album.images[0].url
 
-        val spotifyURL: String = track.getJSONObject("external_urls").getString("spotify")
+        val spotifyURL: String = track.externalUrls.spotify
 
         return SongInfo(
-            track.getString("name"),
-            artists.toString().dropLast(1),
+            track.name,
+            artists,
             spotifyURL,
             albumArtURL
         )
@@ -124,18 +132,18 @@ class MainViewModel : ViewModel() {
 
         lyricsResponse = response
 
-        val json = JSONObject(response)
+        val json = jsonDec.decodeFromString<SyncedLinesResponse>(response)
 
-        if (json.getBoolean("error")) {
-            return "No lyrics found."
-        }
 
-        val lines = json.getJSONArray("lines")
+        if (json.error)
+            return context.getString(R.string.lyrics_not_found)
+
+
+        val lines = json.lines
         val syncedLyrics = StringBuilder()
-        for (i in 0 until lines.length()) {
-            val currentLine = lines.getJSONObject(i)
-            syncedLyrics.append("[${currentLine.getString("timeTag")}").append("]")
-                .append(currentLine.getString("words")).append("\n")
+
+        for (line in lines) {
+            syncedLyrics.append("[${line.timeTag}]${line.words}\n")
         }
 
         return syncedLyrics.toString()
@@ -197,22 +205,22 @@ class MainViewModel : ViewModel() {
      * Retrieves information about the contributors to the app.
      * @return A list of maps containing the contributors' information.
      */
-    fun getContributorsInfo(): List<Map<String, String>> {
+    fun getContributorsInfo(): List<Map<ContributorsArgs, String>> {
         val lambada10 = mapOf(
-            "name" to "Lambada10",
-            "additionalInfo" to "Lead developer",
-            "github" to "https://github.com/Lambada10",
-            "telegram" to "https://t.me/Lambada10"
+            ContributorsArgs.NAME to "Lambada10",
+            ContributorsArgs.ADDITIONAL_INFO to ContributionLevel.LEAD_DEVELOPER.toString(),
+            ContributorsArgs.GITHUB to "https://github.com/Lambada10",
+            ContributorsArgs.TELEGRAM to "https://t.me/Lambada10"
         )
         val bobbyESP = mapOf(
-            "name" to "BobbyESP",
-            "additionalInfo" to "Contributor",
-            "github" to "https://github.com/BobbyESP",
+            ContributorsArgs.NAME to "BobbyESP",
+            ContributorsArgs.ADDITIONAL_INFO to ContributionLevel.CONTRIBUTOR.toString(),
+            ContributorsArgs.GITHUB to "https://github.com/BobbyESP",
         )
         val akane = mapOf(
-            "name" to "AkaneTan",
-            "additionalInfo" to "Contributor",
-            "github" to "https://github.com/AkaneTan",
+            ContributorsArgs.NAME to "AkaneTan",
+            ContributorsArgs.ADDITIONAL_INFO to ContributionLevel.CONTRIBUTOR.toString(),
+            ContributorsArgs.GITHUB to "https://github.com/AkaneTan",
         )
 
         return listOf(
@@ -231,5 +239,56 @@ class MainViewModel : ViewModel() {
     fun getVersion(context: Context): String {
         val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
         return pInfo.versionName
+    }
+}
+
+/**
+ * Defines the contribution level of a contributor.
+ */
+enum class ContributionLevel {
+    CONTRIBUTOR,
+    DEVELOPER,
+    LEAD_DEVELOPER;
+
+    /**
+     * Overrides the toString method to return the translatable string representation of the contribution level.
+     * @return The translatable string representation of the contribution level.
+     */
+    override fun toString(): String {
+        return when (this) {
+            CONTRIBUTOR -> getStringById(R.string.contributor)
+            DEVELOPER -> getStringById(R.string.developer)
+            LEAD_DEVELOPER -> getStringById(R.string.lead_developer)
+        }
+    }
+
+    companion object {
+        fun fromString(string: String): ContributionLevel {
+            return when (string) {
+                getStringById(R.string.contributor) -> CONTRIBUTOR
+                getStringById(R.string.developer) -> DEVELOPER
+                getStringById(R.string.lead_developer) -> LEAD_DEVELOPER
+                else -> throw IllegalArgumentException("Invalid contribution level.")
+            }
+        }
+    }
+}
+
+/**
+ * Defines the arguments for the contributors' information.
+ */
+enum class ContributorsArgs {
+    NAME,
+    ADDITIONAL_INFO,
+    GITHUB,
+    TELEGRAM;
+
+    override fun toString(): String {
+        return when (this) {
+            NAME -> "name"
+            ADDITIONAL_INFO -> "additionalInfo"
+            GITHUB -> "github"
+            TELEGRAM -> "telegram"
+        }
     }
 }
