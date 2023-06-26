@@ -50,7 +50,13 @@ fun BottomBar(navController: NavController) {
             NavigationBarItem(
                 selected = currentRoute == screen.name,
                 onClick = {
-                    if (currentRoute != screen.name) navController.navigate(screen.name)
+                    if (currentRoute != screen.name) {
+                        if (screen == Screens.Home) {
+                            navController.popBackStack(navController.graph.startDestinationId, false)
+                        } else {
+                            navController.navigate(screen.name)
+                        }
+                    }
                 },
                 icon = {
                     val isSelected = currentRoute == screen.name
