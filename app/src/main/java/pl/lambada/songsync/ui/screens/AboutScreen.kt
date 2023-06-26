@@ -19,6 +19,11 @@ import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.ui.components.AboutCard
 
+/**
+ * Composable function for AboutScreen component.
+ *
+ * @param viewModel the [MainViewModel] instance.
+ */
 @Composable
 fun AboutScreen(viewModel: MainViewModel) {
     val uriHandler = LocalUriHandler.current
