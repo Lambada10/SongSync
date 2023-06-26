@@ -1,4 +1,4 @@
-package pl.lambada.songsync.data
+package pl.lambada.songsync.data.dto
 
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.SaverScope

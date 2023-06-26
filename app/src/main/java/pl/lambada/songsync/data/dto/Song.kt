@@ -1,4 +1,4 @@
-package pl.lambada.songsync.data
+package pl.lambada.songsync.data.dto
 
 import android.net.Uri
 import androidx.compose.runtime.saveable.Saver
