@@ -167,14 +167,12 @@ class MainViewModel : ViewModel() {
         )
 
         cursor?.use {
-            val idColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
             val titleColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
             val artistColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
             val albumIdColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
             val pathColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
 
             while (it.moveToNext()) {
-                val id = it.getLong(idColumn)
                 val title = it.getString(titleColumn)
                 val artist = it.getString(artistColumn)
                 val albumId = it.getLong(albumIdColumn)
@@ -186,10 +184,7 @@ class MainViewModel : ViewModel() {
                     albumId
                 )
 
-                val file = File(filePath)
-                val fileName = file.name
-
-                val song = Song(id, title, artist, imgUri, filePath, fileName)
+                val song = Song(title, artist, imgUri, filePath)
                 songs.add(song)
             }
         }

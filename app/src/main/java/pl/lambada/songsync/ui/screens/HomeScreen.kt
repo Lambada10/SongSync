@@ -33,6 +33,7 @@ import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.Song
 import pl.lambada.songsync.data.SongInfo
+import pl.lambada.songsync.data.SongListSaver
 import pl.lambada.songsync.data.SongSaver
 import pl.lambada.songsync.data.ext.lowercaseWithLocale
 import pl.lambada.songsync.ui.components.MarqueeText
@@ -50,7 +51,10 @@ import kotlin.math.roundToInt
 fun HomeScreen(viewModel: MainViewModel) {
     var uiState by rememberSaveable { mutableStateOf(UiState.Loading) }
     val context = LocalContext.current
-    var songs: List<Song> by remember { mutableStateOf(emptyList()) }
+    var songs by rememberSaveable(
+        stateSaver = SongListSaver,
+        init = { mutableStateOf(emptyList()) }
+    )
 
     when (uiState) {
         UiState.Loading -> {
@@ -60,7 +64,10 @@ fun HomeScreen(viewModel: MainViewModel) {
             })
         }
 
-        UiState.Loaded -> HomeScreenLoaded(viewModel = viewModel, songs = songs)
+        UiState.Loaded -> HomeScreenLoaded(
+            viewModel = viewModel,
+            songs = songs
+        )
 
         else -> {
             Text(text = stringResource(id = R.string.unreachable_state))
