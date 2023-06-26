@@ -214,10 +214,16 @@ class MainViewModel : ViewModel() {
             "additionalInfo" to "Contributor",
             "github" to "https://github.com/BobbyESP",
         )
+        val akane = mapOf(
+            "name" to "AkaneTan",
+            "additionalInfo" to "Contributor",
+            "github" to "https://github.com/AkaneTan",
+        )
 
         return listOf(
             lambada10,
-            bobbyESP
+            bobbyESP,
+            akane
         )
     }
 
