@@ -6,38 +6,31 @@ import android.content.pm.PackageInfo
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
-import org.apache.commons.text.similarity.LevenshteinDistance
 import org.json.JSONObject
 import pl.lambada.songsync.BuildConfig
-import pl.lambada.songsync.data.ext.lowercaseWithLocale
 import java.io.BufferedReader
 import java.io.File
-import java.io.FileNotFoundException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
+/**
+ * ViewModel class for the main functionality of the app.
+ */
 class MainViewModel : ViewModel() {
-    /*
-    Spotify API credentials, can be overwritten by user.
-    If you want to build this app yourself, you need to create your own Spotify API credentials
-    and put them in your local gradle.properties file.
-     */
+    // Spotify API credentials
     private var spotifyClientID = BuildConfig.SPOTIFY_CLIENT_ID
     private var spotifyClientSecret = BuildConfig.SPOTIFY_CLIENT_SECRET
     private var spotifyToken = ""
     private var tokenTime: Long = 0
 
-    /*
-    Used for storing responses, used in Alert Dialogs (show response)
-    I won't refactor functions to return responses. So we have this instead.
-     */
-    var spotifyResponse = ""
-    var lyricsResponse = ""
+    // Responses from Spotify and lyrics API
+    private var spotifyResponse = ""
+    private var lyricsResponse = ""
 
-    /*
-    Refreshes token by sending a request to Spotify API.
+    /**
+     * Refreshes the access token by sending a request to the Spotify API.
      */
     fun refreshToken() {
         val url = URL("https://accounts.spotify.com/api/token")
@@ -60,19 +53,18 @@ class MainViewModel : ViewModel() {
         connection.disconnect()
 
         val json = JSONObject(response)
-        this.spotifyToken = json.getString("access_token")
-        this.tokenTime = System.currentTimeMillis()
+        spotifyToken = json.getString("access_token")
+        tokenTime = System.currentTimeMillis()
     }
 
-    /*
-    Gets song info from Spotify API.
-    Parameters:
-        * SongInfo object, with songName and artistName fields filled
-        * offset (optional), used for trying to find a better match/searching again
+    /**
+     * Gets song information from the Spotify API.
+     * @param query The SongInfo object with songName and artistName fields filled.
+     * @param offset (optional) The offset used for trying to find a better match or searching again.
+     * @return The SongInfo object containing the song information.
      */
     fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
-
-        if (System.currentTimeMillis() - this.tokenTime > 1800000) { // 30 minutes
+        if (System.currentTimeMillis() - tokenTime > 1800000) { // 30 minutes
             refreshToken()
         }
 
@@ -91,7 +83,7 @@ class MainViewModel : ViewModel() {
 
         connection.disconnect()
 
-        this.spotifyResponse = response
+        spotifyResponse = response
 
         val json = JSONObject(response)
         val track = json.getJSONObject("tracks").getJSONArray("items").getJSONObject(0)
@@ -108,7 +100,6 @@ class MainViewModel : ViewModel() {
 
         val spotifyURL: String = track.getJSONObject("external_urls").getString("spotify")
 
-
         return SongInfo(
             track.getString("name"),
             artists.toString().dropLast(1),
@@ -117,22 +108,10 @@ class MainViewModel : ViewModel() {
         )
     }
 
-    /*
-    Calculates similarity between two strings.
-    Used for comparing query and search results to eliminate false positives.
-     */
-    fun calculateStringSimilarity(string1: String, string2: String): Double {
-        val levenshteinDistance = LevenshteinDistance()
-        val distance = levenshteinDistance.apply(
-            string1.lowercaseWithLocale(),
-            string2.lowercaseWithLocale()
-        )
-        val maxLength = maxOf(string1.length, string2.length)
-        return ((1 - distance.toDouble() / maxLength) * 10000).toInt().toDouble() / 100
-    }
-
-    /*
-    Gets synced lyrics using song link, and returns them as a string (formatted as LRC file).
+    /**
+     * Gets synced lyrics using the song link and returns them as a string formatted as an LRC file.
+     * @param songLink The link to the song.
+     * @return The synced lyrics as a string.
      */
     fun getSyncedLyrics(songLink: String): String {
         val url = URL("https://spotify-lyric-api.herokuapp.com/?url=$songLink&format=lrc")
@@ -143,12 +122,13 @@ class MainViewModel : ViewModel() {
 
         connection.disconnect()
 
-        this.lyricsResponse = response
+        lyricsResponse = response
 
         val json = JSONObject(response)
 
-        if (json.getBoolean("error"))
+        if (json.getBoolean("error")) {
             return "No lyrics found."
+        }
 
         val lines = json.getJSONArray("lines")
         val syncedLyrics = StringBuilder()
@@ -161,8 +141,10 @@ class MainViewModel : ViewModel() {
         return syncedLyrics.toString()
     }
 
-    /*
-    Loads songs from MediaStore.
+    /**
+     * Loads all songs from the MediaStore.
+     * @param context The application context.
+     * @return A list of Song objects representing the songs.
      */
     fun getAllSongs(context: Context): List<Song> {
         val selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
@@ -216,12 +198,9 @@ class MainViewModel : ViewModel() {
         return songs
     }
 
-    /*
-    Contributors info:
-        - name
-        - additional info (optional)
-        - github link (optional but you probably have one)
-        - telegram link (optional)
+    /**
+     * Retrieves information about the contributors to the app.
+     * @return A list of maps containing the contributors' information.
      */
     fun getContributorsInfo(): List<Map<String, String>> {
         val lambada10 = mapOf(
@@ -242,9 +221,12 @@ class MainViewModel : ViewModel() {
         )
     }
 
-    /*
-    Get app version.
+    /**
+     * Gets the version of the app.
+     * @param context The application context.
+     * @return The version name of the app.
      */
+    @Suppress("DEPRECATION")
     fun getVersion(context: Context): String {
         val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
         return pInfo.versionName

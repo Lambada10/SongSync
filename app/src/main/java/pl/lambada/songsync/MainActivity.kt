@@ -14,11 +14,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
@@ -29,7 +26,16 @@ import pl.lambada.songsync.ui.components.TopBar
 import pl.lambada.songsync.ui.theme.SongSyncTheme
 import java.net.UnknownHostException
 
+/**
+ * The main activity of the SongSync app.
+ */
 class MainActivity : ComponentActivity() {
+
+    /**
+     * Called when the activity is starting.
+     *
+     * @param savedInstanceState The saved instance state.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -68,13 +74,16 @@ class MainActivity : ComponentActivity() {
             SongSyncTheme {
                 Scaffold(
                     topBar = {
-                        TopBar(navController = navController) },
+                        TopBar(navController = navController)
+                    },
                     bottomBar = {
-                        BottomBar(navController = navController) }
-                ) {paddingValues ->
-                    Surface(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
+                        BottomBar(navController = navController)
+                    }
+                ) { paddingValues ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
                     ) {
                         if (!hasPermissions) {
                             AlertDialog(
@@ -96,8 +105,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             )
-                        }
-                        else if (!internetConnection) {
+                        } else if (!internetConnection) {
                             AlertDialog(
                                 onDismissRequest = { /* don't dismiss */ },
                                 confirmButton = {
@@ -118,8 +126,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             )
-                        }
-                        else {
+                        } else {
                             Navigator(navController = navController, viewModel = viewModel)
                         }
                     }

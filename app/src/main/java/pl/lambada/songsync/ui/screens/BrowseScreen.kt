@@ -44,6 +44,11 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.net.UnknownHostException
 
+/**
+ * Composable function for BrowseScreen component.
+ *
+ * @param viewModel the [MainViewModel] instance.
+ */
 @Composable
 fun BrowseScreen(viewModel: MainViewModel) {
 

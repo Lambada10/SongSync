@@ -15,17 +15,28 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 
+/**
+ * Data class for representing a song.
+ * @param id The ID of the song.
+ * @param title The title of the song.
+ * @param artist The artist of the song.
+ * @param imgUri The URI of the image.
+ * @param filePath The file path of the song.
+ * @param fileName The file name of the song.
+ */
 @Serializable
 data class Song(
     val id: Long?,
     val title: String? = "Unknown",
     val artist: String? = "Unknown",
-    @Serializable(UriSerializer::class) val imgUri: Uri?,
+    @Serializable(with = UriSerializer::class) val imgUri: Uri?,
     val filePath: String?,
     val fileName: String?
 )
 
-//Uri serializer
+/**
+ * Serializer for Uri.
+ */
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(forClass = Uri::class)
 object UriSerializer : KSerializer<Uri> {
@@ -40,7 +51,11 @@ object UriSerializer : KSerializer<Uri> {
     }
 }
 
-object SongSaver: Saver<Song, String> {
+/**
+ * Saver for Song.
+ * Used for saving song info with rememberSaveable.
+ */
+object SongSaver : Saver<Song, String> {
     override fun restore(value: String): Song {
         return Json.decodeFromString(value)
     }
@@ -48,5 +63,4 @@ object SongSaver: Saver<Song, String> {
     override fun SaverScope.save(value: Song): String {
         return Json.encodeToString(value)
     }
-
 }
