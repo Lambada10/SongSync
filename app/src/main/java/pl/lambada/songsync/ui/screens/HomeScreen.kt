@@ -337,6 +337,7 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                                 } catch (e: Exception) {
                                     if (e is FileNotFoundException) {
                                         lyricsResult = noLyricsString
+                                        queryStatus = QueryStatus.LyricsFailed
                                     } else {
                                         failReason = e.toString()
                                         queryStatus = QueryStatus.LyricsFailed
