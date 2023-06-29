@@ -30,6 +30,7 @@ import pl.lambada.songsync.ui.components.BottomBar
 import pl.lambada.songsync.ui.components.TopBar
 import pl.lambada.songsync.ui.components.dialogs.NoInternetDialog
 import pl.lambada.songsync.ui.theme.SongSyncTheme
+import java.io.FileNotFoundException
 import java.net.UnknownHostException
 
 /**
@@ -57,8 +58,11 @@ class MainActivity : ComponentActivity() {
                 launch(Dispatchers.IO) {
                     try {
                         viewModel.refreshToken()
-                    } catch (e: UnknownHostException) {
-                        internetConnection = false
+                    } catch (e: Exception) {
+                        if (e is UnknownHostException || e is FileNotFoundException)
+                            internetConnection = false
+                        else
+                            throw e
                     }
                 }
             }
