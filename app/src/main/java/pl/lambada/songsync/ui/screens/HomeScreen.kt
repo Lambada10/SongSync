@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,9 +18,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -407,25 +410,46 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                         queryStatus = QueryStatus.Cancelled
                     },
                     confirmButton = {
-                        Button(onClick = {
-                            val lrc =
-                                "[ti:${queryResult.songName}]\n" +
-                                        "[ar:${queryResult.artistName}]\n" +
-                                        "[by:${context.getString(R.string.generated_using)}]\n" +
-                                        lyricsResult
+                        Row {
+                            val clipboardManager = LocalClipboardManager.current
+                            val copiedString = stringResource(R.string.lyrics_copied_to_clipboard)
+                            OutlinedButton(
+                                onClick = {
+                                    clipboardManager.setText(AnnotatedString(lyricsResult))
+                                    Toast.makeText(
+                                        context,
+                                        copiedString,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    queryStatus = QueryStatus.Cancelled
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ContentCopy,
+                                    contentDescription = "Copy lyrics to clipboard"
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(onClick = {
+                                val lrc =
+                                    "[ti:${queryResult.songName}]\n" +
+                                            "[ar:${queryResult.artistName}]\n" +
+                                            "[by:${context.getString(R.string.generated_using)}]\n" +
+                                            lyricsResult
 
-                            val file = File(song.filePath?.dropLast(4) + ".lrc")
-                            file.writeText(lrc)
+                                val file = File(song.filePath?.dropLast(4) + ".lrc")
+                                file.writeText(lrc)
 
-                            Toast.makeText(
-                                context,
-                                "${context.getString(R.string.lyrics_saved_to)} ${file.path}",
-                                Toast.LENGTH_LONG
-                            ).show()
+                                Toast.makeText(
+                                    context,
+                                    "${context.getString(R.string.lyrics_saved_to)} ${file.path}",
+                                    Toast.LENGTH_LONG
+                                ).show()
 
-                            queryStatus = QueryStatus.Cancelled
-                        }) {
-                            Text(text = stringResource(R.string.save_lyrics))
+                                queryStatus = QueryStatus.Cancelled
+                            }) {
+                                Text(text = stringResource(R.string.save_lyrics))
+                            }
                         }
                     },
                     dismissButton = {
