@@ -146,7 +146,7 @@ class MainViewModel : ViewModel() {
             syncedLyrics.append("[${line.timeTag}]${line.words}\n")
         }
 
-        return syncedLyrics.toString()
+        return syncedLyrics.toString().dropLast(1)
     }
 
     /**
