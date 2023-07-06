@@ -81,4 +81,5 @@
     <string name="about">About</string>
     <string name="song_name_no_args">Song name</string>
     <string name="artist_name_no_args">Artist name</string>
+    <string name="lyrics_copied_to_clipboard">Lyrics copied to clipboard</string>
 </resources>
