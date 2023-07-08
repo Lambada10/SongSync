@@ -34,10 +34,8 @@ import kotlinx.coroutines.launch
 import org.json.JSONException
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
-import pl.lambada.songsync.data.dto.SongListSaver
 import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.data.dto.SongInfo
-import pl.lambada.songsync.data.dto.SongSaver
 import pl.lambada.songsync.data.ext.lowercaseWithLocale
 import pl.lambada.songsync.ui.components.MarqueeText
 import java.io.File
@@ -52,12 +50,9 @@ import kotlin.math.roundToInt
  */
 @Composable
 fun HomeScreen(viewModel: MainViewModel) {
-    var uiState by rememberSaveable { mutableStateOf(UiState.Loading) }
+    var uiState by remember { mutableStateOf(UiState.Loading) }
     val context = LocalContext.current
-    var songs by rememberSaveable(
-        stateSaver = SongListSaver,
-        init = { mutableStateOf(emptyList()) }
-    )
+    var songs by remember { mutableStateOf(emptyList<Song>()) }
 
     when (uiState) {
         UiState.Loading -> {
@@ -130,7 +125,7 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
                     IconButton(onClick = { showSearch = !showSearch }) {
                         Icon(
                             imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
+                            contentDescription = stringResource(R.string.search),
                         )
                     }
                 }
@@ -156,7 +151,7 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Search,
-                                contentDescription = "Search",
+                                contentDescription = stringResource(id = R.string.search),
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -212,34 +207,30 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
             imageLoader = LocalContext.current.imageLoader
         )
 
-        val savedSong by rememberSaveable(stateSaver = SongSaver) {
-            mutableStateOf(song)
-        }
-
         Row(modifier = Modifier.height(72.dp)) {
             Image(
                 painter = painter,
-                contentDescription = "Album cover",
+                contentDescription = stringResource(id = R.string.album_cover),
                 modifier = Modifier
                     .height(72.dp)
                     .aspectRatio(1f),
             )
             Spacer(modifier = Modifier.width(2.dp))
             Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.Top) {
-                MarqueeText(text = savedSong.title ?: unknownString, fontSize = 18.sp)
+                MarqueeText(text = song.title ?: unknownString, fontSize = 18.sp)
                 Spacer(modifier = Modifier.weight(1f))
-                MarqueeText(text = savedSong.artist ?: unknownString, fontSize = 14.sp)
+                MarqueeText(text = song.artist ?: unknownString, fontSize = 14.sp)
             }
         }
     }
 
     if (fetch) {
         var queryStatus by rememberSaveable { mutableStateOf(QueryStatus.NotSubmitted) }
-        val query = SongInfo(songName = song.title ?: "", artistName = song.artist ?: "")
+        val query = SongInfo(songName = song.title, artistName = song.artist)
         var offset by rememberSaveable { mutableIntStateOf(0) }
-        var queryResult by remember { mutableStateOf(SongInfo()) }
-        var failReason by rememberSaveable { mutableStateOf("") }
-        var lyricsResult by rememberSaveable { mutableStateOf("") }
+        var queryResult: SongInfo? by remember { mutableStateOf(null) }
+        var failReason: String? by rememberSaveable { mutableStateOf(null) }
+        var lyricsResult: String? by rememberSaveable { mutableStateOf(null) }
 
         when (queryStatus) {
             QueryStatus.Cancelled -> {
@@ -313,17 +304,14 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
             }
 
             QueryStatus.Success -> {
-                val songNameResult by rememberSaveable { mutableStateOf(queryResult.songName) }
-                val artistNameResult by rememberSaveable { mutableStateOf(queryResult.artistName) }
-
                 AlertDialog(
                     title = {
                         Text(text = stringResource(R.string.song_info_fetched))
                     },
                     text = {
                         Column {
-                            Text(text = stringResource(R.string.song_name, songNameResult ?: unknownString))
-                            Text(text = stringResource(R.string.artist_name, artistNameResult ?: unknownString))
+                            Text(text = stringResource(R.string.song_name, queryResult?.songName ?: unknownString))
+                            Text(text = stringResource(R.string.artist_name, queryResult?.artistName ?: unknownString))
                             Text(text = stringResource(R.string.is_that_correct))
                         }
                     },
@@ -335,7 +323,7 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                             scope.launch(Dispatchers.Default) {
                                 queryStatus = QueryStatus.LyricsPending
                                 try {
-                                    lyricsResult = viewModel.getSyncedLyrics(queryResult.songLink.toString())
+                                    lyricsResult = viewModel.getSyncedLyrics(queryResult!!.songLink!!)
                                     queryStatus = QueryStatus.LyricsSuccess
                                 } catch (e: Exception) {
                                     if (e is FileNotFoundException) {
@@ -380,8 +368,8 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                         Text(
                             text = stringResource(
                                 R.string.fetching_lyrics_for_by,
-                                queryResult.songName ?: unknownString,
-                                queryResult.artistName ?: unknownString
+                                queryResult?.songName ?: unknownString,
+                                queryResult?.artistName ?: unknownString
                             )
                         )
                     },
@@ -395,6 +383,7 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
             }
 
             QueryStatus.LyricsSuccess -> {
+                val lyrics = lyricsResult!!
                 AlertDialog(
                     title = {
                         Text(text = stringResource(R.string.lyrics_fetched))
@@ -402,7 +391,7 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                     text = {
                         Column {
                             Text(text = stringResource(R.string.first_line_of_lyrics))
-                            Text(text = lyricsResult.split("\n")[0])
+                            Text(text = lyrics.split("\n")[0])
                             Text(text = stringResource(id = R.string.is_that_correct))
                         }
                     },
@@ -415,7 +404,7 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                             val copiedString = stringResource(R.string.lyrics_copied_to_clipboard)
                             OutlinedButton(
                                 onClick = {
-                                    clipboardManager.setText(AnnotatedString(lyricsResult))
+                                    clipboardManager.setText(AnnotatedString(lyrics))
                                     Toast.makeText(
                                         context,
                                         copiedString,
@@ -426,23 +415,25 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.ContentCopy,
-                                    contentDescription = "Copy lyrics to clipboard"
+                                    contentDescription = stringResource(R.string.copy_lyrics_to_clipboard)
                                 )
                             }
                             Spacer(modifier = Modifier.width(8.dp))
                             Button(onClick = {
                                 val lrc =
-                                    "[ti:${queryResult.songName}]\n" +
-                                            "[ar:${queryResult.artistName}]\n" +
+                                    "[ti:${queryResult?.songName}]\n" +
+                                            "[ar:${queryResult?.artistName}]\n" +
                                             "[by:${context.getString(R.string.generated_using)}]\n" +
                                             lyricsResult
 
-                                val file = File(song.filePath?.dropLast(4) + ".lrc")
+                                val filePath = song.filePath!!
+                                val idx = filePath.lastIndexOf('.')
+                                val file = File(filePath.substring(0, if (idx == -1) filePath.length else idx) + ".lrc")
                                 file.writeText(lrc)
 
                                 Toast.makeText(
                                     context,
-                                    "${context.getString(R.string.lyrics_saved_to)} ${file.path}",
+                                    context.getString(R.string.lyrics_saved_to, file.path),
                                     Toast.LENGTH_LONG
                                 ).show()
 
@@ -493,10 +484,11 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
                     },
                     title = { Text(text = stringResource(id = R.string.error)) },
                     text = {
-                        if (failReason.contains("NotFound") || failReason.contains("JSON")) {
+                        if (failReason?.contains("NotFound") == true
+                                || failReason?.contains("JSON") == true) {
                             Text(text = stringResource(id = R.string.no_results))
                         } else {
-                            Text(text = stringResource(R.string.an_error_occurred, failReason))
+                            Text(text = stringResource(R.string.an_error_occurred, failReason.toString()))
                         }
                     }
                 )
@@ -603,12 +595,13 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                 }
             )
 
-            var notFoundInARow by remember { mutableIntStateOf(0) }
+            var notFoundInARow by rememberSaveable { mutableIntStateOf(0) }
             var downloadJob by remember { mutableStateOf<Job?>(null) }
 
-            LaunchedEffect(true) {
+            LaunchedEffect(Unit) {
                 downloadJob = launch(Dispatchers.IO) {
-                    for (song in songs) {
+                    for (i in (failedCount + successCount) until songs.size) {
+                        val song = songs[i]
                         if (uiState == UiState.Cancelled) {
                             downloadJob?.cancel()
                             return@launch
@@ -643,10 +636,15 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                         }
                         val lyricsResult: String
                         try {
-                            lyricsResult = viewModel.getSyncedLyrics(queryResult?.songLink!!)
-                        } catch (e: FileNotFoundException) {
-                            failedCount++
-                            continue
+                            lyricsResult = viewModel.getSyncedLyrics(queryResult?.songLink!!)!!
+                        } catch (e: Exception) {
+                            when (e) {
+                                is NullPointerException, is FileNotFoundException -> {
+                                    failedCount++
+                                    continue
+                                }
+                                else -> throw e
+                            }
                         }
                         val lrc =
                             "[ti:${queryResult.songName}]\n" +

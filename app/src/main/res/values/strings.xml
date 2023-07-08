@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name" translatable="false">SongSync</string>
     <string name="unreachable_state">Unreachable UI state</string>
     <string name="batch_download_lyrics">Batch download lyrics</string>
@@ -44,7 +44,7 @@
     <string name="no_internet_server">No internet connection or server is down</string>
     <string name="lyrics_not_found">Lyrics not found</string>
     <string name="unknown">Unknown</string>
-    <string name="lyrics_saved_to">Lyrics saved to</string>
+    <string name="lyrics_saved_to">Lyrics saved to %s</string>
     <string name="generated_using" translatable="false">Generated using SongSync</string>
     <string name="what_is_songsync">SongSync is an app that lets you to download synced lyrics (.lrc files) for your local music library.</string>
     <string name="extra_what_is_songsync">You can also search for specific songs to get their lyrics (and save them to downloads).</string>
@@ -82,4 +82,8 @@
     <string name="song_name_no_args">Song name</string>
     <string name="artist_name_no_args">Artist name</string>
     <string name="lyrics_copied_to_clipboard">Lyrics copied to clipboard</string>
+    <string name="album_cover">Album cover</string>
+    <string name="file_saved_to">File saved to %1$s</string>
+    <string name="search">Search</string>
+    <string name="copy_lyrics_to_clipboard">Copy lyrics to clipboard</string>
 </resources>

@@ -14,9 +14,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import pl.lambada.songsync.R
 
 @Composable
 fun SongCard(
@@ -35,7 +37,7 @@ fun SongCard(
         Row(modifier = Modifier.height(72.dp)) {
             Image(
                 painter = painter,
-                contentDescription = "Album cover",
+                contentDescription = stringResource(R.string.album_cover),
                 modifier = Modifier
                     .height(72.dp)
                     .aspectRatio(1f),

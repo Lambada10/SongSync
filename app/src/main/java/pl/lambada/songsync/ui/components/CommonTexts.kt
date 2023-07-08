@@ -4,7 +4,6 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -24,51 +23,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-
-@Composable
-fun MediumText (
-    text: String,
-    modifier: Modifier = Modifier,
-    color: Color = Color.Unspecified,
-    fontWeight: FontWeight = FontWeight.Bold,
-    lineHeight: TextUnit = TextUnit.Unspecified,
-    maxLines: Int = 1,
-    fontSize: TextUnit = 16.sp,
-    textAlign: TextAlign? = null,
-) {
-    Text(
-        text,
-        textAlign = textAlign,
-        color = color,
-        fontSize = fontSize,
-        fontWeight = fontWeight,
-        maxLines = maxLines,
-        lineHeight = lineHeight,
-        overflow = TextOverflow.Ellipsis,
-        modifier = modifier
-    )
-}
-
-@Composable
-fun Subtext (
-    text: String,
-    modifier: Modifier = Modifier,
-    fontSize: TextUnit = 12.sp,
-    maxLines: Int = 2,
-    textAlign: TextAlign? = null,
-) {
-    Text(text, textAlign = textAlign, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), fontSize = fontSize, lineHeight = 18.sp, maxLines = maxLines, overflow = TextOverflow.Ellipsis, modifier = modifier)
-}
-
-@Composable
-fun SubtextOverline (
-    text: String,
-    modifier: Modifier = Modifier
-) {
-    Text(text, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), letterSpacing = 2.sp, fontSize = 12.sp, lineHeight = 18.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = modifier)
-}
 
 @Composable
 fun MarqueeText(
@@ -84,7 +39,6 @@ fun MarqueeText(
     textDecoration: TextDecoration? = null,
     textAlign: TextAlign? = null,
     lineHeight: TextUnit = TextUnit.Unspecified,
-    maxLines: Int = 1,
     overflow: TextOverflow = TextOverflow.Clip,
     softWrap: Boolean = true,
     onTextLayout: (TextLayoutResult) -> Unit = {},
@@ -112,7 +66,7 @@ fun MarqueeText(
             style = style,
         )
     }
-    var offset by remember { mutableStateOf(0) }
+    var offset by remember { mutableIntStateOf(0) }
     val textLayoutInfoState = remember { mutableStateOf<TextLayoutInfo?>(null) }
     LaunchedEffect(textLayoutInfoState.value) {
         val textLayoutInfo = textLayoutInfoState.value ?: return@LaunchedEffect
@@ -147,7 +101,7 @@ fun MarqueeText(
         modifier = modifier.clipToBounds()
     ) { constraints ->
         val infiniteWidthConstraints = constraints.copy(maxWidth = Int.MAX_VALUE)
-        var mainText = subcompose(MarqueeLayers.MainText) {
+        val mainText = subcompose(MarqueeLayers.MainText) {
             createText(textModifier)
         }.first().measure(infiniteWidthConstraints)
 

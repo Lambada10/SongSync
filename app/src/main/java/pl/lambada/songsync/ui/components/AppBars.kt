@@ -15,10 +15,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import pl.lambada.songsync.data.Screens
+import pl.lambada.songsync.ui.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +68,7 @@ fun BottomBar(navController: NavController) {
                     }
                     Icon(imageVector, contentDescription = screen.name)
                 },
-                label = { Text(text = screen.toString()) })
+                label = { Text(text = stringResource(screen.stringResource)) })
         }
     }
 }

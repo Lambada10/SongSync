@@ -1,10 +1,7 @@
 package pl.lambada.songsync.data.dto
 
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.SaverScope
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * Data class for storing song information.
@@ -15,24 +12,10 @@ import kotlinx.serialization.json.Json
  * @param songLink The link to the song.
  * @param albumCoverLink The link to the album cover.
  */
-@Serializable
+@Parcelize
 data class SongInfo(
-    var songName: String? = null,
+    var songName: String?,
     var artistName: String? = null,
     var songLink: String? = null,
     var albumCoverLink: String? = null,
-)
-
-/**
- * Saver for SongInfo.
- * Used for saving song info with rememberSaveable.
- */
-object SongInfoSaver : Saver<SongInfo, String> {
-    override fun restore(value: String): SongInfo {
-        return Json.decodeFromString(value)
-    }
-
-    override fun SaverScope.save(value: SongInfo): String {
-        return Json.encodeToString(value)
-    }
-}
+) : Parcelable

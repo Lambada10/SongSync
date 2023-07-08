@@ -2,23 +2,18 @@ package pl.lambada.songsync.data
 
 import android.content.ContentUris
 import android.content.Context
-import android.content.pm.PackageInfo
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import kotlinx.serialization.json.Json
 import pl.lambada.songsync.BuildConfig
-import pl.lambada.songsync.MainActivity.Companion.context
-import pl.lambada.songsync.R
 import pl.lambada.songsync.data.dto.AccessTokenResponse
 import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.data.dto.SongInfo
 import pl.lambada.songsync.data.dto.SyncedLinesResponse
 import pl.lambada.songsync.data.dto.TrackSearchResult
-import pl.lambada.songsync.data.ext.lowercaseWithLocale
-import pl.lambada.songsync.getStringById
 import java.io.BufferedReader
-import java.io.File
+import java.io.FileNotFoundException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
@@ -29,9 +24,10 @@ import java.nio.charset.StandardCharsets
  */
 class MainViewModel : ViewModel() {
 
-    val jsonDec = Json {
+    private val jsonDec = Json {
         ignoreUnknownKeys = true
     }
+    private var cachedSongs: List<Song>? = null
 
     // Spotify API credentials
     private var spotifyClientID = BuildConfig.SPOTIFY_CLIENT_ID
@@ -47,6 +43,10 @@ class MainViewModel : ViewModel() {
      * Refreshes the access token by sending a request to the Spotify API.
      */
     fun refreshToken() {
+        if (System.currentTimeMillis() - tokenTime < 1800000) { // 30 minutes
+            return
+        }
+
         val url = URL("https://accounts.spotify.com/api/token")
         val connection = url.openConnection() as HttpURLConnection
 
@@ -78,9 +78,7 @@ class MainViewModel : ViewModel() {
      * @return The SongInfo object containing the song information.
      */
     fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
-        if (System.currentTimeMillis() - tokenTime > 1800000) { // 30 minutes
-            refreshToken()
-        }
+        refreshToken()
 
         val endpoint = "https://api.spotify.com/v1/search"
         val search = URLEncoder.encode(
@@ -100,6 +98,8 @@ class MainViewModel : ViewModel() {
         spotifyResponse = response
 
         val json = jsonDec.decodeFromString<TrackSearchResult>(response)
+        if (json.tracks.items.isEmpty())
+            throw FileNotFoundException("No tracks matched search")
         val track = json.tracks.items[0]
 
         val artists = track.artists.joinToString(", ") { it.name }
@@ -121,7 +121,7 @@ class MainViewModel : ViewModel() {
      * @param songLink The link to the song.
      * @return The synced lyrics as a string.
      */
-    fun getSyncedLyrics(songLink: String): String {
+    fun getSyncedLyrics(songLink: String): String? {
         val url = URL("https://spotify-lyric-api.herokuapp.com/?url=$songLink&format=lrc")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
@@ -136,7 +136,7 @@ class MainViewModel : ViewModel() {
 
 
         if (json.error)
-            return context.getString(R.string.lyrics_not_found)
+            return null
 
 
         val lines = json.lines
@@ -155,140 +155,51 @@ class MainViewModel : ViewModel() {
      * @return A list of Song objects representing the songs.
      */
     fun getAllSongs(context: Context): List<Song> {
-        val selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
-        val projection = arrayOf(
-            MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Media.TITLE,
-            MediaStore.Audio.Media.ARTIST,
-            MediaStore.Audio.Media.DATA,
-            MediaStore.Audio.Media.ALBUM_ID,
-        )
-        val sortOrder = MediaStore.Audio.Media.TITLE + " ASC"
+        return cachedSongs ?: run {
+            val selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
+            val projection = arrayOf(
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.ALBUM_ID,
+            )
+            val sortOrder = MediaStore.Audio.Media.TITLE + " ASC"
 
-        val songs = mutableListOf<Song>()
-        val cursor = context.contentResolver.query(
-            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-            projection,
-            selection,
-            null,
-            sortOrder
-        )
+            val songs = mutableListOf<Song>()
+            val cursor = context.contentResolver.query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                null,
+                sortOrder
+            )
 
-        cursor?.use {
-            val titleColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
-            val artistColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
-            val albumIdColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
-            val pathColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+            cursor?.use {
+                val titleColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+                val artistColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+                val albumIdColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+                val pathColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
 
-            while (it.moveToNext()) {
-                val title = it.getString(titleColumn)
-                val artist = it.getString(artistColumn)
-                val albumId = it.getLong(albumIdColumn)
-                val filePath = it.getString(pathColumn)
+                while (it.moveToNext()) {
+                    val title = it.getString(titleColumn)
+                    val artist = it.getString(artistColumn)
+                    val albumId = it.getLong(albumIdColumn)
+                    val filePath = it.getString(pathColumn)
 
-                val sArtworkUri = Uri.parse("content://media/external/audio/albumart")
-                val imgUri = ContentUris.withAppendedId(
-                    sArtworkUri,
-                    albumId
-                )
+                    val sArtworkUri = Uri.parse("content://media/external/audio/albumart")
+                    val imgUri = ContentUris.withAppendedId(
+                        sArtworkUri,
+                        albumId
+                    )
 
-                val song = Song(title, artist, imgUri, filePath)
-                songs.add(song)
+                    val song = Song(title, artist, imgUri, filePath)
+                    songs.add(song)
+                }
             }
-        }
-        cursor?.close()
-
-        return songs
-    }
-
-    /**
-     * Retrieves information about the contributors to the app.
-     * @return A list of maps containing the contributors' information.
-     */
-    fun getContributorsInfo(): List<Map<ContributorsArgs, String>> {
-        val lambada10 = mapOf(
-            ContributorsArgs.NAME to "Lambada10",
-            ContributorsArgs.ADDITIONAL_INFO to ContributionLevel.LEAD_DEVELOPER.toString(),
-            ContributorsArgs.GITHUB to "https://github.com/Lambada10",
-            ContributorsArgs.TELEGRAM to "https://t.me/Lambada10"
-        )
-        val bobbyESP = mapOf(
-            ContributorsArgs.NAME to "BobbyESP",
-            ContributorsArgs.ADDITIONAL_INFO to ContributionLevel.CONTRIBUTOR.toString(),
-            ContributorsArgs.GITHUB to "https://github.com/BobbyESP",
-        )
-        val akane = mapOf(
-            ContributorsArgs.NAME to "AkaneTan",
-            ContributorsArgs.ADDITIONAL_INFO to ContributionLevel.CONTRIBUTOR.toString(),
-            ContributorsArgs.GITHUB to "https://github.com/AkaneTan",
-        )
-
-        return listOf(
-            lambada10,
-            bobbyESP,
-            akane
-        )
-    }
-
-    /**
-     * Gets the version of the app.
-     * @param context The application context.
-     * @return The version name of the app.
-     */
-    @Suppress("DEPRECATION")
-    fun getVersion(context: Context): String {
-        val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        return pInfo.versionName
-    }
-}
-
-/**
- * Defines the contribution level of a contributor.
- */
-enum class ContributionLevel {
-    CONTRIBUTOR,
-    DEVELOPER,
-    LEAD_DEVELOPER;
-
-    /**
-     * Overrides the toString method to return the translatable string representation of the contribution level.
-     * @return The translatable string representation of the contribution level.
-     */
-    override fun toString(): String {
-        return when (this) {
-            CONTRIBUTOR -> getStringById(R.string.contributor)
-            DEVELOPER -> getStringById(R.string.developer)
-            LEAD_DEVELOPER -> getStringById(R.string.lead_developer)
-        }
-    }
-
-    companion object {
-        fun fromString(string: String): ContributionLevel {
-            return when (string) {
-                getStringById(R.string.contributor) -> CONTRIBUTOR
-                getStringById(R.string.developer) -> DEVELOPER
-                getStringById(R.string.lead_developer) -> LEAD_DEVELOPER
-                else -> throw IllegalArgumentException("Invalid contribution level.")
-            }
-        }
-    }
-}
-
-/**
- * Defines the arguments for the contributors' information.
- */
-enum class ContributorsArgs {
-    NAME,
-    ADDITIONAL_INFO,
-    GITHUB,
-    TELEGRAM;
-
-    override fun toString(): String {
-        return when (this) {
-            NAME -> "name"
-            ADDITIONAL_INFO -> "additionalInfo"
-            GITHUB -> "github"
-            TELEGRAM -> "telegram"
+            cursor?.close()
+            cachedSongs = songs
+            cachedSongs!!
         }
     }
 }

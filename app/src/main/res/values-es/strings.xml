@@ -44,7 +44,6 @@
     <string name="no_internet_server">Sin conexión a internet o el servidor no funciona</string>
     <string name="lyrics_not_found">Letra no encontrada</string>
     <string name="unknown">Desconocido</string>
-    <string name="lyrics_saved_to">Letra guardada en</string>
     <string name="what_is_songsync">SongSync es una aplicación que te permite descargar letras sincronizadas (archivos .lrc) para tu biblioteca de música local.</string>
     <string name="extra_what_is_songsync">También puede buscar canciones específicas para obtener sus letras (y guardarlas en tus descargas).</string>
     <string name="app_version">Versión de la app: %1$s</string>

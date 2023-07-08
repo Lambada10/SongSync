@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
-import pl.lambada.songsync.data.Screens
 import pl.lambada.songsync.ui.screens.AboutScreen
 import pl.lambada.songsync.ui.screens.BrowseScreen
 import pl.lambada.songsync.ui.screens.HomeScreen
@@ -25,8 +25,17 @@ fun Navigator(navController: NavHostController, viewModel: MainViewModel) {
         composable(Screens.Browse.name) {
             BrowseScreen(viewModel = viewModel)
         }
-        composable(route = Screens.About.name) {
-            AboutScreen(viewModel = viewModel)
+        composable(Screens.About.name) {
+            AboutScreen()
         }
     }
+}
+
+/**
+ * Enum class for navigation.
+ */
+enum class Screens(val stringResource: Int) {
+    Home(R.string.home),
+    Browse(R.string.browse),
+    About(R.string.about)
 }

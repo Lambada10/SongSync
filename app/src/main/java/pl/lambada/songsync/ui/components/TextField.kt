@@ -14,13 +14,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CommonTextField(
+    modifier: Modifier = Modifier,
     value: String = "",
     onValueChange: (Any?) -> Unit = {},
     label: String = "",
     singleLine: Boolean = true,
     imeAction: ImeAction = ImeAction.Done,
     readOnly: Boolean = false,
-    modifier: Modifier = Modifier.fillMaxWidth().padding(8.dp),
     ) {
     OutlinedTextField(
         value = value,
