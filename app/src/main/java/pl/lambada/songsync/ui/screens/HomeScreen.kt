@@ -1,28 +1,46 @@
 package pl.lambada.songsync.ui.screens
 
+import android.os.Parcelable
 import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -31,6 +49,7 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import org.json.JSONException
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
@@ -92,91 +111,161 @@ fun LoadingScreen(onLoadingComplete: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Parcelize
+data class MyTextFieldValue(val text: String, val cursorStart: Int, val cursorEnd: Int) : Parcelable
+
+@OptIn(
+    ExperimentalLayoutApi::class
+)
 @Composable
 fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
-    var showSearch by rememberSaveable { mutableStateOf(false) }
-    var query by rememberSaveable { mutableStateOf("") }
-
+    var showingSearch by rememberSaveable { mutableStateOf(false) }
+    var showSearch by remember { mutableStateOf(showingSearch) }
+    var query by rememberSaveable(stateSaver = Saver(
+        save = { MyTextFieldValue(it.text, it.selection.start, it.selection.end) },
+        restore = { TextFieldValue(it.text, TextRange(it.cursorStart, it.cursorEnd)) })
+    ) { mutableStateOf(TextFieldValue()) }
     var isBatchDownload by rememberSaveable { mutableStateOf(false) }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(start = 16.dp, top = 8.dp, end = 8.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-            Column(
-                modifier = Modifier.animateContentSize(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioLowBouncy,
-                        stiffness = Spring.StiffnessLow
+    Column {
+        if (isBatchDownload) {
+            BatchDownloadLyrics(
+                songs = songs,
+                viewModel = viewModel,
+                onDone = { isBatchDownload = false }
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier.animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            ),
+        ) {
+            val focusRequester = remember { FocusRequester() }
+            var willShowIme by remember { mutableStateOf(false) }
+            val showingIme = WindowInsets.isImeVisible
+            if (!showingSearch && showSearch) {
+                showingSearch = true
+            }
+            if (!showSearch && !willShowIme && showingSearch && !WindowInsets.isImeVisible && query.text.isEmpty()) {
+                // If search already is no longer "to be shown" but "currently showing", query is
+                // empty and user hides soft-keyboard, we close search bar
+                showingSearch = false
+            }
+            AnimatedContent(
+                targetState = showingSearch,
+                transitionSpec = {
+                    // Compare the incoming number with the previous number.
+                    if (targetState) {
+                        // If the target number is larger, it slides up and fades in
+                        // while the initial (smaller) number slides up and fades out.
+                        (slideInVertically { height -> height } + fadeIn()).togetherWith(
+                            slideOutVertically { height -> -height } + fadeOut())
+                    } else {
+                        // If the target number is smaller, it slides down and fades in
+                        // while the initial number slides down and fades out.
+                        (slideInVertically { height -> -height } + fadeIn()).togetherWith(
+                            slideOutVertically { height -> height } + fadeOut())
+                    }.using(
+                        // Disable clipping since the faded slide-in/out should
+                        // be displayed out of bounds.
+                        SizeTransform(clip = false)
                     )
-                ),
-            ) {
-                Row {
-                    Button(onClick = { isBatchDownload = true }) {
-                        Text(text = stringResource(R.string.batch_download_lyrics))
+                },
+                label = ""
+            ) { showing ->
+                if (showing) {
+                    if (willShowIme && WindowInsets.isImeVisible) {
+                        willShowIme = false
                     }
-                    Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = { showSearch = !showSearch }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = stringResource(R.string.search),
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Divider()
-
-                if (isBatchDownload) {
-                    BatchDownloadLyrics(
-                        songs = songs,
-                        viewModel = viewModel,
-                        onDone = { isBatchDownload = false }
-                    )
-                }
-
-                if (showSearch) {
-                    val keyboardController = LocalSoftwareKeyboardController.current
-                    SearchBar(
-                        query = query,
-                        onQueryChange = { query = it },
-                        onSearch = { keyboardController?.hide() },
-                        active = false,
-                        onActiveChange = {},
+                    val focusManager = LocalFocusManager.current
+                    TextField(
+                        value = query,
+                        onValueChange = { query = it },
+                        label = { Text(stringResource(id = R.string.search)) },
                         leadingIcon = {
                             Icon(
-                                imageVector = Icons.Default.Search,
+                                Icons.Filled.Search,
                                 contentDescription = stringResource(id = R.string.search),
+                                modifier = Modifier.clickable {
+                                    query = TextFieldValue("")
+                                    showSearch = false
+                                    showingSearch = false
+                                }
                             )
                         },
-                        modifier = Modifier.fillMaxWidth(),
-                        content = {}
+                        shape = ShapeDefaults.ExtraLarge,
+                        colors = TextFieldDefaults.colors(
+                            focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                            .height(50.dp)
+                            .padding(horizontal = 5.dp)
+                            .focusRequester(focusRequester)
+                            .onFocusChanged {
+                                if (it.isFocused && !showingIme) {
+                                    willShowIme = true
+                                }
+                            }
+                            .onGloballyPositioned {
+                                if (showSearch && !showingIme) {
+                                    focusRequester.requestFocus()
+                                    showSearch = false
+                                }
+                            },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        keyboardActions = KeyboardActions(onSearch = {
+                            focusManager.clearFocus()
+                        })
                     )
+                } else {
+                    Row(Modifier.height(50.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Button(onClick = { isBatchDownload = true }) {
+                            Text(text = stringResource(R.string.batch_download_lyrics))
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        IconButton(onClick = { showSearch = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = stringResource(R.string.search),
+                            )
+                        }
+                    }
                 }
             }
-        }
-
-        items(songs.size) {
-            val song = songs[it]
-            val songTitleLowercase = song.title?.lowercaseWithLocale()
-            val songArtistLowercase = song.artist?.lowercaseWithLocale()
-            val queryLowercase = query.lowercaseWithLocale()
-
-            if (songTitleLowercase?.contains(queryLowercase) == true || songArtistLowercase?.contains(
-                    queryLowercase
-                ) == true
-            ) {
-                SongItem(song = song, viewModel = viewModel)
-            }
-        }
-
-        item {
             Spacer(modifier = Modifier.height(8.dp))
+            Divider()
+        }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 16.dp, top = 8.dp, end = 8.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            items(songs.size) {
+                val song = songs[it]
+                val songTitleLowercase = song.title?.lowercaseWithLocale()
+                val songArtistLowercase = song.artist?.lowercaseWithLocale()
+                val queryLowercase = query.text.lowercaseWithLocale()
+
+                if (songTitleLowercase?.contains(queryLowercase) == true || songArtistLowercase?.contains(
+                        queryLowercase
+                    ) == true
+                ) {
+                    SongItem(song = song, viewModel = viewModel)
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
     }
 }
