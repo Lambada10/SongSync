@@ -35,6 +35,7 @@ fun AboutScreen() {
             AboutCard(stringResource(R.string.about_songsync)) {
                 Text(stringResource(R.string.what_is_songsync))
                 Text(stringResource(R.string.extra_what_is_songsync))
+                Text("")
                 Text(stringResource(R.string.app_version, version))
             }
         }
@@ -142,12 +143,12 @@ enum class Contributor(val devName: String, val contributionLevel: ContributionL
                        val github: String? = null, val telegram: String? = null) {
     LAMBADA10("Lambada10", ContributionLevel.LEAD_DEVELOPER,
         github = "https://github.com/Lambada10", telegram = "https://t.me/Lambada10"),
+    NIFT4("Nick", ContributionLevel.DEVELOPER,
+        github = "https://github.com/nift4", telegram = "https://t.me/nift4"),
     BOBBYESP("BobbyESP", ContributionLevel.CONTRIBUTOR,
         github = "https://github.com/BobbyESP"),
     AKANETAN("AkaneTan", ContributionLevel.CONTRIBUTOR,
-        github = "https://github.com/AkaneTan"),
-    NIFT4("Nick", ContributionLevel.CONTRIBUTOR,
-        github = "https://github.com/nift4")
+        github = "https://github.com/AkaneTan")
 }
 
 /**

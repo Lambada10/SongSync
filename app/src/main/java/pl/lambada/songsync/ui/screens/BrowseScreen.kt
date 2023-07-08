@@ -2,6 +2,7 @@ package pl.lambada.songsync.ui.screens
 
 import android.os.Environment
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -184,15 +185,16 @@ fun BrowseScreen(viewModel: MainViewModel) {
                 SongCard(
                     songName = result.songName ?: stringResource(id = R.string.unknown),
                     artists = result.artistName ?: stringResource(id = R.string.unknown),
-                    coverUrl = result.albumCoverLink ?: nextSong?.imgUri?.toString()
+                    coverUrl = result.albumCoverLink ?: nextSong?.imgUri?.toString(),
+                    modifier = Modifier.clickable { result.songLink?.let { uriHandler.openUri(it) } }
                 )
-
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedButton(
                         onClick = {
@@ -209,9 +211,6 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                 queryStatus = QueryStatus.NotSubmitted
                             }) {
                         Text(text = stringResource(id = R.string.edit))
-                    }
-                    Button(onClick = { uriHandler.openUri(result.songLink.toString()) }) {
-                        Text(text = stringResource(R.string.listen_on_spotify))
                     }
                 }
 
@@ -251,8 +250,10 @@ fun BrowseScreen(viewModel: MainViewModel) {
                         val lyrics = lyricsResult!!
                         Row(
                             modifier = Modifier
+                                .padding(8.dp)
                                 .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Button(onClick = {
                                 val lrc =
@@ -313,7 +314,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
 
                     LyricsStatus.Failed -> {
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = lyricsResult ?: stringResource(id = R.string.lyrics_not_found))
+                        Text(text = lyricsResult ?: stringResource(id = R.string.this_track_has_no_lyrics))
                     }
                 }
 

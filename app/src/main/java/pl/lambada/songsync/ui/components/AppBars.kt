@@ -38,12 +38,12 @@ fun TopBar(navController: NavController) {
 
     val screens = Screens.values()
 
-    val currentScreen = screens.firstOrNull { it.name == currentRoute }.toString()
+    val currentScreen = screens.firstOrNull { it.name == currentRoute }
 
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text = currentScreen,
+                text = currentScreen?.let { stringResource(it.stringResource) } ?: currentRoute.toString(),
                 fontWeight = FontWeight.Bold
             )
         },
@@ -75,7 +75,7 @@ fun BottomBar(navController: NavController) {
                         Screens.Browse -> if (isSelected) Icons.Default.Search else Icons.Outlined.Search
                         Screens.About -> if (isSelected) Icons.Default.Info else Icons.Outlined.Info
                     }
-                    Icon(imageVector, contentDescription = screen.name)
+                    Icon(imageVector, contentDescription = stringResource(screen.stringResource))
                 },
                 label = { Text(text = stringResource(screen.stringResource)) })
         }
