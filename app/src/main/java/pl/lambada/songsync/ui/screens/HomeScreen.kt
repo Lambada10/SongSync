@@ -1,7 +1,6 @@
 package pl.lambada.songsync.ui.screens
 
 import android.os.Parcelable
-import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateContentSize
@@ -20,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -33,16 +31,15 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -56,10 +53,10 @@ import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.data.dto.SongInfo
 import pl.lambada.songsync.data.ext.lowercaseWithLocale
+import pl.lambada.songsync.ui.Screens
 import pl.lambada.songsync.ui.components.MarqueeText
 import java.io.File
 import java.io.FileNotFoundException
-import java.net.UnknownHostException
 import kotlin.math.roundToInt
 
 /**
@@ -68,7 +65,7 @@ import kotlin.math.roundToInt
  * @param viewModel The [MainViewModel] instance.
  */
 @Composable
-fun HomeScreen(viewModel: MainViewModel) {
+fun HomeScreen(navController: NavHostController, viewModel: MainViewModel) {
     var uiState by remember { mutableStateOf(UiState.Loading) }
     val context = LocalContext.current
     var songs by remember { mutableStateOf(emptyList<Song>()) }
@@ -82,6 +79,7 @@ fun HomeScreen(viewModel: MainViewModel) {
         }
 
         UiState.Loaded -> HomeScreenLoaded(
+            navController = navController,
             viewModel = viewModel,
             songs = songs
         )
@@ -118,7 +116,7 @@ data class MyTextFieldValue(val text: String, val cursorStart: Int, val cursorEn
     ExperimentalLayoutApi::class
 )
 @Composable
-fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
+fun HomeScreenLoaded(navController: NavHostController, viewModel: MainViewModel, songs: List<Song>) {
     var showingSearch by rememberSaveable { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(showingSearch) }
     var query by rememberSaveable(stateSaver = Saver(
@@ -135,7 +133,6 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
                 onDone = { isBatchDownload = false }
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
         Column(
             modifier = Modifier.animateContentSize(
                 animationSpec = spring(
@@ -170,12 +167,13 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
                         (slideInVertically { height -> -height } + fadeIn()).togetherWith(
                             slideOutVertically { height -> height } + fadeOut())
                     }.using(
-                        // Disable clipping since the faded slide-in/out should
-                        // be displayed out of bounds.
-                        SizeTransform(clip = false)
+                        SizeTransform()
                     )
                 },
-                label = ""
+                label = "",
+                modifier = Modifier.fillMaxWidth()
+                    .height(55.dp)
+                    .padding(horizontal = 20.dp)
             ) { showing ->
                 if (showing) {
                     if (willShowIme && WindowInsets.isImeVisible) {
@@ -205,8 +203,6 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
                             disabledIndicatorColor = Color.Transparent
                         ),
                         modifier = Modifier.fillMaxWidth()
-                            .height(50.dp)
-                            .padding(horizontal = 5.dp)
                             .focusRequester(focusRequester)
                             .onFocusChanged {
                                 if (it.isFocused && !showingIme) {
@@ -225,7 +221,7 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
                         })
                     )
                 } else {
-                    Row(Modifier.height(50.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
                         Button(onClick = { isBatchDownload = true }) {
                             Text(text = stringResource(R.string.batch_download_lyrics))
                         }
@@ -245,10 +241,14 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(start = 16.dp, top = 8.dp, end = 8.dp),
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             items(songs.size) {
                 val song = songs[it]
                 val songTitleLowercase = song.title?.lowercaseWithLocale()
@@ -259,7 +259,7 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
                         queryLowercase
                     ) == true
                 ) {
-                    SongItem(song = song, viewModel = viewModel)
+                    SongItem(navController = navController, song = song, viewModel = viewModel)
                 }
             }
 
@@ -271,21 +271,15 @@ fun HomeScreenLoaded(viewModel: MainViewModel, songs: List<Song>) {
 }
 
 @Composable
-fun SongItem(song: Song, viewModel: MainViewModel) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val unknownString = stringResource(id = R.string.unknown)
-    val noLyricsString = stringResource(id = R.string.lyrics_not_found)
-
-    var fetch by rememberSaveable { mutableStateOf(false) }
-
+fun SongItem(navController: NavHostController, song: Song, viewModel: MainViewModel) {
     OutlinedCard(
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                fetch = true
+                viewModel.nextSong = song
+                navController.navigate(Screens.Browse.name)
             }
     ) {
         val painter = rememberAsyncImagePainter(
@@ -306,296 +300,9 @@ fun SongItem(song: Song, viewModel: MainViewModel) {
             )
             Spacer(modifier = Modifier.width(2.dp))
             Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.Top) {
-                MarqueeText(text = song.title ?: unknownString, fontSize = 18.sp)
+                MarqueeText(text = song.title ?: stringResource(id = R.string.unknown), fontSize = 18.sp)
                 Spacer(modifier = Modifier.weight(1f))
-                MarqueeText(text = song.artist ?: unknownString, fontSize = 14.sp)
-            }
-        }
-    }
-
-    if (fetch) {
-        var queryStatus by rememberSaveable { mutableStateOf(QueryStatus.NotSubmitted) }
-        val query = SongInfo(songName = song.title, artistName = song.artist)
-        var offset by rememberSaveable { mutableIntStateOf(0) }
-        var queryResult: SongInfo? by remember { mutableStateOf(null) }
-        var failReason: String? by rememberSaveable { mutableStateOf(null) }
-        var lyricsResult: String? by rememberSaveable { mutableStateOf(null) }
-
-        when (queryStatus) {
-            QueryStatus.Cancelled -> {
-                fetch = false
-            }
-
-            QueryStatus.NotSubmitted -> {
-                AlertDialog(
-                    title = {
-                        Text(text = stringResource(R.string.get_lyrics))
-                    },
-                    text = {
-                        Text(
-                            text = stringResource(
-                                R.string.selected_song_by,
-                                song.title ?: unknownString,
-                                song.artist ?: unknownString
-                            )
-                        )
-                    },
-                    onDismissRequest = {
-                        queryStatus = QueryStatus.Cancelled
-                    },
-                    confirmButton = {
-                        Button(onClick = {
-                            scope.launch(Dispatchers.IO) {
-                                queryStatus = QueryStatus.Pending
-                                try {
-                                    queryResult = viewModel.getSongInfo(query, offset)
-                                    queryStatus = QueryStatus.Success
-                                } catch (e: Exception) {
-                                    when (e) {
-                                        is UnknownHostException -> {
-                                            queryStatus = QueryStatus.NoConnection
-                                        }
-                                        else -> {
-                                            failReason = e.toString()
-                                            queryStatus = QueryStatus.Failed
-                                        }
-                                    }
-                                }
-                            }
-                        }) {
-                            Text(text = stringResource(R.string.get_song_info))
-                        }
-                    }
-                )
-            }
-
-            QueryStatus.Pending -> {
-                AlertDialog(
-                    title = {
-                        Text(text = stringResource(R.string.fetching_song_info))
-                    },
-                    text = {
-                        Text(
-                            text = stringResource(
-                                R.string.fetching_song_info_for_by,
-                                song.title ?: unknownString,
-                                song.artist ?: unknownString
-                            )
-                        )
-                    },
-                    onDismissRequest = {
-                        queryStatus = QueryStatus.Cancelled
-                    },
-                    confirmButton = {
-                        // no button but compose cries when I don't use confirmButton
-                    }
-                )
-            }
-
-            QueryStatus.Success -> {
-                AlertDialog(
-                    title = {
-                        Text(text = stringResource(R.string.song_info_fetched))
-                    },
-                    text = {
-                        Column {
-                            Text(text = stringResource(R.string.song_name, queryResult?.songName ?: unknownString))
-                            Text(text = stringResource(R.string.artist_name, queryResult?.artistName ?: unknownString))
-                            Text(text = stringResource(R.string.is_that_correct))
-                        }
-                    },
-                    onDismissRequest = {
-                        queryStatus = QueryStatus.Cancelled
-                    },
-                    confirmButton = {
-                        Button(onClick = {
-                            scope.launch(Dispatchers.Default) {
-                                queryStatus = QueryStatus.LyricsPending
-                                try {
-                                    lyricsResult = viewModel.getSyncedLyrics(queryResult!!.songLink!!)
-                                    queryStatus = QueryStatus.LyricsSuccess
-                                } catch (e: Exception) {
-                                    if (e is FileNotFoundException) {
-                                        lyricsResult = noLyricsString
-                                        queryStatus = QueryStatus.LyricsFailed
-                                    } else {
-                                        failReason = e.toString()
-                                        queryStatus = QueryStatus.LyricsFailed
-                                    }
-                                }
-                            }
-                        }) {
-                            Text(text = stringResource(id = R.string.get_lyrics))
-                        }
-                    },
-                    dismissButton = {
-                        OutlinedButton(onClick = {
-                            offset += 1
-                            scope.launch(Dispatchers.IO) {
-                                queryStatus = QueryStatus.Pending
-                                try {
-                                    queryResult = viewModel.getSongInfo(query, offset)
-                                    queryStatus = QueryStatus.Success
-                                } catch (e: Exception) {
-                                    failReason = e.toString()
-                                    queryStatus = QueryStatus.Failed
-                                }
-                            }
-                        }) {
-                            Text(text = stringResource(R.string.try_again))
-                        }
-                    }
-                )
-            }
-
-            QueryStatus.LyricsPending -> {
-                AlertDialog(
-                    title = {
-                        Text(text = stringResource(R.string.fetching_lyrics))
-                    },
-                    text = {
-                        Text(
-                            text = stringResource(
-                                R.string.fetching_lyrics_for_by,
-                                queryResult?.songName ?: unknownString,
-                                queryResult?.artistName ?: unknownString
-                            )
-                        )
-                    },
-                    onDismissRequest = {
-                        queryStatus = QueryStatus.Cancelled
-                    },
-                    confirmButton = {
-                        // no button but compose cries when I don't use confirmButton
-                    }
-                )
-            }
-
-            QueryStatus.LyricsSuccess -> {
-                val lyrics = lyricsResult!!
-                AlertDialog(
-                    title = {
-                        Text(text = stringResource(R.string.lyrics_fetched))
-                    },
-                    text = {
-                        Column {
-                            Text(text = stringResource(R.string.first_line_of_lyrics))
-                            Text(text = lyrics.split("\n")[0])
-                            Text(text = stringResource(id = R.string.is_that_correct))
-                        }
-                    },
-                    onDismissRequest = {
-                        queryStatus = QueryStatus.Cancelled
-                    },
-                    confirmButton = {
-                        Row {
-                            val clipboardManager = LocalClipboardManager.current
-                            val copiedString = stringResource(R.string.lyrics_copied_to_clipboard)
-                            OutlinedButton(
-                                onClick = {
-                                    clipboardManager.setText(AnnotatedString(lyrics))
-                                    Toast.makeText(
-                                        context,
-                                        copiedString,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    queryStatus = QueryStatus.Cancelled
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.ContentCopy,
-                                    contentDescription = stringResource(R.string.copy_lyrics_to_clipboard)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Button(onClick = {
-                                val lrc =
-                                    "[ti:${queryResult?.songName}]\n" +
-                                            "[ar:${queryResult?.artistName}]\n" +
-                                            "[by:${context.getString(R.string.generated_using)}]\n" +
-                                            lyricsResult
-
-                                val filePath = song.filePath!!
-                                val idx = filePath.lastIndexOf('.')
-                                val file = File(filePath.substring(0, if (idx == -1) filePath.length else idx) + ".lrc")
-                                file.writeText(lrc)
-
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.lyrics_saved_to, file.path),
-                                    Toast.LENGTH_LONG
-                                ).show()
-
-                                queryStatus = QueryStatus.Cancelled
-                            }) {
-                                Text(text = stringResource(R.string.save_lyrics))
-                            }
-                        }
-                    },
-                    dismissButton = {
-                        OutlinedButton(onClick = {
-                            queryStatus = QueryStatus.Cancelled
-                        }) {
-                            Text(text = stringResource(R.string.cancel))
-                        }
-                    }
-                )
-            }
-
-            QueryStatus.LyricsFailed -> {
-                AlertDialog(
-                    title = {
-                        Text(text = stringResource(R.string.error))
-                    },
-                    text = {
-                        Text(text = stringResource(R.string.this_track_has_no_lyrics))
-                    },
-                    onDismissRequest = {
-                        queryStatus = QueryStatus.Cancelled
-                    },
-                    confirmButton = {
-                        Button(onClick = {
-                            queryStatus = QueryStatus.Cancelled
-                        }) {
-                            Text(text = stringResource(R.string.ok))
-                        }
-                    }
-                )
-            }
-
-            QueryStatus.Failed -> {
-                AlertDialog(
-                    onDismissRequest = { queryStatus = QueryStatus.Cancelled },
-                    confirmButton = {
-                        Button(onClick = { queryStatus = QueryStatus.Cancelled }) {
-                            Text(text = stringResource(id = R.string.ok))
-                        }
-                    },
-                    title = { Text(text = stringResource(id = R.string.error)) },
-                    text = {
-                        if (failReason?.contains("NotFound") == true
-                                || failReason?.contains("JSON") == true) {
-                            Text(text = stringResource(id = R.string.no_results))
-                        } else {
-                            Text(text = stringResource(R.string.an_error_occurred, failReason.toString()))
-                        }
-                    }
-                )
-            }
-
-            QueryStatus.NoConnection -> {
-                AlertDialog(
-                    onDismissRequest = { queryStatus = QueryStatus.Cancelled },
-                    confirmButton = {
-                        Button(onClick = { queryStatus = QueryStatus.Cancelled }) {
-                            Text(text = stringResource(id = R.string.ok))
-                        }
-                    },
-                    title = { Text(text = stringResource(id = R.string.error)) },
-                    text = {
-                        Text(text = stringResource(R.string.no_internet_server))
-                    }
-                )
+                MarqueeText(text = song.artist ?: stringResource(id = R.string.unknown), fontSize = 14.sp)
             }
         }
     }
@@ -741,7 +448,11 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                                     "[by:$generatedUsingString]\n" +
                                     lyricsResult
 
-                        val file = File(song.filePath!!.dropLast(4) + ".lrc")
+                        val file = song.let {
+                            val filePath = it.filePath!!
+                            val idx = filePath.lastIndexOf('.')
+                            File(filePath.substring(0, if (idx == -1) filePath.length else idx) + ".lrc")
+                        }
                         file.writeText(lrc)
 
                         successCount++
@@ -800,10 +511,6 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
             // nothing because we do not use the other states
         }
     }
-}
-
-enum class QueryStatus {
-    NotSubmitted, Pending, Success, Failed, Cancelled, LyricsPending, LyricsSuccess, LyricsFailed, NoConnection
 }
 
 enum class UiState {

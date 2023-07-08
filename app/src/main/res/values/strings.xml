@@ -86,4 +86,7 @@
     <string name="file_saved_to">File saved to %1$s</string>
     <string name="search">Search</string>
     <string name="copy_lyrics_to_clipboard">Copy lyrics to clipboard</string>
+    <string name="local_song">Local song</string>
+    <string name="cloud_song">Cloud song</string>
+    <string name="edit">Edit</string>
 </resources>

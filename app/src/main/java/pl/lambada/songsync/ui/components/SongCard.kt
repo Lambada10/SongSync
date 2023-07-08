@@ -25,7 +25,7 @@ fun SongCard(
     modifier: Modifier = Modifier,
     songName: String,
     artists: String,
-    coverUrl: String,
+    coverUrl: String?,
 ) {
     OutlinedCard(
         shape = RoundedCornerShape(10.dp),
@@ -33,15 +33,16 @@ fun SongCard(
             .fillMaxWidth()
             .padding(8.dp)
     ) {
-        val painter = rememberAsyncImagePainter(model = coverUrl)
         Row(modifier = Modifier.height(72.dp)) {
-            Image(
-                painter = painter,
-                contentDescription = stringResource(R.string.album_cover),
-                modifier = Modifier
-                    .height(72.dp)
-                    .aspectRatio(1f),
-            )
+            if (coverUrl != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(model = coverUrl),
+                    contentDescription = stringResource(R.string.album_cover),
+                    modifier = Modifier
+                        .height(72.dp)
+                        .aspectRatio(1f),
+                )
+            }
             Spacer(modifier = Modifier.width(2.dp))
             Column(
                 modifier = Modifier.padding(12.dp),

@@ -28,6 +28,7 @@ class MainViewModel : ViewModel() {
         ignoreUnknownKeys = true
     }
     private var cachedSongs: List<Song>? = null
+    var nextSong: Song? = null // for fullscreen downloader dialog
 
     // Spotify API credentials
     private var spotifyClientID = BuildConfig.SPOTIFY_CLIENT_ID
@@ -182,8 +183,12 @@ class MainViewModel : ViewModel() {
                 val pathColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
 
                 while (it.moveToNext()) {
-                    val title = it.getString(titleColumn)
-                    val artist = it.getString(artistColumn)
+                    val title = it.getString(titleColumn).let { str ->
+                        if (str == "<unknown>") null else str
+                    }
+                    val artist = it.getString(artistColumn).let { str ->
+                        if (str == "<unknown>") null else str
+                    }
                     val albumId = it.getLong(albumIdColumn)
                     val filePath = it.getString(pathColumn)
 

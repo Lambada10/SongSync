@@ -14,9 +14,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -30,15 +35,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
+import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.data.dto.SongInfo
 import pl.lambada.songsync.ui.components.CommonTextField
 import pl.lambada.songsync.ui.components.SongCard
@@ -53,6 +61,12 @@ import java.net.UnknownHostException
  */
 @Composable
 fun BrowseScreen(viewModel: MainViewModel) {
+
+    var nextSong: Song? by rememberSaveable { mutableStateOf(null) }
+    if (viewModel.nextSong != null) {
+        nextSong = viewModel.nextSong
+        viewModel.nextSong = null
+    }
 
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
@@ -69,16 +83,36 @@ fun BrowseScreen(viewModel: MainViewModel) {
         val generatedUsingString = stringResource(id = R.string.generated_using)
 
         // queryStatus: "Not submitted", "Pending", "Success", "Failed" - used to show different UI
-        var queryStatus by rememberSaveable { mutableStateOf(QueryStatus.NotSubmitted) }
+        var queryStatus by rememberSaveable { mutableStateOf(
+            if (nextSong != null) QueryStatus.Pending else QueryStatus.NotSubmitted) }
 
         // querySong, queryArtist - used to store user input, offset - for search again
-        var querySong by rememberSaveable { mutableStateOf("") }
-        var queryArtist by rememberSaveable { mutableStateOf("") }
+        var querySong by rememberSaveable { mutableStateOf(nextSong?.title ?: "") }
+        var queryArtist by rememberSaveable { mutableStateOf(nextSong?.artist ?: "") }
         var offset by rememberSaveable { mutableIntStateOf(0) }
 
         // queryResult - used to store result of query, failReason - used to store error message if error occurs
-        var queryResult: SongInfo? by rememberSaveable { mutableStateOf(null) }
+        var queryResult: SongInfo? by rememberSaveable { mutableStateOf(SongInfo(
+            songName = querySong, artistName = queryArtist
+        )) }
         var failReason: String? by rememberSaveable { mutableStateOf(null) }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        if (nextSong != null) {
+            Row {
+                Icon(
+                    imageVector = Icons.Filled.Downloading,
+                    contentDescription = null,
+                    Modifier.padding(end = 5.dp)
+                )
+                Text(stringResource(R.string.local_song))
+            }
+            SongCard(
+                songName = nextSong?.title ?: stringResource(id = R.string.unknown),
+                artists = nextSong?.artist ?: stringResource(id = R.string.unknown),
+                coverUrl = nextSong?.imgUri?.toString()
+            )
+        }
 
         when (queryStatus) {
             QueryStatus.NotSubmitted -> {
@@ -103,13 +137,23 @@ fun BrowseScreen(viewModel: MainViewModel) {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {
-                    val query = SongInfo(
+                    queryResult = SongInfo(
                         songName = querySong, artistName = queryArtist
                     )
+                    offset = 0
+                    queryStatus = QueryStatus.Pending
+                }) {
+                    Text(text = stringResource(id = R.string.get_lyrics))
+                }
+            }
+
+            QueryStatus.Pending -> {
+                Spacer(modifier = Modifier.height(16.dp))
+                CircularProgressIndicator()
+                LaunchedEffect(Unit) {
                     scope.launch(Dispatchers.IO) {
-                        queryStatus = QueryStatus.Pending
                         try {
-                            queryResult = viewModel.getSongInfo(query, offset)
+                            queryResult = viewModel.getSongInfo(queryResult!!, offset)
                             queryStatus = QueryStatus.Success
                         } catch (e: Exception) {
                             when (e) {
@@ -124,50 +168,48 @@ fun BrowseScreen(viewModel: MainViewModel) {
                             }
                         }
                     }
-                }) {
-                    Text(text = stringResource(id = R.string.get_lyrics))
                 }
-            }
-
-            QueryStatus.Pending -> {
-                Spacer(modifier = Modifier.height(16.dp))
-                CircularProgressIndicator()
             }
 
             QueryStatus.Success -> {
                 val result = queryResult!!
-                Spacer(modifier = Modifier.height(16.dp))
+                Row {
+                    Icon(
+                        imageVector = Icons.Filled.Cloud,
+                        contentDescription = null,
+                        Modifier.padding(end = 5.dp)
+                    )
+                    Text(stringResource(R.string.cloud_song))
+                }
                 SongCard(
-                    songName = result.songName.toString(), artists = result.artistName.toString(),
-                    coverUrl = result.albumCoverLink.toString()
+                    songName = result.songName ?: stringResource(id = R.string.unknown),
+                    artists = result.artistName ?: stringResource(id = R.string.unknown),
+                    coverUrl = result.albumCoverLink ?: nextSong?.imgUri?.toString()
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp)
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     OutlinedButton(
                         onClick = {
                             offset += 1
-                            val query = SongInfo(
+                            queryResult = SongInfo(
                                 songName = querySong, artistName = queryArtist
                             )
-                            scope.launch(Dispatchers.IO) {
-                                queryStatus = QueryStatus.Pending
-                                try {
-                                    queryResult = viewModel.getSongInfo(query, offset)
-                                    queryStatus = QueryStatus.Success
-                                } catch (e: Exception) {
-                                    queryStatus = QueryStatus.Failed
-                                    failReason = e.toString()
-                                }
-                            }
+                            queryStatus = QueryStatus.Pending
                         }) {
                         Text(text = stringResource(id = R.string.try_again))
                     }
-                    Spacer(modifier = Modifier.weight(1f))
+                    OutlinedButton(
+                            onClick = {
+                                queryStatus = QueryStatus.NotSubmitted
+                            }) {
+                        Text(text = stringResource(id = R.string.edit))
+                    }
                     Button(onClick = { uriHandler.openUri(result.songLink.toString()) }) {
                         Text(text = stringResource(R.string.listen_on_spotify))
                     }
@@ -205,10 +247,57 @@ fun BrowseScreen(viewModel: MainViewModel) {
                     }
 
                     LyricsStatus.Success -> {
-                        // must be non-null, and, to avoid cutting lines twice,
-                        // store in extra variable before dropping \n
+                        // must be non-null
                         val lyrics = lyricsResult!!
-                        lyrics.dropLast(1) // drop last \n
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Button(onClick = {
+                                val lrc =
+                                    "[ti:${result.songName}]\n" + "[ar:${result.artistName}]\n" + "[by:$generatedUsingString]\n" + lyrics
+                                val file = nextSong?.let {
+                                    val filePath = it.filePath!!
+                                    val idx = filePath.lastIndexOf('.')
+                                    File(
+                                        filePath.substring(
+                                            0,
+                                            if (idx == -1) filePath.length else idx
+                                        ) + ".lrc"
+                                    )
+                                } ?: File(
+                                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                                    "${result.songName} - ${result.artistName}.lrc"
+                                )
+                                file.writeText(lrc)
+
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.file_saved_to, file.absolutePath),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }) {
+                                Text(text = stringResource(R.string.save_lrc_file))
+                            }
+                            val clipboardManager = LocalClipboardManager.current
+                            val copiedString = stringResource(R.string.lyrics_copied_to_clipboard)
+                            OutlinedButton(
+                                onClick = {
+                                    clipboardManager.setText(AnnotatedString(lyrics))
+                                    Toast.makeText(
+                                        context,
+                                        copiedString,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ContentCopy,
+                                    contentDescription = stringResource(R.string.copy_lyrics_to_clipboard)
+                                )
+                            }
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedCard(
                             modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(10.dp)
@@ -218,24 +307,6 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                     text = lyrics, modifier = Modifier.padding(8.dp)
                                 )
                             }
-                        }
-
-                        Button(onClick = {
-                            val lrc =
-                                "[ti:${result.songName}]\n" + "[ar:${result.artistName}]\n" + "[by:$generatedUsingString]\n" + lyricsResult
-                            val file = File(
-                                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                                "${result.songName} - ${result.artistName}.lrc"
-                            )
-                            file.writeText(lrc)
-
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.file_saved_to, file.absolutePath),
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }) {
-                            Text(text = stringResource(R.string.save_lrc_file))
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -282,14 +353,14 @@ fun BrowseScreen(viewModel: MainViewModel) {
                     }
                 )
             }
-
-            else -> {
-                // Nothing
-            }
         }
     }
 }
 
-enum class LyricsStatus {
+private enum class LyricsStatus {
     NotSubmitted, Success, Failed
+}
+
+private enum class QueryStatus {
+    NotSubmitted, Pending, Success, Failed, NoConnection
 }
