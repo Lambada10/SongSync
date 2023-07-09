@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="unreachable_state">Nicht erreichbarer Zustand</string>
     <string name="batch_download_lyrics">Mehrere Titel herunterladen</string>
     <string name="get_lyrics">Lyrics herunterladen</string>
     <string name="try_again">Nochmal versuchen</string>
@@ -8,28 +7,22 @@
     <string name="error">Fehler</string>
     <string name="this_track_has_no_lyrics">Dieses Lied hat keine Lyrics</string>
     <string name="ok">OK</string>
-    <string name="an_error_occurred">Ein Fehler ist aufgetreten: %1$s</string>
-    <string name="this_will_download_lyrics_for_all_songs">Dies wird Lyrics für alle Songs herunterladen</string>
-    <string name="existing_lyrics_for_songs_overwrite">Bereits vorhandene Lyrics werden überschrieben</string>
-    <string name="less_accurate">Dies könnte ungenauer sein, als Lyrics einzeln herunterzuladen</string>
-    <string name="sure_to_continue">Bist du dir sicher, das du Fortfahren willst?</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="downloading_lyrics">Lade Lyrics herunten</string>
     <string name="song">Song: %1$s</string>
-    <string name="progress">Fortschritt: %1$s/%2$s (%3$s%%)</string>
-    <string name="success_failed">Erfolgreich: %1$s, Fehlgeschlagen: %2$s</string>
+    <string name="progress">Fortschritt: %1$d/%2$d (%3$d%%)</string>
+    <string name="success_failed">Erfolgreich: %1$d, Übersprungen: %2$d, Keine Lyrics: %3$d, Fehlgeschlagen: %4$d</string>
     <string name="please_do_not_close_the_app_this_may_take_a_while">Bitte schließe die App nicht, dies kann eine Weile dauern</string>
     <string name="download_complete">Herunterladen abgeschlossen</string>
-    <string name="success">Erfolgreich: %1$s</string>
-    <string name="failed">Fehlgeschlagen: %1$s</string>
+    <string name="success">Erfolgreich: %1$d</string>
+    <string name="failed">Fehlgeschlagen: %1$d</string>
     <string name="spotify_api_rate_limit_reached">Spotify API Rate-Limit erreicht</string>
     <string name="please_try_again_later">Bitte versuche es später noch einmal</string>
     <string name="save_lrc_file">.lrc-Datei speichern</string>
     <string name="no_results">Keine Ergebnisse</string>
     <string name="no_internet_server">Keine Internetverbindung oder Server ist down</string>
     <string name="unknown">Unbekannt</string>
-    <string name="lyrics_saved_to">Lyrics in %1$s gespeichert</string>
     <string name="what_is_songsync">SongSync ist eine App, die dich sychronisierte Lyric-Dateien (.lrc) für deine lokale Musikbibliothek herunterladen lässt</string>
     <string name="extra_what_is_songsync">Du kannst auch nach spezifischen Songs suchen, um ihre Lyrics zu erhalten (und sie in Downloads zu speichern).</string>
     <string name="app_version">App-Version: %1$s</string>
@@ -69,4 +62,14 @@
     <string name="local_song">Lokales Lied</string>
     <string name="cloud_song">Lied in der Cloud</string>
     <string name="edit">Bearbeiten</string>
+    <string name="selected_count">%1$d ausgewählt</string>
+    <string name="back">Zurück</string>
+    <string name="select_all">Alle auswählen</string>
+    <string name="invert_selection">Auswahl invertieren</string>
+    <string name="skipped">Übersprungen: %1$d</string>
+    <plurals name="this_will_download_lyrics_for_all_songs">
+        <item quantity="one">Dies wird Lyrics für einen Song herunterladen. Bereits vorhandene Lyrics werden nicht überschrieben. Dies könnte weniger genau sein, als Lyrics einzelnd herunterzuladen. Bist du sicher, das du fortfahren willst?</item>
+        <item quantity="other">Dies wird Lyrics für %1$d Songs herunterladen. Bereits vorhandene Lyrics werden nicht überschrieben. Dies könnte weniger genau sein, als Lyrics einzelnd herunterzuladen. Bist du sicher, das du fortfahren willst?</item>
+    </plurals>
+    <string name="no_lyrics">Keine Lyrics: %1$d</string>
 </resources>

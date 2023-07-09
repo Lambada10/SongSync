@@ -1,3 +1,5 @@
+@file:Suppress("SpellCheckingInspection")
+
 package pl.lambada.songsync.ui.screens
 
 import androidx.compose.foundation.layout.Row
@@ -139,6 +141,7 @@ fun AboutScreen() {
     }
 }
 
+@Suppress("SpellCheckingInspection")
 enum class Contributor(val devName: String, val contributionLevel: ContributionLevel,
                        val github: String? = null, val telegram: String? = null) {
     LAMBADA10("Lambada10", ContributionLevel.LEAD_DEVELOPER,

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="unreachable_state">Estado de la UI inalcanzable</string>
     <string name="batch_download_lyrics">Descargar todas las letras</string>
     <string name="get_lyrics">Obtener letra</string>
     <string name="try_again">Volver a intentar</string>
@@ -8,21 +7,15 @@
     <string name="error">Error</string>
     <string name="this_track_has_no_lyrics">Esta canción no tiene letra</string>
     <string name="ok">OK</string>
-    <string name="an_error_occurred">Ocurrió un error: %1$s</string>
-    <string name="this_will_download_lyrics_for_all_songs">Esto descargará la letra para todas las canciones</string>
-    <string name="existing_lyrics_for_songs_overwrite">Las letras ya existentes se sobreescribirán por las nuevas</string>
-    <string name="less_accurate">Esta opción puede llegar a ser menos precisa que descargar la letra canción por canción</string>
-    <string name="sure_to_continue">Estás seguro de que quieres continuar?</string>
     <string name="yes">Sí</string>
     <string name="no">No</string>
     <string name="downloading_lyrics">Descargando letra</string>
     <string name="song">Canción: %1$s</string>
     <string name="progress">Progreso: %1$s/%2$s (%3$s%%)</string>
-    <string name="success_failed">Descargadas: %1$s, fallidas: %2$s</string>
     <string name="please_do_not_close_the_app_this_may_take_a_while">Porfavor, no cierres la aplicación. Esto puede llevar un rato</string>
     <string name="download_complete">Descarga completada</string>
-    <string name="success">Descargadas: %1$s</string>
-    <string name="failed">Fallidas: %1$s</string>
+    <string name="success">Descargadas: %1$d</string>
+    <string name="failed">Fallidas: %1$d</string>
     <string name="spotify_api_rate_limit_reached">Límite de la API de Spotify superado</string>
     <string name="please_try_again_later">Porfavor, inténtelo más tarde</string>
     <string name="save_lrc_file">Guardar archivo .lrc</string>

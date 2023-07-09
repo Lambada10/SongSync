@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name" translatable="false">SongSync</string>
-    <string name="unreachable_state">Unreachable UI state</string>
     <string name="batch_download_lyrics">Batch download lyrics</string>
     <string name="get_lyrics">Get lyrics</string>
     <string name="try_again">Try again</string>
@@ -8,28 +7,22 @@
     <string name="error">Error</string>
     <string name="this_track_has_no_lyrics">This track has no lyrics</string>
     <string name="ok">OK</string>
-    <string name="an_error_occurred">An error occurred: %1$s</string>
-    <string name="this_will_download_lyrics_for_all_songs">This will download lyrics for all songs</string>
-    <string name="existing_lyrics_for_songs_overwrite">Existing lyrics for songs will be overwritten with new ones</string>
-    <string name="less_accurate">This may be less accurate than downloading lyrics one by one</string>
-    <string name="sure_to_continue">Are you sure you want to continue?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="downloading_lyrics">Downloading lyrics</string>
     <string name="song">Song: %1$s</string>
-    <string name="progress">Progress: %1$s/%2$s (%3$s%%)</string>
-    <string name="success_failed">Success: %1$s, Failed: %2$s</string>
+    <string name="progress">Progress: %1$d/%2$d (%3$d%%)</string>
+    <string name="success_failed">Success: %1$d, Skipped: %2$d, No lyrics: %3$d, Failed: %4$d</string>
     <string name="please_do_not_close_the_app_this_may_take_a_while">Please do not close the app, this may take a while</string>
     <string name="download_complete">Download complete</string>
-    <string name="success">Success: %1$s</string>
-    <string name="failed">Failed: %1$s</string>
+    <string name="success">Success: %1$d</string>
+    <string name="failed">Failed: %1$d</string>
     <string name="spotify_api_rate_limit_reached">Spotify API rate limit reached</string>
     <string name="please_try_again_later">Please try again later</string>
     <string name="save_lrc_file">Save .lrc file</string>
     <string name="no_results">No results</string>
     <string name="no_internet_server">No internet connection or server is down</string>
     <string name="unknown">Unknown</string>
-    <string name="lyrics_saved_to">Lyrics saved to %1$s</string>
     <string name="generated_using" translatable="false">Generated using SongSync</string>
     <string name="what_is_songsync">SongSync is an app that lets you to download synced lyrics (.lrc files) for your local music library.</string>
     <string name="extra_what_is_songsync">You can also search for specific songs to get their lyrics (and save them to downloads).</string>
@@ -74,4 +67,14 @@
     <string name="local_song">Local song</string>
     <string name="cloud_song">Cloud song</string>
     <string name="edit">Edit</string>
+    <string name="selected_count">Selected %1$d</string>
+    <string name="back">Back</string>
+    <string name="select_all">Select all</string>
+    <string name="invert_selection">Invert selection</string>
+    <string name="skipped">Skipped: %1$d</string>
+    <string name="no_lyrics">No lyrics: %1$d</string>
+    <plurals name="this_will_download_lyrics_for_all_songs">
+        <item quantity="one">This will download lyrics for one song. Existing lyrics for songs will not be overwritten with new ones. This may be less accurate than downloading lyrics one by one. Are you sure you want to continue?</item>
+        <item quantity="other">This will download lyrics for %1$d songs. Existing lyrics for songs will not be overwritten with new ones. This may be less accurate than downloading lyrics one by one. Are you sure you want to continue?</item>
+    </plurals>
 </resources>

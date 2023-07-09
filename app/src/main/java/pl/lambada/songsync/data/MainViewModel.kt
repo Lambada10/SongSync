@@ -17,7 +17,9 @@ import java.io.FileNotFoundException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
+import java.net.UnknownHostException
 import java.nio.charset.StandardCharsets
+import kotlin.jvm.Throws
 
 /**
  * ViewModel class for the main functionality of the app.
@@ -78,6 +80,7 @@ class MainViewModel : ViewModel() {
      * @param offset (optional) The offset used for trying to find a better match or searching again.
      * @return The SongInfo object containing the song information.
      */
+    @Throws(UnknownHostException::class, FileNotFoundException::class, NoTrackFoundException::class)
     fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
         refreshToken()
 
@@ -100,7 +103,7 @@ class MainViewModel : ViewModel() {
 
         val json = jsonDec.decodeFromString<TrackSearchResult>(response)
         if (json.tracks.items.isEmpty())
-            throw FileNotFoundException("No tracks matched search")
+            throw NoTrackFoundException()
         val track = json.tracks.items[0]
 
         val artists = track.artists.joinToString(", ") { it.name }
@@ -135,10 +138,8 @@ class MainViewModel : ViewModel() {
 
         val json = jsonDec.decodeFromString<SyncedLinesResponse>(response)
 
-
         if (json.error)
             return null
-
 
         val lines = json.lines
         val syncedLyrics = StringBuilder()
@@ -192,6 +193,7 @@ class MainViewModel : ViewModel() {
                     val albumId = it.getLong(albumIdColumn)
                     val filePath = it.getString(pathColumn)
 
+                    @Suppress("SpellCheckingInspection")
                     val sArtworkUri = Uri.parse("content://media/external/audio/albumart")
                     val imgUri = ContentUris.withAppendedId(
                         sArtworkUri,
@@ -208,3 +210,5 @@ class MainViewModel : ViewModel() {
         }
     }
 }
+
+class NoTrackFoundException : Exception()

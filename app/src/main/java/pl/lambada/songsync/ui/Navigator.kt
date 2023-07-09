@@ -1,11 +1,13 @@
 package pl.lambada.songsync.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
+import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.ui.screens.AboutScreen
 import pl.lambada.songsync.ui.screens.BrowseScreen
 import pl.lambada.songsync.ui.screens.HomeScreen
@@ -17,10 +19,12 @@ import pl.lambada.songsync.ui.screens.HomeScreen
  * @param viewModel The main view model.
  */
 @Composable
-fun Navigator(navController: NavHostController, viewModel: MainViewModel) {
+fun Navigator(navController: NavHostController, selected: SnapshotStateList<String>,
+              allSongs: List<Song>?, viewModel: MainViewModel) {
     NavHost(navController = navController, startDestination = Screens.Home.name) {
         composable(Screens.Home.name) {
-            HomeScreen(navController = navController, viewModel = viewModel)
+            HomeScreen(navController = navController, selected = selected,
+                allSongs = allSongs, viewModel = viewModel)
         }
         composable(Screens.Browse.name) {
             BrowseScreen(viewModel = viewModel)

@@ -11,19 +11,25 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.FilterAltOff
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -33,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
@@ -47,15 +54,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import org.json.JSONException
+import okhttp3.internal.toImmutableList
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
+import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.data.dto.SongInfo
 import pl.lambada.songsync.data.ext.lowercaseWithLocale
+import pl.lambada.songsync.data.ext.toLrcFile
 import pl.lambada.songsync.ui.Screens
 import pl.lambada.songsync.ui.components.MarqueeText
-import java.io.File
 import java.io.FileNotFoundException
 import kotlin.math.roundToInt
 
@@ -65,47 +73,31 @@ import kotlin.math.roundToInt
  * @param viewModel The [MainViewModel] instance.
  */
 @Composable
-fun HomeScreen(navController: NavHostController, viewModel: MainViewModel) {
-    var uiState by remember { mutableStateOf(UiState.Loading) }
-    val context = LocalContext.current
-    var songs by remember { mutableStateOf(emptyList<Song>()) }
-
-    when (uiState) {
-        UiState.Loading -> {
-            LoadingScreen(onLoadingComplete = {
-                songs = viewModel.getAllSongs(context)
-                uiState = UiState.Loaded
-            })
-        }
-
-        UiState.Loaded -> HomeScreenLoaded(
+fun HomeScreen(selected: SnapshotStateList<String>, allSongs: List<Song>?,
+               navController: NavHostController, viewModel: MainViewModel) {
+    if (allSongs == null) {
+        LoadingScreen()
+    } else {
+        HomeScreenLoaded(
             navController = navController,
             viewModel = viewModel,
-            songs = songs
+            songs = allSongs,
+            selected = selected
         )
-
-        else -> {
-            Text(text = stringResource(id = R.string.unreachable_state))
-        }
     }
 }
 
 /**
  * Composable function representing the loading screen.
- *
- * @param onLoadingComplete Callback invoked when the loading is complete.
  */
 @Composable
-fun LoadingScreen(onLoadingComplete: () -> Unit) {
+fun LoadingScreen() {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator()
-        LaunchedEffect(Unit) {
-            onLoadingComplete()
-        }
     }
 }
 
@@ -116,7 +108,8 @@ data class MyTextFieldValue(val text: String, val cursorStart: Int, val cursorEn
     ExperimentalLayoutApi::class
 )
 @Composable
-fun HomeScreenLoaded(navController: NavHostController, viewModel: MainViewModel, songs: List<Song>) {
+fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHostController,
+                     viewModel: MainViewModel, songs: List<Song>) {
     var showingSearch by rememberSaveable { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(showingSearch) }
     var query by rememberSaveable(stateSaver = Saver(
@@ -124,119 +117,18 @@ fun HomeScreenLoaded(navController: NavHostController, viewModel: MainViewModel,
         restore = { TextFieldValue(it.text, TextRange(it.cursorStart, it.cursorEnd)) })
     ) { mutableStateOf(TextFieldValue()) }
     var isBatchDownload by rememberSaveable { mutableStateOf(false) }
+    var filtered by rememberSaveable { mutableStateOf<List<Song>?>(null) }
+    val scope = rememberCoroutineScope()
+    val displaySongs = filtered ?: songs
 
     Column {
         if (isBatchDownload) {
             BatchDownloadLyrics(
-                songs = songs,
+                songs = if (selected.isEmpty()) displaySongs
+                        else displaySongs.filter { selected.contains(it.filePath) }.toList(),
                 viewModel = viewModel,
                 onDone = { isBatchDownload = false }
             )
-        }
-        Column(
-            modifier = Modifier.animateContentSize(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioLowBouncy,
-                    stiffness = Spring.StiffnessLow
-                )
-            ),
-        ) {
-            val focusRequester = remember { FocusRequester() }
-            var willShowIme by remember { mutableStateOf(false) }
-            val showingIme = WindowInsets.isImeVisible
-            if (!showingSearch && showSearch) {
-                showingSearch = true
-            }
-            if (!showSearch && !willShowIme && showingSearch && !WindowInsets.isImeVisible && query.text.isEmpty()) {
-                // If search already is no longer "to be shown" but "currently showing", query is
-                // empty and user hides soft-keyboard, we close search bar
-                showingSearch = false
-            }
-            AnimatedContent(
-                targetState = showingSearch,
-                transitionSpec = {
-                    // Compare the incoming number with the previous number.
-                    if (targetState) {
-                        // If the target number is larger, it slides up and fades in
-                        // while the initial (smaller) number slides up and fades out.
-                        (slideInVertically { height -> height } + fadeIn()).togetherWith(
-                            slideOutVertically { height -> -height } + fadeOut())
-                    } else {
-                        // If the target number is smaller, it slides down and fades in
-                        // while the initial number slides down and fades out.
-                        (slideInVertically { height -> -height } + fadeIn()).togetherWith(
-                            slideOutVertically { height -> height } + fadeOut())
-                    }.using(
-                        SizeTransform()
-                    )
-                },
-                label = "",
-                modifier = Modifier.fillMaxWidth()
-                    .height(55.dp)
-                    .padding(horizontal = 20.dp)
-            ) { showing ->
-                if (showing) {
-                    if (willShowIme && WindowInsets.isImeVisible) {
-                        willShowIme = false
-                    }
-                    val focusManager = LocalFocusManager.current
-                    TextField(
-                        value = query,
-                        onValueChange = { query = it },
-                        label = { Text(stringResource(id = R.string.search)) },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Filled.Search,
-                                contentDescription = stringResource(id = R.string.search),
-                                modifier = Modifier.clickable {
-                                    query = TextFieldValue("")
-                                    showSearch = false
-                                    showingSearch = false
-                                }
-                            )
-                        },
-                        shape = ShapeDefaults.ExtraLarge,
-                        colors = TextFieldDefaults.colors(
-                            focusedLabelColor = MaterialTheme.colorScheme.onSurface,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            disabledIndicatorColor = Color.Transparent
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                            .focusRequester(focusRequester)
-                            .onFocusChanged {
-                                if (it.isFocused && !showingIme) {
-                                    willShowIme = true
-                                }
-                            }
-                            .onGloballyPositioned {
-                                if (showSearch && !showingIme) {
-                                    focusRequester.requestFocus()
-                                    showSearch = false
-                                }
-                            },
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                        keyboardActions = KeyboardActions(onSearch = {
-                            focusManager.clearFocus()
-                        })
-                    )
-                } else {
-                    Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
-                        Button(onClick = { isBatchDownload = true }) {
-                            Text(text = stringResource(R.string.batch_download_lyrics))
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        IconButton(onClick = { showSearch = true }) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = stringResource(R.string.search),
-                            )
-                        }
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Divider()
         }
         LazyColumn(
             modifier = Modifier
@@ -246,11 +138,127 @@ fun HomeScreenLoaded(navController: NavHostController, viewModel: MainViewModel,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             item {
-                Spacer(modifier = Modifier.height(8.dp))
+                Column(
+                    modifier = Modifier
+                        .animateContentSize(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioLowBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        )
+                        .padding(vertical = 5.dp),
+                ) {
+                    val focusRequester = remember { FocusRequester() }
+                    var willShowIme by remember { mutableStateOf(false) }
+                    val showingIme = WindowInsets.isImeVisible
+                    if (!showingSearch && showSearch) {
+                        showingSearch = true
+                    }
+                    if (!showSearch && !willShowIme && showingSearch && !WindowInsets.isImeVisible && query.text.isEmpty()) {
+                        // If search already is no longer "to be shown" but "currently showing", query is
+                        // empty and user hides soft-keyboard, we close search bar
+                        showingSearch = false
+                    }
+                    AnimatedContent(
+                        targetState = showingSearch,
+                        transitionSpec = {
+                            if (targetState) {
+                                (slideInVertically { height -> height } + fadeIn()).togetherWith(
+                                    slideOutVertically { height -> -height } + fadeOut())
+                            } else {
+                                (slideInVertically { height -> -height } + fadeIn()).togetherWith(
+                                    slideOutVertically { height -> height } + fadeOut())
+                            }.using(
+                                SizeTransform()
+                            )
+                        },
+                        label = "",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(55.dp)
+                    ) { showing ->
+                        if (showing) {
+                            if (willShowIme && WindowInsets.isImeVisible) {
+                                willShowIme = false
+                            }
+                            val focusManager = LocalFocusManager.current
+                            TextField(
+                                value = query,
+                                onValueChange = { query = it },
+                                label = { Text(stringResource(id = R.string.search)) },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Filled.Search,
+                                        contentDescription = stringResource(id = R.string.search),
+                                        modifier = Modifier.clickable {
+                                            query = TextFieldValue("")
+                                            showSearch = false
+                                            showingSearch = false
+                                        }
+                                    )
+                                },
+                                shape = ShapeDefaults.ExtraLarge,
+                                colors = TextFieldDefaults.colors(
+                                    focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                    disabledIndicatorColor = Color.Transparent
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .focusRequester(focusRequester)
+                                    .onFocusChanged {
+                                        if (it.isFocused && !showingIme) {
+                                            willShowIme = true
+                                        }
+                                    }
+                                    .onGloballyPositioned {
+                                        if (showSearch && !showingIme) {
+                                            focusRequester.requestFocus()
+                                            showSearch = false
+                                        }
+                                    },
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                                keyboardActions = KeyboardActions(onSearch = {
+                                    focusManager.clearFocus()
+                                })
+                            )
+                        } else {
+                            Row(verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center) {
+                                Button(onClick = { isBatchDownload = true }) {
+                                    Text(text = stringResource(R.string.batch_download_lyrics))
+                                }
+                                Spacer(modifier = Modifier.weight(1f))
+                                IconButton(onClick = {
+                                    scope.launch(Dispatchers.Default) {
+                                        filtered = if (filtered != null) null else
+                                            songs.filter {
+                                                it.filePath.toLrcFile()?.exists() != true
+                                            }.toImmutableList()
+                                    }
+                                }) {
+                                    Icon(
+                                        imageVector = if (filtered != null) Icons.Default.FilterAlt
+                                                else Icons.Default.FilterAltOff,
+                                        contentDescription = stringResource(R.string.search),
+                                    )
+                                }
+                                IconButton(onClick = { showSearch = true }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Search,
+                                        contentDescription = stringResource(R.string.search),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                Divider()
             }
 
-            items(songs.size) {
-                val song = songs[it]
+            items(displaySongs.size) { i ->
+                val song = displaySongs[i]
                 val songTitleLowercase = song.title?.lowercaseWithLocale()
                 val songArtistLowercase = song.artist?.lowercaseWithLocale()
                 val queryLowercase = query.text.lowercaseWithLocale()
@@ -259,7 +267,20 @@ fun HomeScreenLoaded(navController: NavHostController, viewModel: MainViewModel,
                         queryLowercase
                     ) == true
                 ) {
-                    SongItem(navController = navController, song = song, viewModel = viewModel)
+                    SongItem(
+                        selected = selected.contains(song.filePath),
+                        quickSelect = selected.size > 0,
+                        onSelectionChanged = { newValue ->
+                            if (newValue) {
+                                song.filePath?.let { selected.add(it) }
+                            } else {
+                                selected.remove(song.filePath)
+                            }
+                        },
+                        navController = navController,
+                        song = song,
+                        viewModel = viewModel
+                    )
                 }
             }
 
@@ -270,17 +291,25 @@ fun HomeScreenLoaded(navController: NavHostController, viewModel: MainViewModel,
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SongItem(navController: NavHostController, song: Song, viewModel: MainViewModel) {
+fun SongItem(selected: Boolean, quickSelect: Boolean, onSelectionChanged: (Boolean) -> Unit,
+             navController: NavHostController, song: Song, viewModel: MainViewModel) {
     OutlinedCard(
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable {
-                viewModel.nextSong = song
-                navController.navigate(Screens.Browse.name)
-            }
+            .combinedClickable(onClick = {
+                if (quickSelect) {
+                    onSelectionChanged(!selected)
+                } else {
+                    viewModel.nextSong = song
+                    navController.navigate(Screens.Browse.name)
+                }
+            }, onLongClick = {
+                onSelectionChanged(!selected)
+            })
     ) {
         val painter = rememberAsyncImagePainter(
             ImageRequest.Builder(LocalContext.current).data(data = song.imgUri)
@@ -289,20 +318,26 @@ fun SongItem(navController: NavHostController, song: Song, viewModel: MainViewMo
                 }.build(),
             imageLoader = LocalContext.current.imageLoader
         )
-
-        Row(modifier = Modifier.height(72.dp)) {
+        val bgColor = if (selected) MaterialTheme.colorScheme.surfaceVariant
+                        else MaterialTheme.colorScheme.surface
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .height(72.dp)
+            .background(bgColor)) {
             Image(
                 painter = painter,
                 contentDescription = stringResource(id = R.string.album_cover),
                 modifier = Modifier
                     .height(72.dp)
-                    .aspectRatio(1f),
+                    .aspectRatio(1f)
             )
             Spacer(modifier = Modifier.width(2.dp))
             Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.Top) {
-                MarqueeText(text = song.title ?: stringResource(id = R.string.unknown), fontSize = 18.sp)
+                MarqueeText(text = song.title ?: stringResource(id = R.string.unknown), fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.contentColorFor(bgColor))
                 Spacer(modifier = Modifier.weight(1f))
-                MarqueeText(text = song.artist ?: stringResource(id = R.string.unknown), fontSize = 14.sp)
+                MarqueeText(text = song.artist ?: stringResource(id = R.string.unknown), fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.contentColorFor(bgColor))
             }
         }
     }
@@ -315,7 +350,10 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
 
     var uiState by rememberSaveable { mutableStateOf(UiState.Warning) }
     var failedCount by rememberSaveable { mutableIntStateOf(0) }
+    var noLyricsCount by rememberSaveable { mutableIntStateOf(0) }
     var successCount by rememberSaveable { mutableIntStateOf(0) }
+    var skippedCount by rememberSaveable { mutableIntStateOf(0) }
+    val count = successCount + skippedCount + failedCount + noLyricsCount
     val total = songs.size
 
     when (uiState) {
@@ -330,10 +368,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                 },
                 text = {
                     Column {
-                        Text(text = stringResource(R.string.this_will_download_lyrics_for_all_songs))
-                        Text(text = stringResource(R.string.existing_lyrics_for_songs_overwrite))
-                        Text(text = stringResource(R.string.less_accurate))
-                        Text(text = stringResource(R.string.sure_to_continue))
+                        Text(text = pluralStringResource(R.plurals.this_will_download_lyrics_for_all_songs, songs.size, songs.size))
                     }
                 },
                 onDismissRequest = {
@@ -353,9 +388,8 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
         }
 
         UiState.Pending -> {
-            val totalCount = successCount + failedCount
             val percentage = if (total != 0) {
-                (totalCount.toFloat() / total.toFloat() * 100).roundToInt()
+                (count.toFloat() / total.toFloat() * 100).roundToInt()
             } else {
                 0 // In other cases = 0
             }
@@ -370,11 +404,11 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                         MarqueeText(
                             stringResource(
                                 R.string.song,
-                                songs[(successCount + failedCount) % total].title ?: unknownString,
+                                songs.getOrNull((count) % total.coerceAtLeast(1))?.title ?: unknownString,
                             )
                         )
-                        Text(text = stringResource(R.string.progress, totalCount, total, percentage))
-                        Text(text = stringResource(R.string.success_failed, successCount, failedCount))
+                        Text(text = stringResource(R.string.progress, count, total, percentage))
+                        Text(text = stringResource(R.string.success_failed, successCount, skippedCount, noLyricsCount, failedCount))
                         Text(text = stringResource(R.string.please_do_not_close_the_app_this_may_take_a_while))
                     }
                 },
@@ -396,66 +430,69 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
 
             LaunchedEffect(Unit) {
                 downloadJob = launch(Dispatchers.IO) {
-                    for (i in (failedCount + successCount) until songs.size) {
+                    for (i in count until songs.size) {
                         val song = songs[i]
                         if (uiState == UiState.Cancelled) {
                             downloadJob?.cancel()
                             return@launch
                         }
 
-                        if (successCount + failedCount >= total) {
+                        if (count >= total) {
                             uiState = UiState.Done
                             downloadJob?.cancel()
                             return@launch
                         }
-
+                        val file = song.filePath.toLrcFile()
+                        if (file?.exists() == true) {
+                            skippedCount++
+                            continue
+                        }
                         val query = SongInfo(song.title, song.artist)
                         var queryResult: SongInfo? = null
                         try {
                             queryResult = viewModel.getSongInfo(query)
                         } catch (e: Exception) {
-                            if (e is FileNotFoundException) {
-                                notFoundInARow++
-                                failedCount++
-                                if (notFoundInARow >= 5) {
-                                    uiState = UiState.RateLimited
-                                    return@launch
-                                }
-                                continue
-                            }
-                            if (e is JSONException) {
-                                failedCount++
-                                continue
-                            }
-                        } finally {
-                            notFoundInARow = 0
-                        }
-                        val lyricsResult: String
-                        try {
-                            lyricsResult = viewModel.getSyncedLyrics(queryResult?.songLink!!)!!
-                        } catch (e: Exception) {
                             when (e) {
-                                is NullPointerException, is FileNotFoundException -> {
+                                is FileNotFoundException -> {
+                                    notFoundInARow++
                                     failedCount++
+                                    if (notFoundInARow >= 5) {
+                                        uiState = UiState.RateLimited
+                                        return@launch
+                                    }
                                     continue
+                                }
+                                is NoTrackFoundException -> {
+                                    // not increasing notFoundInARow because that is for rate limit
+                                    failedCount++
                                 }
                                 else -> throw e
                             }
                         }
-                        val lrc =
-                            "[ti:${queryResult.songName}]\n" +
-                                    "[ar:${queryResult.artistName}]\n" +
-                                    "[by:$generatedUsingString]\n" +
-                                    lyricsResult
+                        notFoundInARow = 0
+                        if (queryResult != null) {
+                            val lyricsResult: String
+                            try {
+                                lyricsResult = viewModel.getSyncedLyrics(queryResult.songLink!!)!!
+                            } catch (e: Exception) {
+                                when (e) {
+                                    is NullPointerException, is FileNotFoundException -> {
+                                        noLyricsCount++
+                                        continue
+                                    }
 
-                        val file = song.let {
-                            val filePath = it.filePath!!
-                            val idx = filePath.lastIndexOf('.')
-                            File(filePath.substring(0, if (idx == -1) filePath.length else idx) + ".lrc")
+                                    else -> throw e
+                                }
+                            }
+                            val lrc =
+                                "[ti:${queryResult.songName}]\n" +
+                                        "[ar:${queryResult.artistName}]\n" +
+                                        "[by:$generatedUsingString]\n" +
+                                        lyricsResult
+                            file?.writeText(lrc)
+
+                            successCount++
                         }
-                        file.writeText(lrc)
-
-                        successCount++
                     }
                     uiState = UiState.Done
                 }
@@ -471,6 +508,8 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                     Column {
                         Text(text = stringResource(R.string.download_complete))
                         Text(text = stringResource(R.string.success, successCount))
+                        Text(text = stringResource(R.string.skipped, skippedCount))
+                        Text(text = stringResource(R.string.no_lyrics, noLyricsCount))
                         Text(text = stringResource(R.string.failed, failedCount))
                     }
                 },
@@ -506,13 +545,9 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                 }
             )
         }
-
-        else -> {
-            // nothing because we do not use the other states
-        }
     }
 }
 
 enum class UiState {
-    Warning, Pending, Done, RateLimited, Cancelled, Loading, Loaded
+    Warning, Pending, Done, RateLimited, Cancelled
 }

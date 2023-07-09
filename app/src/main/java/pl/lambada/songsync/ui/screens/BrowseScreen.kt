@@ -49,6 +49,7 @@ import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.data.dto.SongInfo
+import pl.lambada.songsync.data.ext.toLrcFile
 import pl.lambada.songsync.ui.components.CommonTextField
 import pl.lambada.songsync.ui.components.SongCard
 import java.io.File
@@ -258,16 +259,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                             Button(onClick = {
                                 val lrc =
                                     "[ti:${result.songName}]\n" + "[ar:${result.artistName}]\n" + "[by:$generatedUsingString]\n" + lyrics
-                                val file = nextSong?.let {
-                                    val filePath = it.filePath!!
-                                    val idx = filePath.lastIndexOf('.')
-                                    File(
-                                        filePath.substring(
-                                            0,
-                                            if (idx == -1) filePath.length else idx
-                                        ) + ".lrc"
-                                    )
-                                } ?: File(
+                                val file = nextSong?.filePath?.toLrcFile() ?: File(
                                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                                     "${result.songName} - ${result.artistName}.lrc"
                                 )
@@ -329,13 +321,12 @@ fun BrowseScreen(viewModel: MainViewModel) {
                     },
                     title = { Text(text = stringResource(id = R.string.error)) },
                     text = {
-                        if (failReason?.contains("NotFound") == true
-                                || failReason?.contains("JSON") == true) {
+                        if (failReason?.contains("NoTrackFoundException") == true) {
                             Text(
                                 text = stringResource(R.string.no_results)
                             )
                         } else {
-                            Text(text = stringResource(R.string.error, failReason.toString()))
+                            Text(text = failReason.toString())
                         }
                     })
             }

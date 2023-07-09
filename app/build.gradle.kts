@@ -9,6 +9,10 @@ plugins {
 
 val spotifyClientID = gradleLocalProperties(rootDir).getProperty("spotify_client_id")!!
 val spotifyClientSecret = gradleLocalProperties(rootDir).getProperty("spotify_client_secret")!!
+val releaseStoreFile = project.properties["RELEASE_STORE_FILE"] as String?
+val releaseStorePassword = project.properties["RELEASE_STORE_PASSWORD"] as String?
+val releaseKeyAlias = project.properties["RELEASE_KEY_ALIAS"] as String?
+val releaseKeyPassword = project.properties["RELEASE_KEY_PASSWORD"] as String?
 
 android {
     namespace = "pl.lambada.songsync"
@@ -32,7 +36,16 @@ android {
         buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"$spotifyClientID\"")
         buildConfigField("String", "SPOTIFY_CLIENT_SECRET", "\"$spotifyClientSecret\"")
     }
-
+    signingConfigs {
+        create("release") {
+            if (project.hasProperty("RELEASE_KEY_ALIAS")) {
+                storeFile = file(releaseStoreFile!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -40,6 +53,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (project.hasProperty("RELEASE_KEY_ALIAS")) {
+                signingConfig = signingConfigs["release"]
+            }
         }
     }
     compileOptions {
@@ -64,7 +80,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.activity.compose)
