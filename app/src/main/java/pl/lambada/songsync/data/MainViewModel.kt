@@ -30,6 +30,7 @@ class MainViewModel : ViewModel() {
         ignoreUnknownKeys = true
     }
     private var cachedSongs: List<Song>? = null
+    var filteredSongs: MutableList<Song>? = null
     var nextSong: Song? = null // for fullscreen downloader dialog
 
     // Spotify API credentials
