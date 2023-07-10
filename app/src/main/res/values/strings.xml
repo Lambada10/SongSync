@@ -78,4 +78,11 @@
     </plurals>
     <string name="invalid_query">Invalid query</string>
     <string name="clear">Clear</string>
+    <string name="check_for_updates">Check for updates</string>
+    <string name="checking_for_updates">Checking for updates</string>
+    <string name="update_available">Update available</string>
+    <string name="changelog">Changelog:\n%1$s</string>
+    <string name="download">Download</string>
+    <string name="up_to_date">You\'re using latest version</string>
+    <string name="error_checking_for_updates">Error checking for updates</string>
 </resources>

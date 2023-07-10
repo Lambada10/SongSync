@@ -8,10 +8,13 @@ import androidx.lifecycle.ViewModel
 import kotlinx.serialization.json.Json
 import pl.lambada.songsync.BuildConfig
 import pl.lambada.songsync.data.dto.AccessTokenResponse
+import pl.lambada.songsync.data.dto.GithubReleaseResponse
+import pl.lambada.songsync.data.dto.Release
 import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.data.dto.SongInfo
 import pl.lambada.songsync.data.dto.SyncedLinesResponse
 import pl.lambada.songsync.data.dto.TrackSearchResult
+import pl.lambada.songsync.data.ext.getVersion
 import java.io.BufferedReader
 import java.io.FileNotFoundException
 import java.net.HttpURLConnection
@@ -19,7 +22,6 @@ import java.net.URL
 import java.net.URLEncoder
 import java.net.UnknownHostException
 import java.nio.charset.StandardCharsets
-import kotlin.jvm.Throws
 
 /**
  * ViewModel class for the main functionality of the app.
@@ -150,6 +152,38 @@ class MainViewModel : ViewModel() {
         }
 
         return syncedLyrics.toString().dropLast(1)
+    }
+
+    /**
+     * Gets latest GitHub release information.
+     * @return The latest release version.
+     */
+    fun getLatestRelease(): Release {
+        val url = URL("https://api.github.com/repos/Lambada10/SongSync/releases/latest")
+        val connection = url.openConnection() as HttpURLConnection
+        connection.requestMethod = "GET"
+
+        val response = connection.inputStream.bufferedReader().use(BufferedReader::readText)
+
+        connection.disconnect()
+
+        val json = jsonDec.decodeFromString<GithubReleaseResponse>(response)
+
+        return Release(
+            htmlURL = json.htmlURL,
+            tagName = json.tagName,
+            changelog = json.body
+        )
+    }
+
+    /**
+     * Checks if the latest release is newer than the current version.
+     */
+    fun isNewerRelease(context: Context): Boolean {
+        val currentVersion = context.getVersion().replace(".", "").toInt()
+        val latestVersion = getLatestRelease().tagName?.replace(".", "")?.replace("v", "")?.toInt()
+
+        return latestVersion!! > currentVersion
     }
 
     /**

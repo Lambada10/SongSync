@@ -30,7 +30,7 @@ fun Navigator(navController: NavHostController, selected: SnapshotStateList<Stri
             BrowseScreen(viewModel = viewModel)
         }
         composable(Screens.About.name) {
-            AboutScreen()
+            AboutScreen(viewModel = viewModel)
         }
     }
 }
