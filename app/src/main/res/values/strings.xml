@@ -77,4 +77,5 @@
         <item quantity="other">This will download lyrics for %1$d songs. Existing lyrics for songs will be overwritten with new ones. This may be less accurate than downloading lyrics one by one. Are you sure you want to continue?</item>
     </plurals>
     <string name="invalid_query">Invalid query</string>
+    <string name="clear">Clear</string>
 </resources>

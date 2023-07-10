@@ -34,6 +34,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.FilterAltOff
 import androidx.compose.material.icons.filled.Search
@@ -220,7 +221,13 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
                                 leadingIcon = {
                                     Icon(
                                         Icons.Filled.Search,
-                                        contentDescription = stringResource(id = R.string.search),
+                                        contentDescription = stringResource(id = R.string.search)
+                                    )
+                                },
+                                trailingIcon = {
+                                    Icon(
+                                        Icons.Default.Clear,
+                                        contentDescription = stringResource(id = R.string.clear),
                                         modifier = Modifier.clickable {
                                             query = TextFieldValue("")
                                             showSearch = false
