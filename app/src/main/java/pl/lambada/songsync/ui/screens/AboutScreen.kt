@@ -1,6 +1,7 @@
+@file:Suppress("SpellCheckingInspection")
+
 package pl.lambada.songsync.ui.screens
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,170 +17,104 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import pl.lambada.songsync.R
-import pl.lambada.songsync.data.ContributorsArgs
-import pl.lambada.songsync.data.MainViewModel
+import pl.lambada.songsync.data.ext.getVersion
 import pl.lambada.songsync.ui.components.AboutCard
 
 /**
  * Composable function for AboutScreen component.
- *
- * @param viewModel the [MainViewModel] instance.
  */
 @Composable
-fun AboutScreen(viewModel: MainViewModel) {
+fun AboutScreen() {
     val uriHandler = LocalUriHandler.current
-    val context = LocalContext.current
+    val version = LocalContext.current.getVersion()
 
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
     ) {
-        val version = viewModel.getVersion(context)
         item {
             AboutCard(stringResource(R.string.about_songsync)) {
-                Column(
-                    modifier = Modifier.padding(
-                        start = 8.dp,
-                        top = 0.dp,
-                        end = 8.dp,
-                        bottom = 8.dp
-                    )
-                ) {
-                    Text(stringResource(R.string.what_is_songsync))
-                    Text(stringResource(R.string.extra_what_is_songsync))
-                    Text(stringResource(R.string.app_version, version))
-                }
+                Text(stringResource(R.string.what_is_songsync))
+                Text(stringResource(R.string.extra_what_is_songsync))
+                Text("")
+                Text(stringResource(R.string.app_version, version))
             }
         }
         item {
             AboutCard(stringResource(R.string.spotify_api)) {
-                Column(
-                    modifier = Modifier.padding(
-                        start = 8.dp,
-                        top = 0.dp,
-                        end = 8.dp,
-                        bottom = 8.dp
-                    )
-                ) {
-                    Text(stringResource(R.string.what_it_uses))
-                    Row {
-                        Spacer(modifier = Modifier.weight(1f))
-                        Button(
-                            modifier = Modifier.padding(top = 8.dp),
-                            onClick = {
-                                uriHandler.openUri("https://developer.spotify.com/documentation/web-api")
-                            }
-                        ) {
-                            Text(stringResource(R.string.spotify_for_developers))
+                Text(stringResource(R.string.what_it_uses))
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Button(
+                        modifier = Modifier.padding(top = 8.dp),
+                        onClick = {
+                            uriHandler.openUri("https://developer.spotify.com/documentation/web-api")
                         }
+                    ) {
+                        Text(stringResource(R.string.spotify_for_developers))
                     }
                 }
             }
         }
         item {
             AboutCard(stringResource(R.string.spotifylyrics_api)) {
-                Column(
-                    modifier = Modifier.padding(
-                        start = 8.dp,
-                        top = 0.dp,
-                        end = 8.dp,
-                        bottom = 8.dp
-                    )
-                ) {
-                    Text(stringResource(R.string.how_we_get_lyrics))
-                    Row {
-                        Spacer(modifier = Modifier.weight(1f))
-                        Button(
-                            modifier = Modifier.padding(top = 8.dp),
-                            onClick = {
-                                uriHandler.openUri("https://github.com/akashrchandran/spotify-lyrics-api")
-                            }
-                        ) {
-                            Text(stringResource(R.string.view_on_github))
+                Text(stringResource(R.string.how_we_get_lyrics))
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Button(
+                        modifier = Modifier.padding(top = 8.dp),
+                        onClick = {
+                            uriHandler.openUri("https://github.com/akashrchandran/spotify-lyrics-api")
                         }
+                    ) {
+                        Text(stringResource(R.string.view_on_github))
                     }
                 }
             }
         }
         item {
             AboutCard(stringResource(R.string.source_code)) {
-                Column(
-                    modifier = Modifier.padding(
-                        start = 8.dp,
-                        top = 0.dp,
-                        end = 8.dp,
-                        bottom = 8.dp
-                    )
-                ) {
-                    Text(stringResource(R.string.we_are_open_source))
-                    Row {
-                        Spacer(modifier = Modifier.weight(1f))
-                        Button(
-                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                            onClick = {
-                                uriHandler.openUri("https://github.com/Lambada10/SongSync")
-                            }
-                        ) {
-                            Text(stringResource(id = R.string.view_on_github))
+                Text(stringResource(R.string.we_are_open_source))
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Button(
+                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                        onClick = {
+                            uriHandler.openUri("https://github.com/Lambada10/SongSync")
                         }
+                    ) {
+                        Text(stringResource(id = R.string.view_on_github))
                     }
                 }
             }
         }
         item {
             AboutCard(stringResource(R.string.contributors)) {
-                val contributors = viewModel.getContributorsInfo()
-                Column(
-                    modifier = Modifier.padding(
-                        start = 8.dp,
-                        top = 0.dp,
-                        end = 8.dp,
-                        bottom = 8.dp
-                    )
-                ) {
-                    contributors.forEach {
-                        var additionalInfo = ""
-                        try {
-                            additionalInfo = it.getValue(ContributorsArgs.ADDITIONAL_INFO)
-                        } catch (e: NoSuchElementException) { // no additional info
-
-                        }
-                        Text(
-                            text = it.getValue(ContributorsArgs.NAME) + (if (additionalInfo != "") " ($additionalInfo)" else "")
-                        )
-                        Row {
-                            Spacer(modifier = Modifier.weight(1f))
-                            var github = ""
-                            try {
-                                github = it.getValue(ContributorsArgs.GITHUB)
-                            } catch (e: NoSuchElementException) {
-                                // no github link
-                            }
-                            if (github != "") Button(
+                Contributor.values().forEach {
+                    val additionalInfo = stringResource(id = it.contributionLevel.stringResource)
+                    Text(text = "${it.devName} ($additionalInfo)")
+                    Row {
+                        Spacer(modifier = Modifier.weight(1f))
+                        if (it.github != null) {
+                            Button(
                                 modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
                                 onClick = {
-                                    uriHandler.openUri(github)
+                                    uriHandler.openUri(it.github)
                                 }
                             ) {
                                 Text(stringResource(R.string.github))
                             }
-                            var telegram = ""
-                            try {
-                                telegram = it.getValue(ContributorsArgs.TELEGRAM)
-                            } catch (e: NoSuchElementException) {
-                                // no telegram link
-                            }
-                            if (telegram != "") {
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Button(
-                                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                                    onClick = {
-                                        uriHandler.openUri(telegram)
-                                    }
-                                ) {
-                                    Text(stringResource(R.string.telegram))
+                        }
+                        if (it.telegram != null) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                                onClick = {
+                                    uriHandler.openUri(it.telegram)
                                 }
+                            ) {
+                                Text(stringResource(R.string.telegram))
                             }
                         }
                     }
@@ -188,29 +123,42 @@ fun AboutScreen(viewModel: MainViewModel) {
         }
         item {
             AboutCard(stringResource(R.string.support)) {
-                Column(
-                    modifier = Modifier.padding(
-                        start = 8.dp,
-                        top = 0.dp,
-                        end = 8.dp,
-                        bottom = 8.dp
-                    )
-                ) {
-                    Text(stringResource(R.string.bugs_or_suggestions_contact_us))
-                    Row {
-                        Spacer(modifier = Modifier.weight(1f))
-                        Button(
-                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                            onClick = {
-                                uriHandler.openUri("https://t.me/LambadaOT")
-                            }
-                        ) {
-                            Text(stringResource(R.string.telegram_group))
+                Text(stringResource(R.string.bugs_or_suggestions_contact_us))
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Button(
+                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                        onClick = {
+                            uriHandler.openUri("https://t.me/LambadaOT")
                         }
+                    ) {
+                        Text(stringResource(R.string.telegram_group))
                     }
-                    Text(stringResource(R.string.create_issue))
                 }
+                Text(stringResource(R.string.create_issue))
             }
         }
     }
+}
+
+@Suppress("SpellCheckingInspection")
+enum class Contributor(val devName: String, val contributionLevel: ContributionLevel,
+                       val github: String? = null, val telegram: String? = null) {
+    LAMBADA10("Lambada10", ContributionLevel.LEAD_DEVELOPER,
+        github = "https://github.com/Lambada10", telegram = "https://t.me/Lambada10"),
+    NIFT4("Nick", ContributionLevel.DEVELOPER,
+        github = "https://github.com/nift4", telegram = "https://t.me/nift4"),
+    BOBBYESP("BobbyESP", ContributionLevel.CONTRIBUTOR,
+        github = "https://github.com/BobbyESP"),
+    AKANETAN("AkaneTan", ContributionLevel.CONTRIBUTOR,
+        github = "https://github.com/AkaneTan")
+}
+
+/**
+ * Defines the contribution level of a contributor.
+ */
+enum class ContributionLevel(val stringResource: Int) {
+    CONTRIBUTOR(R.string.contributor),
+    DEVELOPER(R.string.developer),
+    LEAD_DEVELOPER(R.string.lead_developer)
 }

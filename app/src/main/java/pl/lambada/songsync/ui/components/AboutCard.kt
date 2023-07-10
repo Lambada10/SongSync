@@ -1,6 +1,7 @@
 package pl.lambada.songsync.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +31,15 @@ fun AboutCard(label: String, content: @Composable () -> Unit) {
             modifier = Modifier.padding(8.dp),
             color = MaterialTheme.colorScheme.primary
         )
-        content()
+        Column(
+            modifier = Modifier.padding(
+                start = 8.dp,
+                top = 0.dp,
+                end = 8.dp,
+                bottom = 8.dp
+            )
+        ) {
+            content()
+        }
     }
 }

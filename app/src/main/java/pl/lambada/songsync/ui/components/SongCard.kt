@@ -14,16 +14,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import pl.lambada.songsync.R
 
 @Composable
 fun SongCard(
     modifier: Modifier = Modifier,
     songName: String,
     artists: String,
-    coverUrl: String,
+    coverUrl: String?,
 ) {
     OutlinedCard(
         shape = RoundedCornerShape(10.dp),
@@ -31,15 +33,16 @@ fun SongCard(
             .fillMaxWidth()
             .padding(8.dp)
     ) {
-        val painter = rememberAsyncImagePainter(model = coverUrl)
         Row(modifier = Modifier.height(72.dp)) {
-            Image(
-                painter = painter,
-                contentDescription = "Album cover",
-                modifier = Modifier
-                    .height(72.dp)
-                    .aspectRatio(1f),
-            )
+            if (coverUrl != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(model = coverUrl),
+                    contentDescription = stringResource(R.string.album_cover),
+                    modifier = Modifier
+                        .height(72.dp)
+                        .aspectRatio(1f),
+                )
+            }
             Spacer(modifier = Modifier.width(2.dp))
             Column(
                 modifier = Modifier.padding(12.dp),

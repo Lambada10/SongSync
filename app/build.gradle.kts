@@ -1,15 +1,18 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
-@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
-    //kotlinx serialization plugin
-    kotlin("plugin.serialization")
+    alias(libs.plugins.serialization)
+    alias(libs.plugins.parcelize)
 }
 
 val spotifyClientID = gradleLocalProperties(rootDir).getProperty("spotify_client_id")!!
 val spotifyClientSecret = gradleLocalProperties(rootDir).getProperty("spotify_client_secret")!!
+val releaseStoreFile = project.properties["RELEASE_STORE_FILE"] as String?
+val releaseStorePassword = project.properties["RELEASE_STORE_PASSWORD"] as String?
+val releaseKeyAlias = project.properties["RELEASE_KEY_ALIAS"] as String?
+val releaseKeyPassword = project.properties["RELEASE_KEY_PASSWORD"] as String?
 
 android {
     namespace = "pl.lambada.songsync"
@@ -23,15 +26,26 @@ android {
         versionName = "1.3"
 
         resourceConfigurations += arrayOf(
-            "en", "es"
+            "en", "es", "de"
         )
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
-    }
 
+        buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"$spotifyClientID\"")
+        buildConfigField("String", "SPOTIFY_CLIENT_SECRET", "\"$spotifyClientSecret\"")
+    }
+    signingConfigs {
+        create("release") {
+            if (project.hasProperty("RELEASE_KEY_ALIAS")) {
+                storeFile = file(releaseStoreFile!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -39,20 +53,17 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"$spotifyClientID\"")
-            buildConfigField("String", "SPOTIFY_CLIENT_SECRET", "\"$spotifyClientSecret\"")
-        }
-        debug {
-            buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"$spotifyClientID\"")
-            buildConfigField("String", "SPOTIFY_CLIENT_SECRET", "\"$spotifyClientSecret\"")
+            if (project.hasProperty("RELEASE_KEY_ALIAS")) {
+                signingConfig = signingConfigs["release"]
+            }
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
     buildFeatures {
         compose = true
@@ -69,7 +80,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.activity.compose)
@@ -80,13 +90,7 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.paging.common.ktx)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.espresso.core)
-    androidTestImplementation(platform(libs.compose.bom))
-    androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.tooling)
-    debugImplementation(libs.ui.test.manifest)
 
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.json)
@@ -96,7 +100,6 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.accompanist.permissions)
     implementation(libs.accompanist.coil)
-    //kotlinx serialization
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.kotlinx.coroutines.android)

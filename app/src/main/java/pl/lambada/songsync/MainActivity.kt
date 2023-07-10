@@ -1,30 +1,48 @@
 package pl.lambada.songsync
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.data.MainViewModel
+import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.ui.Navigator
 import pl.lambada.songsync.ui.components.BottomBar
 import pl.lambada.songsync.ui.components.TopBar
@@ -43,18 +61,18 @@ class MainActivity : ComponentActivity() {
      *
      * @param savedInstanceState The saved instance state.
      */
+    @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        context = applicationContext
         setContent {
-            val viewModel = MainViewModel()
-            val navController = rememberNavController()
-            var hasPermissions by rememberSaveable { mutableStateOf(false) }
             val context = LocalContext.current
-            var internetConnection by rememberSaveable { mutableStateOf(true) }
+            val viewModel: MainViewModel by viewModels()
+            val navController = rememberNavController()
+            var hasPermissions by remember { mutableStateOf(false) }
+            var internetConnection by remember { mutableStateOf(true) }
 
             // Get token upon app start
-            LaunchedEffect(true) {
+            LaunchedEffect(Unit) {
                 launch(Dispatchers.IO) {
                     try {
                         viewModel.refreshToken()
@@ -83,18 +101,42 @@ class MainActivity : ComponentActivity() {
             }
 
             SongSyncTheme {
+                // I'll cry if this crashes due to memory concerns
+                val selected = rememberSaveable(saver = Saver(
+                    save = { it.toTypedArray() }, restore = { mutableStateListOf(*it) }
+                )) { mutableStateListOf<String>() }
+                var allSongs by remember { mutableStateOf<List<Song>?>(null) }
+                LaunchedEffect(Unit) {
+                    launch(Dispatchers.IO) {
+                        allSongs = viewModel.getAllSongs(context)
+                    }
+                }
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
                 Scaffold(
                     topBar = {
-                        TopBar(navController = navController)
+                        TopBar(selected = selected, currentRoute = currentRoute, allSongs = allSongs)
                     },
                     bottomBar = {
-                        BottomBar(navController = navController)
+                        BottomBar(currentRoute = currentRoute, navController = navController)
                     }
                 ) { paddingValues ->
                     Surface(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(paddingValues)
+                            .imePadding()
+                            .let {
+                                if (WindowInsets.isImeVisible) {
+                                    // exclude bottom bar if ime is visible
+                                    it.padding(PaddingValues(
+                                        top = paddingValues.calculateTopPadding(),
+                                        start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
+                                        end = paddingValues.calculateEndPadding(LocalLayoutDirection.current)
+                                    ))
+                                } else {
+                                    it.padding(paddingValues)
+                                }
+                            }
                     ) {
                         if (!hasPermissions) {
                             AlertDialog(
@@ -121,22 +163,12 @@ class MainActivity : ComponentActivity() {
                                 finishAndRemoveTask()
                             }
                         } else {
-                            Navigator(navController = navController, viewModel = viewModel)
+                            Navigator(navController = navController, selected = selected,
+                                allSongs = allSongs, viewModel = viewModel)
                         }
                     }
                 }
             }
         }
     }
-
-    companion object {
-        const val TAG = "MainActivity"
-
-        @SuppressLint("StaticFieldLeak")
-        lateinit var context: Context
-    }
-}
-
-fun getStringById(id: Int): String {
-    return MainActivity.context.getString(id)
 }

@@ -81,6 +81,7 @@ data class Artist(
     val uri: String
 )
 
+@Suppress("SpellCheckingInspection")
 @Serializable
 data class ExternalIds(
     val isrc: String
