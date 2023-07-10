@@ -293,7 +293,10 @@ fun BrowseScreen(viewModel: MainViewModel) {
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedCard(
-                            modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(10.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            shape = RoundedCornerShape(10.dp)
                         ) {
                             SelectionContainer {
                                 Text(
