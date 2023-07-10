@@ -330,6 +330,10 @@ fun BrowseScreen(viewModel: MainViewModel) {
                             Text(
                                 text = stringResource(R.string.no_results)
                             )
+                        } else if (failReason?.contains("?q=+&") == true) { // no query
+                            Text(
+                                text = stringResource(R.string.invalid_query)
+                            )
                         } else {
                             Text(text = failReason.toString())
                         }
