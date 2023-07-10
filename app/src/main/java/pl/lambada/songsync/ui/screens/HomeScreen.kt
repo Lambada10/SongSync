@@ -352,8 +352,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
     var failedCount by rememberSaveable { mutableIntStateOf(0) }
     var noLyricsCount by rememberSaveable { mutableIntStateOf(0) }
     var successCount by rememberSaveable { mutableIntStateOf(0) }
-    var skippedCount by rememberSaveable { mutableIntStateOf(0) }
-    val count = successCount + skippedCount + failedCount + noLyricsCount
+    val count = successCount + failedCount + noLyricsCount
     val total = songs.size
 
     when (uiState) {
@@ -408,7 +407,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                             )
                         )
                         Text(text = stringResource(R.string.progress, count, total, percentage))
-                        Text(text = stringResource(R.string.success_failed, successCount, skippedCount, noLyricsCount, failedCount))
+                        Text(text = stringResource(R.string.success_failed, successCount, noLyricsCount, failedCount))
                         Text(text = stringResource(R.string.please_do_not_close_the_app_this_may_take_a_while))
                     }
                 },
@@ -443,10 +442,6 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                             return@launch
                         }
                         val file = song.filePath.toLrcFile()
-                        if (file?.exists() == true) {
-                            skippedCount++
-                            continue
-                        }
                         val query = SongInfo(song.title, song.artist)
                         var queryResult: SongInfo? = null
                         try {
@@ -508,7 +503,6 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                     Column {
                         Text(text = stringResource(R.string.download_complete))
                         Text(text = stringResource(R.string.success, successCount))
-                        Text(text = stringResource(R.string.skipped, skippedCount))
                         Text(text = stringResource(R.string.no_lyrics, noLyricsCount))
                         Text(text = stringResource(R.string.failed, failedCount))
                     }

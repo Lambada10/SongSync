@@ -12,7 +12,7 @@
     <string name="downloading_lyrics">Downloading lyrics</string>
     <string name="song">Song: %1$s</string>
     <string name="progress">Progress: %1$d/%2$d (%3$d%%)</string>
-    <string name="success_failed">Success: %1$d, Skipped: %2$d, No lyrics: %3$d, Failed: %4$d</string>
+    <string name="success_failed">Success: %1$d, No lyrics: %2$d, Failed: %3$d</string>
     <string name="please_do_not_close_the_app_this_may_take_a_while">Please do not close the app, this may take a while</string>
     <string name="download_complete">Download complete</string>
     <string name="success">Success: %1$d</string>
@@ -71,10 +71,9 @@
     <string name="back">Back</string>
     <string name="select_all">Select all</string>
     <string name="invert_selection">Invert selection</string>
-    <string name="skipped">Skipped: %1$d</string>
     <string name="no_lyrics">No lyrics: %1$d</string>
     <plurals name="this_will_download_lyrics_for_all_songs">
-        <item quantity="one">This will download lyrics for one song. Existing lyrics for songs will not be overwritten with new ones. This may be less accurate than downloading lyrics one by one. Are you sure you want to continue?</item>
-        <item quantity="other">This will download lyrics for %1$d songs. Existing lyrics for songs will not be overwritten with new ones. This may be less accurate than downloading lyrics one by one. Are you sure you want to continue?</item>
+        <item quantity="one">This will download lyrics for one song. Existing lyrics for songs will be overwritten with new ones. This may be less accurate than downloading lyrics one by one. Are you sure you want to continue?</item>
+        <item quantity="other">This will download lyrics for %1$d songs. Existing lyrics for songs will be overwritten with new ones. This may be less accurate than downloading lyrics one by one. Are you sure you want to continue?</item>
     </plurals>
 </resources>
