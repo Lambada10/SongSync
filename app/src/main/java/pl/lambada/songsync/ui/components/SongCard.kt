@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.CombinedModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -29,9 +30,12 @@ fun SongCard(
 ) {
     OutlinedCard(
         shape = RoundedCornerShape(10.dp),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp)
+        modifier = CombinedModifier(
+            outer = Modifier.
+                fillMaxWidth().
+                padding(8.dp),
+            inner = modifier
+        )
     ) {
         Row(modifier = Modifier.height(72.dp)) {
             if (coverUrl != null) {
