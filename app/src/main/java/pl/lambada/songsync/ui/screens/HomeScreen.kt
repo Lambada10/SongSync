@@ -359,7 +359,8 @@ fun SongItem(selected: Boolean, quickSelect: Boolean, onSelectionChanged: (Boole
         val painter = rememberAsyncImagePainter(
             ImageRequest.Builder(LocalContext.current).data(data = song.imgUri)
                 .apply {
-                    placeholder(0)
+                    placeholder(R.drawable.ic_song)
+                    error(R.drawable.ic_song)
                 }.build(),
             imageLoader = LocalContext.current.imageLoader
         )

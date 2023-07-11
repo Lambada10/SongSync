@@ -15,10 +15,13 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.CombinedModifier
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import coil.imageLoader
+import coil.request.ImageRequest
 import pl.lambada.songsync.R
 
 @Composable
@@ -39,8 +42,16 @@ fun SongCard(
     ) {
         Row(modifier = Modifier.height(72.dp)) {
             if (coverUrl != null) {
+                val painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(data = coverUrl)
+                        .apply {
+                            placeholder(R.drawable.ic_song)
+                            error(R.drawable.ic_song)
+                        }.build(),
+                    imageLoader = LocalContext.current.imageLoader
+                )
                 Image(
-                    painter = rememberAsyncImagePainter(model = coverUrl),
+                    painter = painter,
                     contentDescription = stringResource(R.string.album_cover),
                     modifier = Modifier
                         .height(72.dp)
