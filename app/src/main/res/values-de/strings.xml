@@ -23,7 +23,7 @@
     <string name="no_results">Keine Ergebnisse</string>
     <string name="no_internet_server">Keine Internetverbindung oder Server ist down</string>
     <string name="unknown">Unbekannt</string>
-    <string name="what_is_songsync">SongSync ist eine App, die dich sychronisierte Lyric-Dateien (.lrc) für deine lokale Musikbibliothek herunterladen lässt</string>
+    <string name="what_is_songsync">SongSync ist eine App, die dich synchronisierte Lyric-Dateien (.lrc) für deine lokale Musikbibliothek herunterladen lässt</string>
     <string name="extra_what_is_songsync">Du kannst auch nach spezifischen Songs suchen, um ihre Lyrics zu erhalten (und sie in Downloads zu speichern).</string>
     <string name="app_version">App-Version: %1$s</string>
     <string name="what_it_uses">SongSync nutzt die Spotify-API, um Song-Daten zu erhalten. Du kannst weitere Informationen auf der Spotify-Webseite finden.</string>
@@ -46,7 +46,7 @@
     <string name="requires_higher_storage_permissions">Diese App benötigt Speicherzugriff um deine Musikbibliothek zu scannen und Lyrics zu speichern.</string>
     <string name="already_granted_restart">Schon erlaubt? Versuche, die App neuzustarten.</string>
     <string name="no_internet_connection">Keine Internetverbindung</string>
-    <string name="you_need_internet_connection">Du benötigst eine Internetverbindung, um diese App zu verwenden-</string>
+    <string name="you_need_internet_connection">Du benötigst eine Internetverbindung, um diese App zu verwenden.</string>
     <string name="check_your_connection">Bitte überprüfe deine Verbindung und versuch es noch einmal.</string>
     <string name="if_connected_spotify_down">Falls du verbunden bist, kann es sein, das Spotify nicht verfügbar ist. Bitte versuche es später noch einmal.</string>
     <string name="home">Start</string>
@@ -71,4 +71,14 @@
         <item quantity="other">Dies wird Lyrics für %1$d Songs herunterladen. Bereits vorhandene Lyrics werden überschrieben. Dies könnte weniger genau sein, als Lyrics einzelnd herunterzuladen. Bist du sicher, das du fortfahren willst?</item>
     </plurals>
     <string name="no_lyrics">Keine Lyrics: %1$d</string>
+    <string name="clear">Löschen</string>
+    <string name="checking_for_updates">Suche nach Updates</string>
+    <string name="update_available">Update verfügbar</string>
+    <string name="changelog">Changelog:
+\n%1$s</string>
+    <string name="download">Herunterladen</string>
+    <string name="up_to_date">Du verwendest bereits die aktuelle Version</string>
+    <string name="invalid_query">Ungültige Eingabe</string>
+    <string name="check_for_updates">Nach Updates suchen</string>
+    <string name="error_checking_for_updates">Suche nach Updates fehlgeschlagen</string>
 </resources>
