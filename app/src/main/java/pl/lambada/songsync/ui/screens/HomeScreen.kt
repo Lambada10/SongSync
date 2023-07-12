@@ -221,7 +221,11 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
                                 leadingIcon = {
                                     Icon(
                                         Icons.Filled.Search,
-                                        contentDescription = stringResource(id = R.string.search)
+                                        contentDescription = stringResource(id = R.string.search),
+                                        modifier = Modifier.clickable {
+                                            showSearch = false
+                                            showingSearch = false
+                                        }
                                     )
                                 },
                                 trailingIcon = {
