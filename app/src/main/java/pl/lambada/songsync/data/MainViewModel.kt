@@ -92,6 +92,10 @@ class MainViewModel : ViewModel() {
             "${query.songName} ${query.artistName}",
             StandardCharsets.UTF_8.toString()
         )
+
+        if (search == "+")
+            throw EmptyQueryException()
+
         val url = URL("$endpoint?q=$search&type=track&limit=1&offset=$offset")
         val connection = url.openConnection() as HttpURLConnection
 
@@ -247,3 +251,5 @@ class MainViewModel : ViewModel() {
 }
 
 class NoTrackFoundException : Exception()
+
+class EmptyQueryException : Exception()

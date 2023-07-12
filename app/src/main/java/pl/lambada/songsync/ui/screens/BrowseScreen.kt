@@ -46,6 +46,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
+import pl.lambada.songsync.data.EmptyQueryException
+import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.data.dto.SongInfo
@@ -97,7 +99,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
         var queryResult: SongInfo? by rememberSaveable { mutableStateOf(SongInfo(
             songName = querySong, artistName = queryArtist
         )) }
-        var failReason: String? by rememberSaveable { mutableStateOf(null) }
+        var failReason: Exception? by rememberSaveable { mutableStateOf(null) }
 
         Spacer(modifier = Modifier.height(16.dp))
         if (nextSong != null) {
@@ -165,7 +167,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
 
                                 else -> {
                                     queryStatus = QueryStatus.Failed
-                                    failReason = e.toString()
+                                    failReason = e
                                 }
                             }
                         }
@@ -326,16 +328,22 @@ fun BrowseScreen(viewModel: MainViewModel) {
                     },
                     title = { Text(text = stringResource(id = R.string.error)) },
                     text = {
-                        if (failReason?.contains("NoTrackFoundException") == true) {
-                            Text(
-                                text = stringResource(R.string.no_results)
-                            )
-                        } else if (failReason?.contains("?q=+&") == true) { // no query
-                            Text(
-                                text = stringResource(R.string.invalid_query)
-                            )
-                        } else {
-                            Text(text = failReason.toString())
+                        when (failReason) {
+                            is NoTrackFoundException -> {
+                                Text(
+                                    text = stringResource(R.string.no_results)
+                                )
+                            }
+
+                            is EmptyQueryException -> {
+                                Text(
+                                    text = stringResource(R.string.invalid_query)
+                                )
+                            }
+
+                            else -> {
+                                Text(text = failReason.toString())
+                            }
                         }
                     })
             }
