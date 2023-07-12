@@ -22,8 +22,8 @@ android {
         applicationId = "pl.lambada.songsync"
         minSdk = 30
         targetSdk = 33
-        versionCode = 13
-        versionName = "1.3"
+        versionCode = 200
+        versionName = "2.0.0"
 
         resourceConfigurations += arrayOf(
             "en", "es", "de"
