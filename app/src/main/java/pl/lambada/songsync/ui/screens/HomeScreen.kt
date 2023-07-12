@@ -318,8 +318,12 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
                         onSelectionChanged = { newValue ->
                             if (newValue) {
                                 song.filePath?.let { selected.add(it) }
+                                showSearch = false
+                                showingSearch = false
                             } else {
                                 selected.remove(song.filePath)
+                                if (selected.size == 0 && query.text.isNotEmpty())
+                                    showingSearch = true
                             }
                         },
                         navController = navController,
