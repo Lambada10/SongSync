@@ -6,7 +6,7 @@ A simple Android app to download lyrics (.lrc files) for songs in your music lib
 * Download lyrics for individual songs in your music library
 * Search for lyrics for songs not in your music library (and download them)
 
-### Screenshots (v1.0)
+### Screenshots (v2.0.0)
 ![Screenshot 1](https://github.com/Lambada10/SongSync/raw/master/screenshots/screenshot1.png)
 ![Screenshot 2](https://github.com/Lambada10/SongSync/raw/master/screenshots/screenshot2.png)
 ![Screenshot 3](https://github.com/Lambada10/SongSync/raw/master/screenshots/screenshot3.png)
