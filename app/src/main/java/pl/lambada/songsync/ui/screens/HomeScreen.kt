@@ -158,7 +158,7 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
         if (isBatchDownload) {
             BatchDownloadLyrics(
                 songs = if (selected.isEmpty()) displaySongs
-                        else displaySongs.filter { selected.contains(it.filePath) }.toList(),
+                        else songs.filter { selected.contains(it.filePath) }.toList(),
                 viewModel = viewModel,
                 onDone = { isBatchDownload = false }
             )
