@@ -328,7 +328,7 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
                             } else {
                                 selected.remove(song.filePath)
                                 if (selected.size == 0 && query.text.isNotEmpty())
-                                    showingSearch = true
+                                    showingSearch = true // show again but don't focus
                             }
                         },
                         navController = navController,
