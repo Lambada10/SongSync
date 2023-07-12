@@ -514,11 +514,8 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                                     }
                                     continue
                                 }
-                                is NoTrackFoundException -> {
+                                is NoTrackFoundException, is EmptyQueryException -> {
                                     // not increasing notFoundInARow because that is for rate limit
-                                    failedCount++
-                                }
-                                is EmptyQueryException -> {
                                     failedCount++
                                 }
                                 else -> throw e
