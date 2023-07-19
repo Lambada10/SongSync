@@ -20,7 +20,8 @@ android {
 
     defaultConfig {
         applicationId = "pl.lambada.songsync"
-        minSdk = 30
+        minSdk = 21
+        //noinspection OldTargetApi
         targetSdk = 33
         versionCode = 200
         versionName = "2.0.0"
@@ -85,22 +86,14 @@ dependencies {
     implementation(libs.activity.compose)
     implementation(platform(libs.compose.bom))
     implementation(libs.ui)
-    implementation(libs.ui.graphics)
-    implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
-    implementation(libs.androidx.paging.common.ktx)
     debugImplementation(libs.ui.tooling)
-
+    debugImplementation(libs.ui.tooling.preview)
     implementation(libs.accompanist.systemuicontroller)
-    implementation(libs.json)
-    implementation(libs.commons.text)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil.compose)
     implementation(libs.androidx.material.icons.extended)
-    implementation(libs.accompanist.permissions)
-    implementation(libs.accompanist.coil)
     implementation(libs.kotlinx.serialization.json)
-
     implementation(libs.kotlinx.coroutines.android)
 }
