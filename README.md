@@ -18,7 +18,7 @@ A simple Android app to download lyrics (.lrc files) for songs in your music lib
 You can download the latest version of the app from the [releases page](https://github.com/Lambada10/SongSync/releases).
 
 ### Translation
-If you would like to help translating this app, you can do so [here](https://translate.nift4.org/projects/songsync/songsync/).
+If you would like to help translating this app, you can do so [here](https://translate.nift4.org/engage/songsync/).
 
 ### Building
 To build this app, you will need to create a file called `local.properties` in the root directory of the project. This file should contain the following lines:
