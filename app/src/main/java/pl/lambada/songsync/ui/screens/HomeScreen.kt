@@ -1,5 +1,6 @@
 package pl.lambada.songsync.ui.screens
 
+import android.os.Build
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
@@ -541,8 +542,17 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                                         "[ar:${queryResult.artistName}]\n" +
                                         "[by:$generatedUsingString]\n" +
                                         lyricsResult
-                            file?.writeText(lrc)
-
+                            try {
+                                file?.writeText(lrc)
+                            } catch (e: FileNotFoundException) {
+                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && !song.filePath!!.contains("/storage/emulated/0")) {
+                                    // can't save to external storage on legacy
+                                    failedCount++
+                                    continue
+                                } else {
+                                    throw e
+                                }
+                            }
                             successCount++
                         }
                     }
