@@ -1,5 +1,6 @@
 package pl.lambada.songsync.ui.screens
 
+import android.os.Build
 import android.os.Environment
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -251,6 +253,10 @@ fun BrowseScreen(viewModel: MainViewModel) {
                     LyricsStatus.Success -> {
                         // must be non-null
                         val lyrics = lyricsResult!!
+
+                        val isLegacyVersion = Build.VERSION.SDK_INT < Build.VERSION_CODES.R
+                        val isInternalStorage = nextSong?.filePath?.contains("/storage/emulated/0/") ?: true // true because it's not a local song
+
                         Row(
                             modifier = Modifier
                                 .padding(8.dp)
@@ -258,23 +264,29 @@ fun BrowseScreen(viewModel: MainViewModel) {
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Button(onClick = {
-                                val lrc =
-                                    "[ti:${result.songName}]\n" + "[ar:${result.artistName}]\n" + "[by:$generatedUsingString]\n" + lyrics
-                                val file = nextSong?.filePath?.toLrcFile() ?: File(
-                                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                                    "${result.songName} - ${result.artistName}.lrc"
-                                )
-                                file.writeText(lrc)
+                            Button(
+                                onClick = {
+                                    val lrc =
+                                        "[ti:${result.songName}]\n" + "[ar:${result.artistName}]\n" + "[by:$generatedUsingString]\n" + lyrics
+                                    val file = nextSong?.filePath?.toLrcFile() ?: File(
+                                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                                        "SongSync/${result.songName} - ${result.artistName}.lrc"
+                                    )
+                                    file.writeText(lrc)
 
-                                nextSong?.let { viewModel.filteredSongs?.remove(it) } // remove from list because has lyrics now
+                                    nextSong?.let { viewModel.filteredSongs?.remove(it) } // remove from list because has lyrics now
 
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.file_saved_to, file.absolutePath),
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }) {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(
+                                            R.string.file_saved_to,
+                                            file.absolutePath
+                                        ),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                },
+                                enabled = !(isLegacyVersion && !isInternalStorage)
+                            ) {
                                 Text(text = stringResource(R.string.save_lrc_file))
                             }
                             val clipboardManager = LocalClipboardManager.current
@@ -295,6 +307,52 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                 )
                             }
                         }
+
+                        if (isLegacyVersion && !isInternalStorage) {
+                            OutlinedCard(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                shape = RoundedCornerShape(10.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.cannot_save_to_external_storage),
+                                    modifier = Modifier.padding(8.dp)
+                                )
+                                Row {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Button(
+                                        onClick = {
+                                            val lrc =
+                                                "[ti:${result.songName}]\n" + "[ar:${result.artistName}]\n" + "[by:$generatedUsingString]\n" + lyrics
+                                            val songFile =
+                                                nextSong!!.filePath.toLrcFile()?.toURI()
+                                                    ?.let { File(it) }?.name
+
+                                            val file = File(
+                                                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                                                "SongSync/" + songFile.toString()
+                                            )
+                                            file.writeText(lrc)
+
+                                            Toast.makeText(
+                                                context,
+                                                context.getString(
+                                                    R.string.file_saved_to,
+                                                    file.absolutePath
+                                                ),
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                    ) {
+                                        Text(text = stringResource(R.string.save_to_downloads))
+                                    }
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
+
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedCard(
                             modifier = Modifier

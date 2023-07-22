@@ -85,4 +85,6 @@
     <string name="download">Download</string>
     <string name="up_to_date">You\'re using latest version</string>
     <string name="error_checking_for_updates">Error checking for updates</string>
+    <string name="cannot_save_to_external_storage">Saving files to external storage is not supported on this Android version</string>
+    <string name="save_to_downloads">Save to downloads</string>
 </resources>
