@@ -1,13 +1,15 @@
 package pl.lambada.songsync
 
+import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
@@ -21,15 +23,17 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -39,6 +43,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.data.MainViewModel
@@ -58,8 +64,6 @@ import java.net.UnknownHostException
  */
 class MainActivity : ComponentActivity() {
 
-    private var permissionCallback: ((Boolean) -> Unit)? = null
-
     /**
      * Called when the activity is starting.
      *
@@ -68,35 +72,17 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalLayoutApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val storagePermissionResultLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                permissionCallback!!(Environment.isExternalStorageManager())
-            }
-        }
-        val requestPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) {
-            permissionCallback!!(
-                it[android.Manifest.permission.READ_EXTERNAL_STORAGE] ?: false &&
-                        it[android.Manifest.permission.WRITE_EXTERNAL_STORAGE] ?: false)
-        }
         setContent {
             val context = LocalContext.current
+            val scope = rememberCoroutineScope()
             val viewModel: MainViewModel by viewModels()
             val navController = rememberNavController()
             var hasLoadedPermissions by remember { mutableStateOf(false) }
             var hasPermissions by remember { mutableStateOf(false) }
-            var showRationale by remember { mutableStateOf(false) }
             var internetConnection by remember { mutableStateOf(true) }
 
             // Get token upon app start
             LaunchedEffect(Unit) {
-                permissionCallback = {
-                    hasPermissions = it
-                    hasLoadedPermissions = true
-                }
                 launch(Dispatchers.IO) {
                     try {
                         viewModel.refreshToken()
@@ -105,52 +91,6 @@ class MainActivity : ComponentActivity() {
                             internetConnection = false
                         else
                             throw e
-                    }
-                }
-                // Request permissions and wait with check
-                when {
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
-                            !Environment.isExternalStorageManager() -> {
-                        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                        intent.addCategory("android.intent.category.DEFAULT")
-                        intent.data = android.net.Uri.parse(
-                            String.format(
-                                "package:%s",
-                                context.applicationContext.packageName
-                            )
-                        )
-                        storagePermissionResultLauncher.launch(intent)
-                    }
-
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                            Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q &&
-                            !(context.checkSelfPermission(
-                                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                            ) == PackageManager.PERMISSION_GRANTED
-                                    && context.checkSelfPermission(
-                                android.Manifest.permission.READ_EXTERNAL_STORAGE
-                            ) == PackageManager.PERMISSION_GRANTED) -> {
-                        if (shouldShowRequestPermissionRationale(
-                                android.Manifest.permission.READ_EXTERNAL_STORAGE
-                            )
-                            || shouldShowRequestPermissionRationale(
-                                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                            )
-                        ) {
-                            hasLoadedPermissions = true
-                            showRationale = true
-                        } else {
-                            requestPermissionLauncher.launch(
-                                arrayOf(
-                                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                                )
-                            )
-                        }
-                    }
-
-                    else -> {
-                        permissionCallback!!(true)
                     }
                 }
             }
@@ -163,6 +103,22 @@ class MainActivity : ComponentActivity() {
                 var allSongs by remember { mutableStateOf<List<Song>?>(null) }
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
+
+                // Check for permissions and get all songs
+                RequestPermissions(
+                    onGranted = { hasPermissions = true },
+                    context = context,
+                    onDone = {
+                        if (hasPermissions) {
+                            // Get all songs
+                            scope.launch(Dispatchers.IO) {
+                                allSongs = viewModel.getAllSongs(context)
+                            }
+                        }
+                        hasLoadedPermissions = true
+                    }
+                )
+
                 Scaffold(
                     topBar = {
                         TopBar(
@@ -179,13 +135,17 @@ class MainActivity : ComponentActivity() {
                             .let {
                                 if (WindowInsets.isImeVisible) {
                                     // exclude bottom bar if ime is visible
-                                    it.padding(PaddingValues(
-                                        top = paddingValues.calculateTopPadding(),
-                                        start = paddingValues.calculateStartPadding(
-                                            LocalLayoutDirection.current),
-                                        end = paddingValues.calculateEndPadding(
-                                            LocalLayoutDirection.current)
-                                    ))
+                                    it.padding(
+                                        PaddingValues(
+                                            top = paddingValues.calculateTopPadding(),
+                                            start = paddingValues.calculateStartPadding(
+                                                LocalLayoutDirection.current
+                                            ),
+                                            end = paddingValues.calculateEndPadding(
+                                                LocalLayoutDirection.current
+                                            )
+                                        )
+                                    )
                                 } else {
                                     it.padding(paddingValues)
                                 }
@@ -197,38 +157,18 @@ class MainActivity : ComponentActivity() {
                             AlertDialog(
                                 onDismissRequest = { /* don't dismiss */ },
                                 confirmButton = {
-                                    if (!showRationale) {
-                                        Button(
-                                            onClick = {
-                                                finishAndRemoveTask()
-                                            }
-                                        ) {
-                                            Text(stringResource(R.string.close_app))
+                                    OutlinedButton(
+                                        onClick = {
+                                            finishAndRemoveTask()
                                         }
-                                    } else {
-                                        Button(
-                                            onClick = {
-                                                requestPermissionLauncher.launch(
-                                                    arrayOf(
-                                                        android.Manifest.permission
-                                                            .READ_EXTERNAL_STORAGE,
-                                                        android.Manifest.permission
-                                                            .WRITE_EXTERNAL_STORAGE
-                                                    )
-                                                )
-                                            }
-                                        ) {
-                                            Text(stringResource(R.string.ok))
-                                        }
+                                    ) {
+                                        Text(stringResource(R.string.close_app))
                                     }
                                 },
                                 title = { Text(stringResource(R.string.permission_denied)) },
                                 text = {
                                     Column {
-                                        Text(stringResource(
-                                            R.string.requires_higher_storage_permissions))
-                                        if (!showRationale)
-                                            Text(stringResource(R.string.already_granted_restart))
+                                        Text(stringResource(R.string.requires_higher_storage_permissions))
                                     }
                                 }
                             )
@@ -237,16 +177,66 @@ class MainActivity : ComponentActivity() {
                                 finishAndRemoveTask()
                             }
                         } else {
-                            LaunchedEffect(Unit) {
-                                launch(Dispatchers.IO) {
-                                    allSongs = viewModel.getAllSongs(context)
-                                }
-                            }
                             Navigator(navController = navController, selected = selected,
                                 allSongs = allSongs, viewModel = viewModel)
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun RequestPermissions(onGranted : () -> Unit, context: Context, onDone : () -> Unit) {
+    var storageManager: ActivityResultLauncher<Intent>? = null
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        storageManager =
+            rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (Environment.isExternalStorageManager()) {
+                    onGranted()
+                }
+                onDone()
+            }
+    }
+    val storagePermissionState = rememberMultiplePermissionsState(
+        listOf(
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ),
+        onPermissionsResult = {
+            if (
+                it[android.Manifest.permission.READ_EXTERNAL_STORAGE]!! &&
+                it[android.Manifest.permission.WRITE_EXTERNAL_STORAGE]!!
+            ) {
+                onGranted()
+            }
+            onDone()
+        }
+    )
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                intent.addCategory("android.intent.category.DEFAULT")
+                intent.data = android.net.Uri.parse(
+                    String.format(
+                        "package:%s",
+                        context.applicationContext.packageName
+                    )
+                )
+                storageManager!!.launch(intent)
+            } else {
+                onGranted()
+                onDone()
+            }
+        } else {
+            if (storagePermissionState.allPermissionsGranted) {
+                onGranted()
+                onDone()
+            } else {
+                storagePermissionState.launchMultiplePermissionRequest()
             }
         }
     }

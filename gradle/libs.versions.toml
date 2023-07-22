@@ -1,6 +1,6 @@
 [versions]
-accompanist-coil = "0.15.0"
 accompanist-systemuicontroller = "0.31.3-beta"
+accompanist-permissions = "0.31.5-beta"
 agp = "8.1.0-rc01"
 coil-compose = "2.1.0"
 kotlin = "1.8.10"
@@ -16,6 +16,7 @@ navigation-compose = "2.5.3"
 navigation-runtime-ktx = "2.5.3"
 
 [libraries]
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist-systemuicontroller" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }

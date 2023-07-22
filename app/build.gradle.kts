@@ -91,6 +91,7 @@ dependencies {
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.tooling.preview)
     implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.accompanist.permissions)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil.compose)
     implementation(libs.androidx.material.icons.extended)
