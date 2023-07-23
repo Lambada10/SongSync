@@ -1,5 +1,6 @@
 package pl.lambada.songsync.ui.screens
 
+import android.content.Context
 import android.os.Build
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedContent
@@ -30,25 +31,32 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.FilterAltOff
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -151,8 +159,10 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
         restore = { TextFieldValue(it.text, TextRange(it.cursorStart, it.cursorEnd)) })
     ) { mutableStateOf(TextFieldValue()) }
     var isBatchDownload by rememberSaveable { mutableStateOf(false) }
+    var showFilters by rememberSaveable { mutableStateOf(false) }
     var filtered by rememberSaveable { mutableStateOf<List<Song>?>(null) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val displaySongs = filtered ?: songs
 
     Column {
@@ -275,26 +285,26 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
                                 }
                                 Spacer(modifier = Modifier.weight(1f))
                                 IconButton(onClick = {
-                                    scope.launch(Dispatchers.Default) {
-                                        filtered =
-                                            if (filtered != null)
-                                                null
-                                            else {
-                                                if (viewModel.filteredSongs == null) {
-                                                    songs.filter {
-                                                        it.filePath.toLrcFile()?.exists() != true
-                                                    }.toMutableList().also { viewModel.filteredSongs = it }
-                                                }
-                                                else viewModel.filteredSongs
-                                            }
-                                    }
+                                    showFilters = true
                                 }) {
                                     Icon(
-                                        imageVector = if (filtered != null) Icons.Default.FilterAlt
-                                                else Icons.Default.FilterAltOff,
+                                        imageVector = Icons.Default.FilterAlt,
                                         contentDescription = stringResource(R.string.search),
                                     )
                                 }
+
+                                if (showFilters)
+                                    FiltersDialog(
+                                        viewModel = viewModel,
+                                        context = context,
+                                        onDismiss = { showFilters = false },
+                                        onFilterChange = {
+                                            scope.launch(Dispatchers.Default) {
+                                                filtered = viewModel.filterSongs()
+                                            }
+                                        }
+                                    )
+                                
                                 IconButton(onClick = { showSearch = true }) {
                                     Icon(
                                         imageVector = Icons.Default.Search,
@@ -314,9 +324,9 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
                 val songArtistLowercase = song.artist?.lowercaseWithLocale()
                 val queryLowercase = query.text.lowercaseWithLocale()
 
-                if (songTitleLowercase?.contains(queryLowercase) == true || songArtistLowercase?.contains(
-                        queryLowercase
-                    ) == true
+                if (
+                    songTitleLowercase?.contains(queryLowercase) == true ||
+                    songArtistLowercase?.contains(queryLowercase) == true
                 ) {
                     SongItem(
                         selected = selected.contains(song.filePath),
@@ -341,6 +351,121 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
 
             item {
                 Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FiltersDialog(viewModel: MainViewModel, context: Context, onDismiss: () -> Unit, onFilterChange: () -> Unit) {
+    var hideLyrics by remember { mutableStateOf(viewModel.hideLyrics) }
+    val folders = viewModel.getSongFolders(context)
+    var showFolders by rememberSaveable { mutableStateOf(false) }
+
+    AlertDialog(onDismissRequest = { onDismiss() }) {
+        Surface(
+            modifier = Modifier
+                .wrapContentWidth()
+                .wrapContentHeight(),
+            shape = MaterialTheme.shapes.large,
+            tonalElevation = AlertDialogDefaults.TonalElevation
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = stringResource(R.string.filters), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Row(modifier = Modifier.weight(0.8f)) {
+                        Text(stringResource(R.string.no_lyrics_only))
+                    }
+                    Switch(
+                        checked = hideLyrics,
+                        onCheckedChange = {
+                            hideLyrics = it
+                            viewModel.hideLyrics = it
+                            onFilterChange()
+                        })
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Row(modifier = Modifier.weight(0.8f)) {
+                        Text(stringResource(R.string.ignore_folders))
+                    }
+                    IconButton(onClick = {
+                        showFolders = true
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowForward,
+                            contentDescription = null,
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Button(onClick = { onDismiss() } ) {
+                        Text(stringResource(R.string.close))
+                    }
+                }
+            }
+        }
+    }
+
+    if(showFolders) {
+        AlertDialog(onDismissRequest = { showFolders = false }) {
+            Surface(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .wrapContentHeight(),
+                shape = MaterialTheme.shapes.large,
+                tonalElevation = AlertDialogDefaults.TonalElevation
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(text = stringResource(R.string.ignore_folders), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(modifier = Modifier.height(24.dp))
+                    LazyColumn {
+                        items(folders.size) {
+                            val folder = folders[it]
+                            var checked by remember { mutableStateOf(viewModel.blacklistedFolders.contains(folder)) }
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Row(modifier = Modifier.weight(0.8f)) {
+                                    Text(folder)
+                                }
+                                Checkbox(
+                                    checked = checked,
+                                    onCheckedChange = { check ->
+                                        if(check) {
+                                            checked = true
+                                            viewModel.blacklistedFolders.add(folder)
+                                        }
+                                        else {
+                                            checked = false
+                                            viewModel.blacklistedFolders.remove(folder)
+                                        }
+                                        onFilterChange()
+                                    }
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                        item {
+                            Row {
+                                Spacer(modifier = Modifier.weight(1f))
+
+                                Button(onClick = { showFolders = false } ) {
+                                    Text(stringResource(R.string.close))
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -448,8 +573,6 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
             } else {
                 0 // In other cases = 0
             }
-
-            viewModel.filteredSongs = null // Reset no lyrics songs on download start
 
             AlertDialog(
                 title = {

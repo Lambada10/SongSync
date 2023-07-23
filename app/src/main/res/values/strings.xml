@@ -87,4 +87,8 @@
     <string name="error_checking_for_updates">Error checking for updates</string>
     <string name="cannot_save_to_external_storage">Saving files to external storage is not supported on this Android version</string>
     <string name="save_to_downloads">Save to downloads</string>
+    <string name="close">Close</string>
+    <string name="filters">Filters</string>
+    <string name="no_lyrics_only">Only show songs without lyrics</string>
+    <string name="ignore_folders">Ignore folders</string>
 </resources>

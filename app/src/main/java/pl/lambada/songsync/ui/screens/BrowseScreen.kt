@@ -274,8 +274,6 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                     )
                                     file.writeText(lrc)
 
-                                    nextSong?.let { viewModel.filteredSongs?.remove(it) } // remove from list because has lyrics now
-
                                     Toast.makeText(
                                         context,
                                         context.getString(

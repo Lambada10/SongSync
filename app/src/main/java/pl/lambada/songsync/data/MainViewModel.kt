@@ -15,6 +15,7 @@ import pl.lambada.songsync.data.dto.SongInfo
 import pl.lambada.songsync.data.dto.SyncedLinesResponse
 import pl.lambada.songsync.data.dto.TrackSearchResult
 import pl.lambada.songsync.data.ext.getVersion
+import pl.lambada.songsync.data.ext.toLrcFile
 import java.io.BufferedReader
 import java.io.FileNotFoundException
 import java.net.HttpURLConnection
@@ -32,8 +33,13 @@ class MainViewModel : ViewModel() {
         ignoreUnknownKeys = true
     }
     private var cachedSongs: List<Song>? = null
-    var filteredSongs: MutableList<Song>? = null
     var nextSong: Song? = null // for fullscreen downloader dialog
+
+    // Filter settings
+    private var cachedFolders: MutableList<String>? = null
+    var blacklistedFolders = mutableListOf<String>()
+    var hideLyrics = false
+    private var hideFolders = blacklistedFolders.isNotEmpty()
 
     // Spotify API credentials
     private var spotifyClientID = BuildConfig.SPOTIFY_CLIENT_ID
@@ -246,6 +252,49 @@ class MainViewModel : ViewModel() {
             cursor?.close()
             cachedSongs = songs
             cachedSongs!!
+        }
+    }
+
+    /**
+     * Loads all songs' folders
+     * @param context The application context.
+     * @return A list of folders.
+     */
+    fun getSongFolders(context: Context): List<String> {
+        return cachedFolders ?: run {
+            val folders = mutableListOf<String>()
+
+            for (song in getAllSongs(context)) {
+                val path = song.filePath
+                val folder = path?.substring(0, path.lastIndexOf("/"))
+                if (folder != null && !folders.contains(folder))
+                    folders.add(folder)
+            }
+
+            cachedFolders = folders
+            cachedFolders!!
+        }
+    }
+
+    /**
+     * Filter songs based on user's preferences.
+     * @return A list of songs depending on the user's preferences. If no preferences are set, null is returned, so app will use all songs.
+     */
+    fun filterSongs(): List<Song>? {
+        hideFolders = blacklistedFolders.isNotEmpty()
+        return when {
+            hideLyrics && hideFolders -> {
+                cachedSongs!!.filter { it.filePath.toLrcFile()?.exists() != true && !blacklistedFolders.contains(it.filePath!!.substring(0, it.filePath.lastIndexOf("/"))) }
+            }
+            hideLyrics -> {
+                cachedSongs!!.filter { it.filePath.toLrcFile()?.exists() != true }
+            }
+            hideFolders -> {
+                cachedSongs!!.filter { !blacklistedFolders.contains(it.filePath!!.substring(0, it.filePath.lastIndexOf("/"))) }
+            }
+            else -> {
+                null
+            }
         }
     }
 }
