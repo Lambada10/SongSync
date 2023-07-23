@@ -593,7 +593,11 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                     }
                 },
                 onDismissRequest = {
-                    uiState = UiState.Cancelled
+                    /*
+                       it's easy to accidentally dismiss the dialog, and since it's a long running task
+                       we don't want to accidentally cancel it, so we don't allow dismissing the dialog
+                       user can cancel the task by pressing the cancel button
+                     */
                 },
                 confirmButton = {
                     // no button but compose cries when I don't use confirmButton
