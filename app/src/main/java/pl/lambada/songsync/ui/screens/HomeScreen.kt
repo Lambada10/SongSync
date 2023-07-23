@@ -1,6 +1,10 @@
 package pl.lambada.songsync.ui.screens
 
+import android.annotation.SuppressLint
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedContent
@@ -88,6 +92,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.getString
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
@@ -96,6 +102,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import pl.lambada.songsync.MainActivity
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.data.MainViewModel
@@ -524,6 +531,7 @@ fun SongItem(selected: Boolean, quickSelect: Boolean, onSelectionChanged: (Boole
     }
 }
 
+@SuppressLint("StringFormatMatches")
 @Composable
 fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () -> Unit) {
     val unknownString = stringResource(id = R.string.unknown)
@@ -536,8 +544,20 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
     val count = successCount + failedCount + noLyricsCount
     val total = songs.size
 
+    val context = LocalContext.current
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val channelID = getString(context, R.string.batch_download_lyrics)
+    val notificationId = 1
+
+    val resultIntent = Intent(context, MainActivity::class.java)
+    resultIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+    resultIntent.setAction(Intent.ACTION_MAIN)
+    resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    val pendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_IMMUTABLE)
+
     when (uiState) {
         UiState.Cancelled -> {
+            notificationManager.cancel(notificationId)
             onDone()
         }
 
@@ -573,6 +593,15 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
             } else {
                 0 // In other cases = 0
             }
+
+            val notificationBuilder = NotificationCompat.Builder(context, channelID)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(context.getString(R.string.downloading_lyrics))
+                .setContentText(context.getString(R.string.progress, count, total, percentage))
+                .setProgress(100, percentage, false)
+                .setContentIntent(pendingIntent)
+
+            notificationManager.notify(notificationId, notificationBuilder.build())
 
             AlertDialog(
                 title = {
@@ -689,6 +718,16 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
         }
 
         UiState.Done -> {
+            notificationManager.cancel(notificationId)
+
+            val notificationBuilder = NotificationCompat.Builder(context, channelID)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(context.getString(R.string.download_complete))
+                .setContentText(context.getString(R.string.success_failed, successCount, noLyricsCount, failedCount))
+                .setContentIntent(pendingIntent)
+
+            notificationManager.notify(notificationId, notificationBuilder.build())
+
             AlertDialog(
                 title = {
                     Text(text = stringResource(id = R.string.batch_download_lyrics))
@@ -713,6 +752,8 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
         }
 
         UiState.RateLimited -> {
+            notificationManager.cancel(notificationId)
+
             AlertDialog(
                 title = {
                     Text(text = stringResource(id = R.string.batch_download_lyrics))

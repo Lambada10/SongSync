@@ -1,5 +1,7 @@
 package pl.lambada.songsync
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -44,7 +46,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.data.MainViewModel
@@ -101,6 +106,21 @@ class MainActivity : ComponentActivity() {
             val songSyncDir = File(downloadsDir, "SongSync")
             if (!songSyncDir.exists()) {
                 songSyncDir.mkdir()
+            }
+
+            // Register notification channel
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val notificationManager =
+                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+                val channelId = getString(R.string.batch_download_lyrics)
+                val channelName = getString(R.string.batch_download_lyrics)
+                val channelDescription = getString(R.string.batch_download_lyrics)
+                val importance = NotificationManager.IMPORTANCE_LOW
+                val channel = NotificationChannel(channelId, channelName, importance)
+                channel.description = channelDescription
+
+                notificationManager.createNotificationChannel(channel)
             }
 
             SongSyncTheme {
@@ -223,7 +243,17 @@ fun RequestPermissions(onGranted : () -> Unit, context: Context, onDone : () -> 
             onDone()
         }
     )
+    var notificationPermission: PermissionState? = null
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        notificationPermission = rememberPermissionState(
+            permission = android.Manifest.permission.POST_NOTIFICATIONS
+        )
+    }
     LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (!notificationPermission!!.status.isGranted)
+                notificationPermission.launchPermissionRequest()
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
