@@ -213,6 +213,12 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onResume() {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(2) // "Done" notification
+        super.onResume()
+    }
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
