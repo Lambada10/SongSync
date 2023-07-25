@@ -599,6 +599,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                 .setContentTitle(context.getString(R.string.downloading_lyrics))
                 .setContentText(context.getString(R.string.progress, count, total, percentage))
                 .setProgress(100, percentage, false)
+                .setTimeoutAfter(2000)
                 .setContentIntent(pendingIntent)
 
             notificationManager.notify(notificationId, notificationBuilder.build())
