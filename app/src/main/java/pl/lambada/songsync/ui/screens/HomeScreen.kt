@@ -547,7 +547,6 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
     val context = LocalContext.current
     val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     val channelID = getString(context, R.string.batch_download_lyrics)
-    val notificationId = 1
 
     val resultIntent = Intent(context, MainActivity::class.java)
     resultIntent.addCategory(Intent.CATEGORY_LAUNCHER)
@@ -557,7 +556,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
 
     when (uiState) {
         UiState.Cancelled -> {
-            notificationManager.cancel(notificationId)
+            notificationManager.cancelAll()
             onDone()
         }
 
@@ -602,7 +601,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                 .setTimeoutAfter(2000)
                 .setContentIntent(pendingIntent)
 
-            notificationManager.notify(notificationId, notificationBuilder.build())
+            notificationManager.notify(1, notificationBuilder.build())
 
             AlertDialog(
                 title = {
@@ -719,7 +718,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
         }
 
         UiState.Done -> {
-            notificationManager.cancel(notificationId)
+            notificationManager.cancelAll()
 
             val notificationBuilder = NotificationCompat.Builder(context, channelID)
                 .setSmallIcon(R.drawable.ic_notification)
@@ -727,7 +726,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                 .setContentText(context.getString(R.string.success_failed, successCount, noLyricsCount, failedCount))
                 .setContentIntent(pendingIntent)
 
-            notificationManager.notify(notificationId, notificationBuilder.build())
+            notificationManager.notify(2, notificationBuilder.build())
 
             AlertDialog(
                 title = {
@@ -753,7 +752,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
         }
 
         UiState.RateLimited -> {
-            notificationManager.cancel(notificationId)
+            notificationManager.cancelAll()
 
             AlertDialog(
                 title = {
