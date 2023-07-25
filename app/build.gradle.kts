@@ -23,8 +23,8 @@ android {
         minSdk = 21
         //noinspection OldTargetApi
         targetSdk = 33
-        versionCode = 200
-        versionName = "2.0.0"
+        versionCode = 210
+        versionName = "2.1.0"
 
         resourceConfigurations += arrayOf(
             "en", "es", "de", "zh-rCN", "in"
