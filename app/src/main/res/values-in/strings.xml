@@ -30,7 +30,7 @@
     <string name="create_issue">Kamu juga bisa membuat isu di GitHub (pranala-nya ada di atas).</string>
     <string name="source_code">Kode sumber</string>
     <string name="support">Dukungan</string>
-    <string name="unknown">Tidak diketahui</string>
+    <string name="unknown">Tidak Diketahui</string>
     <string name="ok">Oke</string>
     <string name="developer">Pengembang</string>
     <string name="lead_developer">Pengembang utama</string>
@@ -70,7 +70,7 @@
     <string name="this_track_has_no_lyrics">Lagu ini tidak memiliki lirik</string>
     <string name="please_do_not_close_the_app_this_may_take_a_while">Mohon jangan menutup aplikasinya, proses ini mungkin memakan waktu yang cukup lama</string>
     <string name="no_internet_server">Tidak ada koneksi internet atau peladen (server) sedang tidak aktif</string>
-    <string name="extra_what_is_songsync">Kamu juga bisa mencari lagu spesifik untuk bisa memperoleh liriknya (dan menyimpannya di Unduhan).</string>
+    <string name="extra_what_is_songsync">Kamu juga bisa mencari lagu spesifik untuk bisa memperoleh liriknya (dan menyimpannya ke Unduhan).</string>
     <string name="how_we_get_lyrics">SongSync menggunakan API SpotifyLyrics untuk memperoleh lirik bagi lagu. Kamu bisa menemukan informasi selengkapnya tentang API SpotifyLyrics di halaman GitHub mereka.</string>
     <string name="contributor">Kontributor</string>
     <string name="requires_higher_storage_permissions">Aplikasi ini membutuhkan akses penyimpanan untuk memindai pustaka musik milikmu dan menyimpan lirik.</string>
@@ -80,4 +80,10 @@
     <plurals name="this_will_download_lyrics_for_all_songs">
         <item quantity="other">Tindakan ini akan mengunduh lirik bagi %1$d lagu. Lirik lagu yang sudah ada akan ditimpa dengan yang baru. Tindakan ini mungkin kurang akurat dibandingkan dengan mengunduh liriknya satu per satu. Apakah kamu yakin ingin melanjutkan\?</item>
     </plurals>
+    <string name="save_to_downloads">Simpan ke Unduhan</string>
+    <string name="close">Tutup</string>
+    <string name="filters">Penyaringan</string>
+    <string name="ignore_folders">Abaikan folder</string>
+    <string name="cannot_save_to_external_storage">Menyimpan berkas ke penyimpanan eksternal tidak didukung pada versi Android ini</string>
+    <string name="no_lyrics_only">Hanya perlihatkan lagu-lagu tanpa lirik saja</string>
 </resources>
