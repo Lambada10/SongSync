@@ -167,7 +167,7 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
     ) { mutableStateOf(TextFieldValue()) }
     var isBatchDownload by rememberSaveable { mutableStateOf(false) }
     var showFilters by rememberSaveable { mutableStateOf(false) }
-    var filtered by rememberSaveable { mutableStateOf<List<Song>?>(null) }
+    var filtered by remember { mutableStateOf<List<Song>?>(null) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val displaySongs = filtered ?: songs
