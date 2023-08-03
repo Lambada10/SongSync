@@ -98,6 +98,13 @@ class MainActivity : ComponentActivity() {
                 viewModel.customID = customID
                 viewModel.customSecret = customSecret
             }
+            val blacklist = sharedPreferences.getString("blacklist", null)
+            if(blacklist != null) {
+                viewModel.blacklistedFolders = blacklist.split(",").toMutableList()
+            }
+            val hideLyrics = sharedPreferences.getBoolean("hide_lyrics", false)
+            viewModel.hideLyrics = hideLyrics
+
 
             // Get token upon app start
             LaunchedEffect(Unit) {

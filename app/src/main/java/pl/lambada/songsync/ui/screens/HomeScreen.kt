@@ -172,6 +172,10 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
     val context = LocalContext.current
     val displaySongs = filtered ?: songs
 
+    LaunchedEffect(Unit) {
+        filtered = viewModel.filterSongs()
+    }
+
     Column {
         if (isBatchDownload) {
             BatchDownloadLyrics(
@@ -370,6 +374,11 @@ fun FiltersDialog(viewModel: MainViewModel, context: Context, onDismiss: () -> U
     val folders = viewModel.getSongFolders(context)
     var showFolders by rememberSaveable { mutableStateOf(false) }
 
+    val sharedPreferences = LocalContext.current.getSharedPreferences(
+        "pl.lambada.songsync_preferences",
+        Context.MODE_PRIVATE
+    )
+
     AlertDialog(onDismissRequest = { onDismiss() }) {
         Surface(
             modifier = Modifier
@@ -392,6 +401,7 @@ fun FiltersDialog(viewModel: MainViewModel, context: Context, onDismiss: () -> U
                         onCheckedChange = {
                             hideLyrics = it
                             viewModel.hideLyrics = it
+                            sharedPreferences.edit().putBoolean("hide_lyrics", it).apply()
                             onFilterChange()
                         })
                 }
@@ -456,6 +466,7 @@ fun FiltersDialog(viewModel: MainViewModel, context: Context, onDismiss: () -> U
                                             checked = false
                                             viewModel.blacklistedFolders.remove(folder)
                                         }
+                                        sharedPreferences.edit().putString("blacklist", viewModel.blacklistedFolders.joinToString(",")).apply()
                                         onFilterChange()
                                     }
                                 )
