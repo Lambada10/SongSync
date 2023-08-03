@@ -41,11 +41,15 @@ class MainViewModel : ViewModel() {
     var hideLyrics = false
     private var hideFolders = blacklistedFolders.isNotEmpty()
 
+    // User-defined keys
+    var customID = ""
+    var customSecret = ""
+
     // Spotify API credentials
     private var spotifyClientID = BuildConfig.SPOTIFY_CLIENT_ID
     private var spotifyClientSecret = BuildConfig.SPOTIFY_CLIENT_SECRET
     private var spotifyToken = ""
-    private var tokenTime: Long = 0
+    var tokenTime: Long = 0
 
     // Responses from Spotify and lyrics API
     private var spotifyResponse = ""
@@ -58,7 +62,6 @@ class MainViewModel : ViewModel() {
         if (System.currentTimeMillis() - tokenTime < 1800000) { // 30 minutes
             return
         }
-
         val url = URL("https://accounts.spotify.com/api/token")
         val connection = url.openConnection() as HttpURLConnection
 
@@ -66,8 +69,11 @@ class MainViewModel : ViewModel() {
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
         connection.doOutput = true
 
+        val realID = if (customID.isNotEmpty()) customID else spotifyClientID
+        val realSecret = if (customSecret.isNotEmpty()) customSecret else spotifyClientSecret
+
         val postData =
-            "grant_type=client_credentials&client_id=$spotifyClientID&client_secret=$spotifyClientSecret"
+            "grant_type=client_credentials&client_id=$realID&client_secret=$realSecret"
         val postDataBytes = postData.toByteArray(StandardCharsets.UTF_8)
 
         connection.outputStream.use {

@@ -21,12 +21,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,6 +37,8 @@ import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.dto.Release
 import pl.lambada.songsync.data.ext.getVersion
 import pl.lambada.songsync.ui.components.AboutCard
+import pl.lambada.songsync.ui.components.CommonTextField
+import java.io.FileNotFoundException
 
 /**
  * Composable function for AboutScreen component.
@@ -43,12 +47,122 @@ import pl.lambada.songsync.ui.components.AboutCard
 fun AboutScreen(viewModel: MainViewModel) {
     val uriHandler = LocalUriHandler.current
     val version = LocalContext.current.getVersion()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
     ) {
+        item {
+            AboutCard(label = stringResource(R.string.custom_spotify_api_credentials)) {
+                val sharedPreferences = context.getSharedPreferences(
+                    "pl.lambada.songsync_preferences",
+                    Context.MODE_PRIVATE
+                )
+                val customID = sharedPreferences.getString("custom_id", null)
+                var customDisplayID by rememberSaveable { mutableStateOf(customID ?: "") }
+                val customSecret = sharedPreferences.getString("custom_secret", null)
+                var customDisplaySecret by rememberSaveable { mutableStateOf(customSecret ?: "") }
+
+                Text(stringResource(R.string.custom_spotify_api_credentials_desc))
+
+                CommonTextField(
+                    label = stringResource(R.string.spotify_client_id),
+                    value = customDisplayID,
+                    onValueChange = { customDisplayID = it.toString() },
+                    imeAction = ImeAction.Next,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
+                CommonTextField(
+                    label = stringResource(R.string.spotify_client_secret),
+                    value = customDisplaySecret,
+                    onValueChange = { customDisplaySecret = it.toString() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Button(
+                        modifier = Modifier.padding(top = 8.dp),
+                        onClick = {
+                            var tokenFailed = false
+                            if (customDisplayID != "" && customDisplaySecret != "") {
+                                sharedPreferences.edit()
+                                    .putString("custom_id", customDisplayID)
+                                    .putString("custom_secret", customDisplaySecret)
+                                    .apply()
+
+                                viewModel.customID = customDisplayID
+                                viewModel.customSecret = customDisplaySecret
+                                viewModel.tokenTime = 0
+                                scope.launch(Dispatchers.IO) {
+                                    try {
+                                        viewModel.refreshToken()
+                                    } catch (e: FileNotFoundException) {
+                                        tokenFailed = true
+                                    }
+                                    if (tokenFailed) {
+                                        viewModel.customID = ""
+                                        viewModel.customSecret = ""
+                                        viewModel.tokenTime = 0
+                                        viewModel.refreshToken()
+                                        sharedPreferences.edit()
+                                            .remove("custom_id")
+                                            .remove("custom_secret")
+                                            .apply()
+                                        scope.launch(Dispatchers.Main) {
+                                            Toast.makeText(
+                                                context,
+                                                context.getString(R.string.invalid_credentials),
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    } else {
+                                        scope.launch(Dispatchers.Main) {
+                                            Toast.makeText(
+                                                context,
+                                                context.getString(R.string.credentials_saved),
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
+                                }
+                            } else if (customDisplayID == "" && customDisplaySecret == "") {
+                                sharedPreferences.edit()
+                                    .remove("custom_id")
+                                    .remove("custom_secret")
+                                    .apply()
+                                viewModel.customID = ""
+                                viewModel.customSecret = ""
+                                viewModel.tokenTime = 0
+                                scope.launch(Dispatchers.IO) {
+                                    viewModel.refreshToken()
+                                }
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.credentials_removed),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.fill_both_or_none),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    ) {
+                        Text(stringResource(R.string.save))
+                    }
+                }
+            }
+        }
+
         item {
             var update by rememberSaveable { mutableStateOf(false) }
             AboutCard(stringResource(R.string.about_songsync)) {

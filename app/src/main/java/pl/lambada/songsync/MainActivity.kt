@@ -87,6 +87,18 @@ class MainActivity : ComponentActivity() {
             var hasPermissions by remember { mutableStateOf(false) }
             var internetConnection by remember { mutableStateOf(true) }
 
+            // Load user-defined settings
+            val sharedPreferences = LocalContext.current.getSharedPreferences(
+                "pl.lambada.songsync_preferences",
+                Context.MODE_PRIVATE
+            )
+            val customID = sharedPreferences.getString("custom_id", null)
+            val customSecret = sharedPreferences.getString("custom_secret", null)
+            if(customID != null && customSecret != null) {
+                viewModel.customID = customID
+                viewModel.customSecret = customSecret
+            }
+
             // Get token upon app start
             LaunchedEffect(Unit) {
                 launch(Dispatchers.IO) {

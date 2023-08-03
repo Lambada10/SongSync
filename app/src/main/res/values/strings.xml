@@ -91,4 +91,13 @@
     <string name="filters">Filters</string>
     <string name="no_lyrics_only">Only show songs without lyrics</string>
     <string name="ignore_folders">Ignore folders</string>
+    <string name="custom_spotify_api_credentials_desc">Here you can set your own Spotify API credentials. Leave empty to use default values.</string>
+    <string name="save">Save</string>
+    <string name="fill_both_or_none">Please fill both fields or leave them empty</string>
+    <string name="credentials_removed">Credentials removed</string>
+    <string name="credentials_saved">Credentials saved</string>
+    <string name="invalid_credentials">Invalid credentials</string>
+    <string name="spotify_client_secret">Spotify Client Secret</string>
+    <string name="spotify_client_id">Spotify Client ID</string>
+    <string name="custom_spotify_api_credentials">Custom Spotify API credentials</string>
 </resources>
