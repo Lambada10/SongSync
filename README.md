@@ -15,6 +15,7 @@ A simple Android app to download lyrics (.lrc files) for songs in your music lib
 ![Screenshot 6](https://github.com/Lambada10/SongSync/raw/master/screenshots/screenshot6.png)
 
 ### Installation
+[![Get it on IzzyOnDroid](https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png)](https://apt.izzysoft.de/fdroid/index/apk/pl.lambada.songsync/)
 You can download the latest version of the app from the [releases page](https://github.com/Lambada10/SongSync/releases).
 
 ### Translation
