@@ -100,4 +100,6 @@
     <string name="spotify_client_secret">Spotify Client Secret</string>
     <string name="spotify_client_id">Spotify Client ID</string>
     <string name="custom_spotify_api_credentials">Custom Spotify API credentials</string>
+    <string name="batch_download_lyrics_legacy_warning">You\'re using older Android version and saving lyrics to external storage won\'t be possible. What do you want to do with songs on external storage?</string>
+    <string name="treat_as_failed">Treat as failed (skip)</string>
 </resources>

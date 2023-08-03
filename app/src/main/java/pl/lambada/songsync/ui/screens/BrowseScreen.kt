@@ -323,8 +323,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                         onClick = {
                                             val lrc =
                                                 "[ti:${result.songName}]\n" + "[ar:${result.artistName}]\n" + "[by:$generatedUsingString]\n" + lyrics
-                                            val songFile =
-                                                nextSong!!.filePath.toLrcFile()?.toURI()
+                                            val songFile = nextSong!!.filePath.toLrcFile()?.toURI()
                                                     ?.let { File(it) }?.name
 
                                             val file = File(

@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Environment
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
@@ -113,6 +114,7 @@ import pl.lambada.songsync.data.ext.lowercaseWithLocale
 import pl.lambada.songsync.data.ext.toLrcFile
 import pl.lambada.songsync.ui.Screens
 import pl.lambada.songsync.ui.components.MarqueeText
+import java.io.File
 import java.io.FileNotFoundException
 import kotlin.math.roundToInt
 
@@ -554,6 +556,8 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
     var successCount by rememberSaveable { mutableIntStateOf(0) }
     val count = successCount + failedCount + noLyricsCount
     val total = songs.size
+    val isLegacyVersion = Build.VERSION.SDK_INT < Build.VERSION_CODES.R
+    var legacySaveToDownloads by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
     val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -585,13 +589,57 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                     uiState = UiState.Cancelled
                 },
                 confirmButton = {
-                    Button(onClick = { uiState = UiState.Pending }) {
+                    Button(
+                        onClick = {
+                            uiState = if (isLegacyVersion) {
+                                UiState.LegacyPrompt
+                            } else {
+                                UiState.Pending
+                            }
+                        }
+                    ) {
                         Text(text = stringResource(R.string.yes))
                     }
                 },
                 dismissButton = {
                     OutlinedButton(onClick = { uiState = UiState.Cancelled }) {
                         Text(text = stringResource(R.string.no))
+                    }
+                }
+            )
+        }
+
+        UiState.LegacyPrompt -> {
+            AlertDialog(
+                title = {
+                    Text(text = stringResource(id = R.string.batch_download_lyrics))
+                },
+                text = {
+                    Column {
+                        Text(text = stringResource(R.string.batch_download_lyrics_legacy_warning))
+                    }
+                },
+                onDismissRequest = {
+                    uiState = UiState.Cancelled
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            legacySaveToDownloads = true
+                            uiState = UiState.Pending
+                        }
+                    ) {
+                        Text(text = stringResource(R.string.save_to_downloads))
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(
+                        onClick = {
+                            legacySaveToDownloads = false
+                            uiState = UiState.Pending
+                        }
+                    ) {
+                        Text(text = stringResource(R.string.treat_as_failed))
                     }
                 }
             )
@@ -713,9 +761,17 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                                 file?.writeText(lrc)
                             } catch (e: FileNotFoundException) {
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && !song.filePath!!.contains("/storage/emulated/0")) {
-                                    // can't save to external storage on legacy
-                                    failedCount++
-                                    continue
+                                    if (!legacySaveToDownloads) {
+                                        failedCount++
+                                        continue
+                                    }
+                                    val songFile = song!!.filePath.toLrcFile()?.toURI()
+                                            ?.let { File(it) }?.name
+                                    val newFile = File(
+                                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                                        "SongSync/" + songFile.toString()
+                                    )
+                                    newFile.writeText(lrc)
                                 } else {
                                     throw e
                                 }
@@ -789,5 +845,5 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
 }
 
 enum class UiState {
-    Warning, Pending, Done, RateLimited, Cancelled
+    Warning, LegacyPrompt, Pending, Done, RateLimited, Cancelled
 }
