@@ -5,4 +5,5 @@
     <locale android:name="de" />
     <locale android:name="zh-rCN" />
     <locale android:name="in" />
+    <locale android:name="ro" />
 </locale-config>

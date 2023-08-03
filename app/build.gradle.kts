@@ -27,7 +27,7 @@ android {
         versionName = "2.1.0"
 
         resourceConfigurations += arrayOf(
-            "en", "es", "de", "zh-rCN", "in"
+            "en", "es", "de", "zh-rCN", "in", "ro"
         )
 
         vectorDrawables {
