@@ -91,15 +91,16 @@
     <string name="filters">Filters</string>
     <string name="no_lyrics_only">Only show songs without lyrics</string>
     <string name="ignore_folders">Ignore folders</string>
-    <string name="custom_spotify_api_credentials_desc">Here you can set your own Spotify API credentials. Leave empty to use default values.</string>
     <string name="save">Save</string>
-    <string name="fill_both_or_none">Please fill both fields or leave them empty</string>
-    <string name="credentials_removed">Credentials removed</string>
     <string name="credentials_saved">Credentials saved</string>
     <string name="invalid_credentials">Invalid credentials</string>
     <string name="spotify_client_secret">Spotify Client Secret</string>
     <string name="spotify_client_id">Spotify Client ID</string>
-    <string name="custom_spotify_api_credentials">Custom Spotify API credentials</string>
     <string name="batch_download_lyrics_legacy_warning">You\'re using older Android version and saving lyrics to external storage won\'t be possible. What do you want to do with songs on external storage?</string>
     <string name="treat_as_failed">Treat as failed (skip)</string>
+    <string name="way_to_get_token">Way to get Spotify token</string>
+    <string name="cant_be_empty">Fields can\'t be empty</string>
+    <string name="default_keys">Default API credentials</string>
+    <string name="web_player_keys">Web Player API</string>
+    <string name="custom_keys">Custom API credentials</string>
 </resources>

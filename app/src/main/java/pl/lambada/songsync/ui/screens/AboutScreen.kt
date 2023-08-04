@@ -4,6 +4,10 @@ package pl.lambada.songsync.ui.screens
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,14 +20,18 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -56,74 +64,152 @@ fun AboutScreen(viewModel: MainViewModel) {
             .padding(8.dp)
     ) {
         item {
-            AboutCard(label = stringResource(R.string.custom_spotify_api_credentials)) {
+            AboutCard(
+                label = stringResource(R.string.way_to_get_token),
+                columnModifier = Modifier
+                    .animateContentSize(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        )
+                    )
+            ) {
                 val sharedPreferences = context.getSharedPreferences(
                     "pl.lambada.songsync_preferences",
                     Context.MODE_PRIVATE
                 )
-                val customID = sharedPreferences.getString("custom_id", null)
-                var customDisplayID by rememberSaveable { mutableStateOf(customID ?: "") }
-                val customSecret = sharedPreferences.getString("custom_secret", null)
-                var customDisplaySecret by rememberSaveable { mutableStateOf(customSecret ?: "") }
 
-                Text(stringResource(R.string.custom_spotify_api_credentials_desc))
-
-                CommonTextField(
-                    label = stringResource(R.string.spotify_client_id),
-                    value = customDisplayID,
-                    onValueChange = { customDisplayID = it.toString() },
-                    imeAction = ImeAction.Next,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                )
-                CommonTextField(
-                    label = stringResource(R.string.spotify_client_secret),
-                    value = customDisplaySecret,
-                    onValueChange = { customDisplaySecret = it.toString() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                )
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button(
-                        modifier = Modifier.padding(top = 8.dp),
+                var selected by remember { mutableIntStateOf(viewModel.tokenType) }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        selected = 0
+                        viewModel.tokenType = 0
+                        sharedPreferences.edit().putInt("token_type", 0).apply()
+                    }
+                ) {
+                    RadioButton(
+                        selected = selected == 0,
                         onClick = {
-                            var tokenFailed = false
-                            if (customDisplayID != "" && customDisplaySecret != "") {
-                                sharedPreferences.edit()
-                                    .putString("custom_id", customDisplayID)
-                                    .putString("custom_secret", customDisplaySecret)
-                                    .apply()
+                            selected = 0
+                            viewModel.tokenType = 0
+                            sharedPreferences.edit().putInt("token_type", 0).apply()
+                        },
+                    )
+                    Text(stringResource(R.string.default_keys))
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        selected = 1
+                        viewModel.tokenType = 1
+                        sharedPreferences.edit().putInt("token_type", 1).apply()
+                    }
+                ) {
+                    RadioButton(
+                        selected = selected == 1,
+                        onClick = {
+                            selected = 1
+                            viewModel.tokenType = 1
+                            sharedPreferences.edit().putInt("token_type", 1).apply()
+                        },
+                    )
+                    Text(stringResource(R.string.web_player_keys))
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        selected = 2
+                        viewModel.tokenType = 2
+                        sharedPreferences.edit().putInt("token_type", 2).apply()
+                    }
+                ) {
+                    RadioButton(
+                        selected = selected == 2,
+                        onClick = {
+                            selected = 2
+                            viewModel.tokenType = 2
+                            sharedPreferences.edit().putInt("token_type", 2).apply()
+                        },
+                    )
+                    Text(stringResource(R.string.custom_keys))
+                }
 
-                                viewModel.customID = customDisplayID
-                                viewModel.customSecret = customDisplaySecret
-                                viewModel.tokenTime = 0
-                                scope.launch(Dispatchers.IO) {
-                                    try {
-                                        viewModel.refreshToken()
-                                    } catch (e: FileNotFoundException) {
-                                        tokenFailed = true
+                when (selected) {
+                    0, 1 -> {
+                        LaunchedEffect(selected) {
+                            viewModel.tokenTime = 0
+                            launch(Dispatchers.IO) {
+                                viewModel.refreshToken()
+                            }
+                        }
+                    }
+                    2 -> {
+                        val customID = sharedPreferences.getString("custom_id", null)
+                        var customDisplayID by rememberSaveable { mutableStateOf(customID ?: "") }
+                        val customSecret = sharedPreferences.getString("custom_secret", null)
+                        var customDisplaySecret by rememberSaveable { mutableStateOf(customSecret ?: "") }
+
+                        CommonTextField(
+                            label = stringResource(R.string.spotify_client_id),
+                            value = customDisplayID,
+                            onValueChange = { customDisplayID = it.toString() },
+                            imeAction = ImeAction.Next,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                        )
+                        CommonTextField(
+                            label = stringResource(R.string.spotify_client_secret),
+                            value = customDisplaySecret,
+                            onValueChange = { customDisplaySecret = it.toString() },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                        )
+                        Row {
+                            Spacer(modifier = Modifier.weight(1f))
+                            Button(
+                                modifier = Modifier.padding(top = 8.dp),
+                                onClick = {
+                                    if (customDisplayID == "" || customDisplaySecret == "") {
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.cant_be_empty),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        return@Button
                                     }
-                                    if (tokenFailed) {
-                                        viewModel.customID = ""
-                                        viewModel.customSecret = ""
-                                        viewModel.tokenTime = 0
-                                        viewModel.refreshToken()
-                                        sharedPreferences.edit()
-                                            .remove("custom_id")
-                                            .remove("custom_secret")
-                                            .apply()
-                                        scope.launch(Dispatchers.Main) {
-                                            Toast.makeText(
-                                                context,
-                                                context.getString(R.string.invalid_credentials),
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+
+                                    sharedPreferences.edit()
+                                        .putString("custom_id", customDisplayID)
+                                        .putString("custom_secret", customDisplaySecret)
+                                        .apply()
+                                    viewModel.customID = customDisplayID
+                                    viewModel.customSecret = customDisplaySecret
+                                    viewModel.tokenTime = 0
+
+                                    scope.launch(Dispatchers.IO) {
+                                        try {
+                                            viewModel.refreshToken()
+                                        } catch (e: FileNotFoundException) {
+                                            launch(Dispatchers.Main) {
+                                                Toast.makeText(
+                                                    context,
+                                                    context.getString(R.string.invalid_credentials),
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                            viewModel.customID = ""
+                                            viewModel.customSecret = ""
+                                            viewModel.tokenType = 0
+                                            viewModel.tokenTime = 0
+                                            launch(Dispatchers.IO) {
+                                                viewModel.refreshToken()
+                                            }
+                                            return@launch
                                         }
-                                    } else {
-                                        scope.launch(Dispatchers.Main) {
+                                        launch(Dispatchers.Main) {
                                             Toast.makeText(
                                                 context,
                                                 context.getString(R.string.credentials_saved),
@@ -132,32 +218,10 @@ fun AboutScreen(viewModel: MainViewModel) {
                                         }
                                     }
                                 }
-                            } else if (customDisplayID == "" && customDisplaySecret == "") {
-                                sharedPreferences.edit()
-                                    .remove("custom_id")
-                                    .remove("custom_secret")
-                                    .apply()
-                                viewModel.customID = ""
-                                viewModel.customSecret = ""
-                                viewModel.tokenTime = 0
-                                scope.launch(Dispatchers.IO) {
-                                    viewModel.refreshToken()
-                                }
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.credentials_removed),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.fill_both_or_none),
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                            ) {
+                                Text(stringResource(R.string.save))
                             }
                         }
-                    ) {
-                        Text(stringResource(R.string.save))
                     }
                 }
             }

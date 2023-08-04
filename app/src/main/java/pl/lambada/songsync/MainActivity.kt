@@ -105,6 +105,8 @@ class MainActivity : ComponentActivity() {
                 }
                 val hideLyrics = sharedPreferences.getBoolean("hide_lyrics", false)
                 viewModel.hideLyrics = hideLyrics
+                val tokenType = sharedPreferences.getInt("token_type", 0)
+                viewModel.tokenType = tokenType
 
                 // Get token upon app start
                 launch(Dispatchers.IO) {

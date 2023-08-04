@@ -14,6 +14,7 @@ import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.data.dto.SongInfo
 import pl.lambada.songsync.data.dto.SyncedLinesResponse
 import pl.lambada.songsync.data.dto.TrackSearchResult
+import pl.lambada.songsync.data.dto.WebPlayerTokenResponse
 import pl.lambada.songsync.data.ext.getVersion
 import pl.lambada.songsync.data.ext.toLrcFile
 import java.io.BufferedReader
@@ -41,6 +42,14 @@ class MainViewModel : ViewModel() {
     var hideLyrics = false
     private var hideFolders = blacklistedFolders.isNotEmpty()
 
+    /**
+     * Way to get token
+     * 0 - Default (provided by app)
+     * 1 - Web Player
+     * 2 - Custom (provided by user)
+     */
+    var tokenType = 0
+
     // User-defined keys
     var customID = ""
     var customSecret = ""
@@ -62,6 +71,24 @@ class MainViewModel : ViewModel() {
         if (System.currentTimeMillis() - tokenTime < 1800000) { // 30 minutes
             return
         }
+
+        if (tokenType == 1) {
+            val url = URL("https://open.spotify.com/get_access_token?reason=transport&productType=web_player")
+            val connection = url.openConnection() as HttpURLConnection
+
+            connection.requestMethod = "GET"
+            connection.setRequestProperty("Content-Type", "application/json")
+
+            val response = connection.inputStream.bufferedReader().use(BufferedReader::readText)
+            connection.disconnect()
+
+            val json = jsonDec.decodeFromString<WebPlayerTokenResponse>(response)
+
+            this.spotifyToken = json.accessToken
+            this.tokenTime = System.currentTimeMillis()
+            return
+        }
+
         val url = URL("https://accounts.spotify.com/api/token")
         val connection = url.openConnection() as HttpURLConnection
 
@@ -69,8 +96,8 @@ class MainViewModel : ViewModel() {
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
         connection.doOutput = true
 
-        val realID = if (customID.isNotEmpty()) customID else spotifyClientID
-        val realSecret = if (customSecret.isNotEmpty()) customSecret else spotifyClientSecret
+        val realID = if (tokenType == 2) customID else spotifyClientID
+        val realSecret = if (tokenType == 2) customSecret else spotifyClientSecret
 
         val postData =
             "grant_type=client_credentials&client_id=$realID&client_secret=$realSecret"

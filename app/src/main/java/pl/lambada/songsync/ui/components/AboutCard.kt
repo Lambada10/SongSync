@@ -10,11 +10,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.CombinedModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AboutCard(label: String, content: @Composable () -> Unit) {
+fun AboutCard(label: String, columnModifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -32,11 +33,14 @@ fun AboutCard(label: String, content: @Composable () -> Unit) {
             color = MaterialTheme.colorScheme.primary
         )
         Column(
-            modifier = Modifier.padding(
-                start = 8.dp,
-                top = 0.dp,
-                end = 8.dp,
-                bottom = 8.dp
+            modifier = CombinedModifier(
+                outer = Modifier.padding(
+                    start = 8.dp,
+                    top = 0.dp,
+                    end = 8.dp,
+                    bottom = 8.dp
+                ),
+                inner = columnModifier
             )
         ) {
             content()
