@@ -80,9 +80,10 @@ fun AboutScreen(viewModel: MainViewModel) {
                 )
 
                 var selected by remember { mutableIntStateOf(viewModel.tokenType) }
+                val hasDefaultKeys = viewModel.isBuiltWithKeys
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable {
+                    modifier = Modifier.clickable(hasDefaultKeys) {
                         selected = 0
                         viewModel.tokenType = 0
                         sharedPreferences.edit().putInt("token_type", 0).apply()
@@ -95,6 +96,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                             viewModel.tokenType = 0
                             sharedPreferences.edit().putInt("token_type", 0).apply()
                         },
+                        enabled = hasDefaultKeys
                     )
                     Text(stringResource(R.string.default_keys))
                 }
@@ -202,7 +204,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                                             }
                                             viewModel.customID = ""
                                             viewModel.customSecret = ""
-                                            viewModel.tokenType = 0
+                                            viewModel.tokenType = if (hasDefaultKeys) 0 else 1
                                             viewModel.tokenTime = 0
                                             launch(Dispatchers.IO) {
                                                 viewModel.refreshToken()

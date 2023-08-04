@@ -23,7 +23,7 @@ You can download the latest version of the app from the [releases page](https://
 If you would like to help translating this app, you can do so [here](https://translate.nift4.org/engage/songsync/).
 
 ### Building
-To build this app, you will need to create a file called `local.properties` in the root directory of the project. This file should contain the following lines:
+To build this app, it is recommended to create a file called `local.properties` in the root directory of the project. This file should contain the following lines:
 ```properties
 spotify_client_id=<your spotify client id>
 spotify_client_secret=<your spotify client secret>

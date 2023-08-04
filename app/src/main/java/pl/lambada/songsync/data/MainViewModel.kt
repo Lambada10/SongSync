@@ -42,14 +42,6 @@ class MainViewModel : ViewModel() {
     var hideLyrics = false
     private var hideFolders = blacklistedFolders.isNotEmpty()
 
-    /**
-     * Way to get token
-     * 0 - Default (provided by app)
-     * 1 - Web Player
-     * 2 - Custom (provided by user)
-     */
-    var tokenType = 0
-
     // User-defined keys
     var customID = ""
     var customSecret = ""
@@ -57,8 +49,17 @@ class MainViewModel : ViewModel() {
     // Spotify API credentials
     private var spotifyClientID = BuildConfig.SPOTIFY_CLIENT_ID
     private var spotifyClientSecret = BuildConfig.SPOTIFY_CLIENT_SECRET
+    val isBuiltWithKeys = !(spotifyClientID == "" || spotifyClientSecret == "")
     private var spotifyToken = ""
     var tokenTime: Long = 0
+
+    /**
+     * Way to get token
+     * 0 - Default (provided by app)
+     * 1 - Web Player
+     * 2 - Custom (provided by user)
+     */
+    var tokenType = if (isBuiltWithKeys) 0 else 1
 
     // Responses from Spotify and lyrics API
     private var spotifyResponse = ""
