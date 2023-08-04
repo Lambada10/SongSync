@@ -23,7 +23,7 @@
     <string name="no_results">Keine Ergebnisse</string>
     <string name="no_internet_server">Keine Internetverbindung oder Server ist down</string>
     <string name="unknown">Unbekannt</string>
-    <string name="what_is_songsync">SongSync ist eine App, die dich synchronisierte Lyric-Dateien (.lrc) für deine lokale Musikbibliothek herunterladen lässt</string>
+    <string name="what_is_songsync">SongSync ist eine App, die dich synchronisierte Lyric-Dateien (.lrc) für deine lokale Musikbibliothek herunterladen lässt.</string>
     <string name="extra_what_is_songsync">Du kannst auch nach spezifischen Songs suchen, um ihre Lyrics zu erhalten (und sie in Downloads zu speichern).</string>
     <string name="app_version">App-Version: %1$s</string>
     <string name="what_it_uses">SongSync nutzt die Spotify-API, um Song-Daten zu erhalten. Du kannst weitere Informationen auf der Spotify-Webseite finden.</string>
@@ -81,4 +81,23 @@
     <string name="invalid_query">Ungültige Eingabe</string>
     <string name="check_for_updates">Nach Updates suchen</string>
     <string name="error_checking_for_updates">Suche nach Updates fehlgeschlagen</string>
+    <string name="cannot_save_to_external_storage">Dateien auf den externen Speicher speichern ist in dieser Android-Version nicht unterstützt</string>
+    <string name="save_to_downloads">In Downloads speichern</string>
+    <string name="close">Schließen</string>
+    <string name="filters">Filter</string>
+    <string name="no_lyrics_only">Nur Songs ohne Lyrics anzeigen</string>
+    <string name="ignore_folders">Ordner ausblenden</string>
+    <string name="save">Speichern</string>
+    <string name="credentials_saved">Schlüssel gespeichert</string>
+    <string name="spotify_client_secret">Spotify Client-Geheimnis</string>
+    <string name="spotify_client_id">Spotify Client-ID</string>
+    <string name="invalid_credentials">Ungültiger Schlüssel</string>
+    <string name="treat_as_failed">Als \"fehlgeschlagen\" behandeln (überspringen)</string>
+    <string name="way_to_get_token">Wege, einen Spotify-Token zu bekommen</string>
+    <string name="cant_be_empty">Felder dürfen nicht leer sein</string>
+    <string name="web_player_keys">Web Player-API</string>
+    <string name="default_keys">Standard API-Schlüssel</string>
+    <string name="custom_keys">Eigene API-Schlüssel</string>
+    <string name="batch_download_lyrics_legacy_warning">Du nutzt eine alte Android-Version, und Lyrics auf dem externen Speicher speichern ist nicht unterstützt. Was möchtest du mit Songs auf dem externen Speicher tun\?</string>
+    <string name="change_api_strategy">Du kannst außerdem alternative Wege, sich mit Spotify zu verbinden, in den Einstellungen aktivieren.</string>
 </resources>
