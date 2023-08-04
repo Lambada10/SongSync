@@ -1,0 +1,1 @@
+download lyrics (.lrc files) for songs in your music library
