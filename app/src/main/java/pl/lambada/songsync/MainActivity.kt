@@ -88,23 +88,24 @@ class MainActivity : ComponentActivity() {
             var internetConnection by remember { mutableStateOf(true) }
 
             // Load user-defined settings
-            val sharedPreferences = LocalContext.current.getSharedPreferences(
-                "pl.lambada.songsync_preferences",
-                Context.MODE_PRIVATE
-            )
-            val customID = sharedPreferences.getString("custom_id", null)
-            val customSecret = sharedPreferences.getString("custom_secret", null)
-            if(customID != null && customSecret != null) {
-                viewModel.customID = customID
-                viewModel.customSecret = customSecret
+            LaunchedEffect(Unit) {
+                val sharedPreferences = context.getSharedPreferences(
+                    "pl.lambada.songsync_preferences",
+                    Context.MODE_PRIVATE
+                )
+                val customID = sharedPreferences.getString("custom_id", null)
+                val customSecret = sharedPreferences.getString("custom_secret", null)
+                if (customID != null && customSecret != null) {
+                    viewModel.customID = customID
+                    viewModel.customSecret = customSecret
+                }
+                val blacklist = sharedPreferences.getString("blacklist", null)
+                if (blacklist != null) {
+                    viewModel.blacklistedFolders = blacklist.split(",").toMutableList()
+                }
+                val hideLyrics = sharedPreferences.getBoolean("hide_lyrics", false)
+                viewModel.hideLyrics = hideLyrics
             }
-            val blacklist = sharedPreferences.getString("blacklist", null)
-            if(blacklist != null) {
-                viewModel.blacklistedFolders = blacklist.split(",").toMutableList()
-            }
-            val hideLyrics = sharedPreferences.getBoolean("hide_lyrics", false)
-            viewModel.hideLyrics = hideLyrics
-
 
             // Get token upon app start
             LaunchedEffect(Unit) {
@@ -121,10 +122,13 @@ class MainActivity : ComponentActivity() {
             }
 
             // Create our subdirectory in downloads if it doesn't exist
-            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val songSyncDir = File(downloadsDir, "SongSync")
-            if (!songSyncDir.exists()) {
-                songSyncDir.mkdir()
+            LaunchedEffect(Unit) {
+                val downloadsDir =
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                val songSyncDir = File(downloadsDir, "SongSync")
+                if (!songSyncDir.exists()) {
+                    songSyncDir.mkdir()
+                }
             }
 
             // Register notification channel
