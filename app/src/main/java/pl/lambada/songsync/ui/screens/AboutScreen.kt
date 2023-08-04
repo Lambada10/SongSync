@@ -205,6 +205,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                                             viewModel.customID = ""
                                             viewModel.customSecret = ""
                                             viewModel.tokenType = if (hasDefaultKeys) 0 else 1
+                                            sharedPreferences.edit().remove("token_type").apply()
                                             viewModel.tokenTime = 0
                                             launch(Dispatchers.IO) {
                                                 viewModel.refreshToken()
