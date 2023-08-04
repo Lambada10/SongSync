@@ -87,8 +87,8 @@ class MainActivity : ComponentActivity() {
             var hasPermissions by remember { mutableStateOf(false) }
             var internetConnection by remember { mutableStateOf(true) }
 
-            // Load user-defined settings
             LaunchedEffect(Unit) {
+                // Load user-defined settings
                 val sharedPreferences = context.getSharedPreferences(
                     "pl.lambada.songsync_preferences",
                     Context.MODE_PRIVATE
@@ -105,10 +105,8 @@ class MainActivity : ComponentActivity() {
                 }
                 val hideLyrics = sharedPreferences.getBoolean("hide_lyrics", false)
                 viewModel.hideLyrics = hideLyrics
-            }
 
-            // Get token upon app start
-            LaunchedEffect(Unit) {
+                // Get token upon app start
                 launch(Dispatchers.IO) {
                     try {
                         viewModel.refreshToken()
@@ -119,31 +117,29 @@ class MainActivity : ComponentActivity() {
                             throw e
                     }
                 }
-            }
 
-            // Create our subdirectory in downloads if it doesn't exist
-            LaunchedEffect(Unit) {
+                // Create our subdirectory in downloads if it doesn't exist
                 val downloadsDir =
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                 val songSyncDir = File(downloadsDir, "SongSync")
                 if (!songSyncDir.exists()) {
                     songSyncDir.mkdir()
                 }
-            }
 
-            // Register notification channel
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val notificationManager =
-                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                // Register notification channel
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val notificationManager =
+                        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-                val channelId = getString(R.string.batch_download_lyrics)
-                val channelName = getString(R.string.batch_download_lyrics)
-                val channelDescription = getString(R.string.batch_download_lyrics)
-                val importance = NotificationManager.IMPORTANCE_LOW
-                val channel = NotificationChannel(channelId, channelName, importance)
-                channel.description = channelDescription
+                    val channelId = getString(R.string.batch_download_lyrics)
+                    val channelName = getString(R.string.batch_download_lyrics)
+                    val channelDescription = getString(R.string.batch_download_lyrics)
+                    val importance = NotificationManager.IMPORTANCE_LOW
+                    val channel = NotificationChannel(channelId, channelName, importance)
+                    channel.description = channelDescription
 
-                notificationManager.createNotificationChannel(channel)
+                    notificationManager.createNotificationChannel(channel)
+                }
             }
 
             SongSyncTheme {
