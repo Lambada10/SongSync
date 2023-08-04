@@ -829,6 +829,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                     Column {
                         Text(text = stringResource(R.string.spotify_api_rate_limit_reached))
                         Text(text = stringResource(R.string.please_try_again_later))
+                        Text(text = stringResource(R.string.change_api_strategy))
                     }
                 },
                 onDismissRequest = {
