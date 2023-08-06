@@ -53,4 +53,5 @@
     <string name="about">Acerca de</string>
     <string name="song_name_no_args">Nombre de la canción</string>
     <string name="artist_name_no_args">Nombre del artista</string>
+    <string name="success_failed">Éxito: %1$d, sin letra: %2$d, Fallido: %3$d</string>
 </resources>
