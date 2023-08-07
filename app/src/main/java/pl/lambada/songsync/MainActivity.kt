@@ -86,6 +86,7 @@ class MainActivity : ComponentActivity() {
             var hasLoadedPermissions by remember { mutableStateOf(false) }
             var hasPermissions by remember { mutableStateOf(false) }
             var internetConnection by remember { mutableStateOf(true) }
+            var themeDefined by remember { mutableStateOf(false) }
 
             LaunchedEffect(Unit) {
                 // Load user-defined settings
@@ -93,6 +94,11 @@ class MainActivity : ComponentActivity() {
                     "pl.lambada.songsync_preferences",
                     Context.MODE_PRIVATE
                 )
+
+                val pureBlack = sharedPreferences.getBoolean("pure_black", false)
+                viewModel.pureBlack = pureBlack
+                themeDefined = true
+
                 val customID = sharedPreferences.getString("custom_id", null)
                 val customSecret = sharedPreferences.getString("custom_secret", null)
                 if (customID != null && customSecret != null) {
@@ -146,7 +152,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            SongSyncTheme {
+            if (themeDefined)
+            SongSyncTheme(pureBlack = viewModel.pureBlack) {
                 // I'll cry if this crashes due to memory concerns
                 val selected = rememberSaveable(saver = Saver(
                     save = { it.toTypedArray() }, restore = { mutableStateListOf(*it) }

@@ -61,6 +61,9 @@ class MainViewModel : ViewModel() {
      */
     var tokenType = if (isBuiltWithKeys) 0 else 1
 
+    // other settings
+    var pureBlack = false
+
     // Responses from Spotify and lyrics API
     private var spotifyResponse = ""
     private var lyricsResponse = ""

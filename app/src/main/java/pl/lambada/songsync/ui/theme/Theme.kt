@@ -38,6 +38,7 @@ private val lightColorScheme = lightColorScheme(
 @Composable
 fun SongSyncTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    pureBlack: Boolean = false,
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -45,14 +46,23 @@ fun SongSyncTheme(
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             if (darkTheme)
-                dynamicDarkColorScheme(context)
+                if (pureBlack)
+                    dynamicDarkColorScheme(context).copy(
+                        surface = Color.Black,
+                        background = Color.Black,
+                    )
+                else
+                    dynamicDarkColorScheme(context)
             else
                 dynamicLightColorScheme(context)
         }
+        pureBlack -> darkColorScheme.copy(
+            surface = Color.Black,
+            background = Color.Black,
+        )
         darkTheme -> darkColorScheme
         else -> lightColorScheme
     }
-
     val sysUiController = rememberSystemUiController()
     val view = LocalView.current
     if (!view.isInEditMode) {

@@ -104,4 +104,7 @@
     <string name="web_player_keys">Web Player API</string>
     <string name="custom_keys">Custom API credentials</string>
     <string name="change_api_strategy">You can also try alternative ways to connect to Spotify network in settings.</string>
+    <string name="theme">Theme</string>
+    <string name="pure_black_theme">Pure black theme</string>
+    <string name="restart_the_app">Restart the app for the changes to take effect</string>
 </resources>
