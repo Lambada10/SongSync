@@ -1,5 +1,6 @@
 package pl.lambada.songsync.ui.screens
 
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.widget.Toast
@@ -44,7 +45,9 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.substring
 import androidx.compose.ui.unit.dp
+import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
@@ -272,7 +275,35 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                                         "SongSync/${result.songName} - ${result.artistName}.lrc"
                                     )
-                                    file.writeText(lrc)
+                                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R || isInternalStorage) {
+                                        file.writeText(lrc)
+                                    } else {
+                                        val sd = context.externalCacheDirs[1].absolutePath.substring(0, context.externalCacheDirs[1].absolutePath.indexOf("/Android/data"))
+                                        val path = nextSong!!.filePath?.toLrcFile()?.absolutePath?.substringAfter(sd)?.split("/")?.dropLast(1)
+                                        var sdCardFiles = DocumentFile.fromTreeUri(
+                                            context,
+                                            Uri.parse(viewModel.sdCardPath)
+                                        )
+                                        for (element in path!!) {
+                                            for (sdCardFile in sdCardFiles!!.listFiles()) {
+                                                if (sdCardFile.name == element) {
+                                                    sdCardFiles = sdCardFile
+                                                }
+                                            }
+                                        }
+                                        sdCardFiles?.listFiles()?.forEach {
+                                            if(it.name == file.name) {
+                                                it.delete()
+                                                return@forEach
+                                            }
+                                        }
+                                        sdCardFiles?.createFile(
+                                            "text/lrc",
+                                            file.name
+                                        )?.let {
+                                            context.contentResolver.openOutputStream(it.uri)?.write(lrc.toByteArray())
+                                        }
+                                    }
 
                                     Toast.makeText(
                                         context,
@@ -283,7 +314,6 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                         Toast.LENGTH_LONG
                                     ).show()
                                 },
-                                enabled = !(isLegacyVersion && !isInternalStorage)
                             ) {
                                 Text(text = stringResource(R.string.save_lrc_file))
                             }
@@ -303,50 +333,6 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                     imageVector = Icons.Default.ContentCopy,
                                     contentDescription = stringResource(R.string.copy_lyrics_to_clipboard)
                                 )
-                            }
-                        }
-
-                        if (isLegacyVersion && !isInternalStorage) {
-                            OutlinedCard(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                shape = RoundedCornerShape(10.dp)
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.cannot_save_to_external_storage),
-                                    modifier = Modifier.padding(8.dp)
-                                )
-                                Row {
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Button(
-                                        onClick = {
-                                            val lrc =
-                                                "[ti:${result.songName}]\n" + "[ar:${result.artistName}]\n" + "[by:$generatedUsingString]\n" + lyrics
-                                            val songFile = nextSong!!.filePath.toLrcFile()?.toURI()
-                                                    ?.let { File(it) }?.name
-
-                                            val file = File(
-                                                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                                                "SongSync/" + songFile.toString()
-                                            )
-                                            file.writeText(lrc)
-
-                                            Toast.makeText(
-                                                context,
-                                                context.getString(
-                                                    R.string.file_saved_to,
-                                                    file.absolutePath
-                                                ),
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        }
-                                    ) {
-                                        Text(text = stringResource(R.string.save_to_downloads))
-                                    }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                }
-                                Spacer(modifier = Modifier.height(8.dp))
                             }
                         }
 

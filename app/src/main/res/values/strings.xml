@@ -85,8 +85,6 @@
     <string name="download">Download</string>
     <string name="up_to_date">You\'re using latest version</string>
     <string name="error_checking_for_updates">Error checking for updates</string>
-    <string name="cannot_save_to_external_storage">Saving files to external storage is not supported on this Android version</string>
-    <string name="save_to_downloads">Save to downloads</string>
     <string name="close">Close</string>
     <string name="filters">Filters</string>
     <string name="no_lyrics_only">Only show songs without lyrics</string>
@@ -96,8 +94,6 @@
     <string name="invalid_credentials">Invalid credentials</string>
     <string name="spotify_client_secret">Spotify Client Secret</string>
     <string name="spotify_client_id">Spotify Client ID</string>
-    <string name="batch_download_lyrics_legacy_warning">You\'re using older Android version and saving lyrics to external storage won\'t be possible. What do you want to do with songs on external storage?</string>
-    <string name="treat_as_failed">Treat as failed (skip)</string>
     <string name="way_to_get_token">Way to get Spotify token</string>
     <string name="cant_be_empty">Fields can\'t be empty</string>
     <string name="default_keys">Default API credentials</string>
@@ -107,4 +103,11 @@
     <string name="theme">Theme</string>
     <string name="pure_black_theme">Pure black theme</string>
     <string name="restart_the_app">Restart the app for the changes to take effect</string>
+    <string name="sd_card">SD Card</string>
+    <string name="set_sd_path">Set the path to your SD card here. This is required for Android 10 and below.</string>
+    <string name="no_sd_card_path_set">No SD card path set!</string>
+    <string name="sd_card_path_set_successfully">SD card path set successfully!</string>
+    <string name="clear_sd_card_path">Clear SD Card path</string>
+    <string name="set_sd_card_path">Set SD Card path</string>
+    <string name="set_sd_path_warn">You are using an older version of Android. Make sure that you have set the SD card path in the settings. If you have not, please cancel this dialog and set it.</string>
 </resources>

@@ -3,7 +3,12 @@
 package pl.lambada.songsync.ui.screens
 
 import android.content.Context
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -13,6 +18,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -255,6 +261,69 @@ fun AboutScreen(viewModel: MainViewModel) {
                         modifier = Modifier.padding(top = 8.dp),
                         fontSize = MaterialTheme.typography.bodySmall.fontSize
                     )
+                }
+            }
+        }
+
+        item {
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                var picker by remember { mutableStateOf(false) }
+                val sdCardPath = viewModel.sdCardPath
+                var sdPath by rememberSaveable { mutableStateOf(sdCardPath) }
+                AboutCard(label = stringResource(R.string.sd_card)) {
+                    Text(stringResource(R.string.set_sd_path))
+                    if(sdPath == "" || sdPath == null) {
+                        Text(
+                            text = stringResource(R.string.no_sd_card_path_set),
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.sd_card_path_set_successfully),
+                            color = MaterialTheme.colorScheme.tertiary,
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row {
+                        Spacer(modifier = Modifier.weight(1f))
+                        OutlinedButton(
+                            onClick = {
+                                sdPath = ""
+                                viewModel.sdCardPath = ""
+                                sharedPreferences.edit().remove("sd_card_path").apply()
+                            }
+                        ) {
+                            Text(stringResource(R.string.clear_sd_card_path))
+                        }
+                    }
+                    Row {
+                        Spacer(modifier = Modifier.weight(1f))
+                        Button(
+                            modifier = Modifier.padding(top = 8.dp),
+                            onClick = {
+                                picker = true
+                            }
+                        ) {
+                            Text(stringResource(R.string.set_sd_card_path))
+                        }
+                    }
+
+                    if (picker) {
+                        val sdCardPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) {
+                            if (it == null) {
+                                picker = false
+                                return@rememberLauncherForActivityResult
+                            }
+                            sdPath = it.toString()
+                            viewModel.sdCardPath = it.toString()
+                            sharedPreferences.edit().putString("sd_card_path", it.toString()).apply()
+                            picker = false
+                        }
+                        LaunchedEffect(Unit) {
+                            sdCardPicker.launch(Uri.parse(Environment.getExternalStorageDirectory().absolutePath))
+                        }
+                    }
                 }
             }
         }

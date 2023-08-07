@@ -1,5 +1,6 @@
 package pl.lambada.songsync
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -75,6 +76,7 @@ class MainActivity : ComponentActivity() {
      *
      * @param savedInstanceState The saved instance state.
      */
+    @SuppressLint("SuspiciousIndentation")
     @OptIn(ExperimentalLayoutApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,6 +100,11 @@ class MainActivity : ComponentActivity() {
                 val pureBlack = sharedPreferences.getBoolean("pure_black", false)
                 viewModel.pureBlack = pureBlack
                 themeDefined = true
+
+                val sdCardPath = sharedPreferences.getString("sd_card_path", null)
+                if (sdCardPath != null) {
+                    viewModel.sdCardPath = sdCardPath
+                }
 
                 val customID = sharedPreferences.getString("custom_id", null)
                 val customSecret = sharedPreferences.getString("custom_secret", null)

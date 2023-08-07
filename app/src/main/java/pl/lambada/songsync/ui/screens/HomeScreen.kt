@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.Parcelable
@@ -95,6 +96,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getString
+import androidx.documentfile.provider.DocumentFile
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
@@ -557,7 +559,6 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
     val count = successCount + failedCount + noLyricsCount
     val total = songs.size
     val isLegacyVersion = Build.VERSION.SDK_INT < Build.VERSION_CODES.R
-    var legacySaveToDownloads by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
     val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -616,7 +617,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                 },
                 text = {
                     Column {
-                        Text(text = stringResource(R.string.batch_download_lyrics_legacy_warning))
+                        Text(text = stringResource(R.string.set_sd_path_warn))
                     }
                 },
                 onDismissRequest = {
@@ -625,21 +626,19 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                 confirmButton = {
                     Button(
                         onClick = {
-                            legacySaveToDownloads = true
                             uiState = UiState.Pending
                         }
                     ) {
-                        Text(text = stringResource(R.string.save_to_downloads))
+                        Text(text = stringResource(R.string.ok))
                     }
                 },
                 dismissButton = {
                     OutlinedButton(
                         onClick = {
-                            legacySaveToDownloads = false
-                            uiState = UiState.Pending
+                            uiState = UiState.Cancelled
                         }
                     ) {
-                        Text(text = stringResource(R.string.treat_as_failed))
+                        Text(text = stringResource(R.string.cancel))
                     }
                 }
             )
@@ -761,17 +760,31 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                                 file?.writeText(lrc)
                             } catch (e: FileNotFoundException) {
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && !song.filePath!!.contains("/storage/emulated/0")) {
-                                    if (!legacySaveToDownloads) {
-                                        failedCount++
-                                        continue
-                                    }
-                                    val songFile = song!!.filePath.toLrcFile()?.toURI()
-                                            ?.let { File(it) }?.name
-                                    val newFile = File(
-                                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                                        "SongSync/" + songFile.toString()
+                                    val sd = context.externalCacheDirs[1].absolutePath.substring(0, context.externalCacheDirs[1].absolutePath.indexOf("/Android/data"))
+                                    val path = file?.absolutePath?.substringAfter(sd)?.split("/")?.dropLast(1)
+                                    var sdCardFiles = DocumentFile.fromTreeUri(
+                                        context,
+                                        Uri.parse(viewModel.sdCardPath)
                                     )
-                                    newFile.writeText(lrc)
+                                    for (element in path!!) {
+                                        for (sdCardFile in sdCardFiles!!.listFiles()) {
+                                            if (sdCardFile.name == element) {
+                                                sdCardFiles = sdCardFile
+                                            }
+                                        }
+                                    }
+                                    sdCardFiles?.listFiles()?.forEach {
+                                        if(it.name == file.name) {
+                                            it.delete()
+                                            return@forEach
+                                        }
+                                    }
+                                    sdCardFiles?.createFile(
+                                        "text/lrc",
+                                        file.name
+                                    )?.let {
+                                        context.contentResolver.openOutputStream(it.uri)?.write(lrc.toByteArray())
+                                    }
                                 } else {
                                     throw e
                                 }

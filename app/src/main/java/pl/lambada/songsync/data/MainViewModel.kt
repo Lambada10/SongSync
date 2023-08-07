@@ -63,6 +63,7 @@ class MainViewModel : ViewModel() {
 
     // other settings
     var pureBlack = false
+    var sdCardPath = ""
 
     // Responses from Spotify and lyrics API
     private var spotifyResponse = ""
