@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name" translatable="false">SongSync</string>
     <string name="batch_download_lyrics">Descărcare lot de versuri</string>
@@ -85,7 +86,6 @@
     <string name="download">Descărcare</string>
     <string name="up_to_date">Utilizați ultima versiune</string>
     <string name="error_checking_for_updates">Eroare la verificarea actualizărilor</string>
-    <string name="cannot_save_to_external_storage">Salvarea fișierelor pe stocarea externă nu este acceptată pe această versiune de Android</string>
     <string name="save_to_downloads">Salvare în descărcări</string>
     <string name="close">Închidere</string>
     <string name="filters">Filtre</string>

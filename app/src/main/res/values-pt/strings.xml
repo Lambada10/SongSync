@@ -65,7 +65,6 @@
 \n%1$s</string>
     <string name="download">Baixado</string>
     <string name="up_to_date">Você está usando a versão mais recente</string>
-    <string name="cannot_save_to_external_storage">Salvar arquivos em armazenamento externo não é suportado nesta versão do Android</string>
     <string name="save_to_downloads">Salvar em downloads</string>
     <string name="close">Fechar</string>
     <string name="filters">Filtros</string>
@@ -76,7 +75,6 @@
     <string name="invalid_credentials">Credenciais inválidas</string>
     <string name="spotify_client_secret">Cliente Secreto Spotify</string>
     <string name="spotify_client_id">ID do cliente Spotify</string>
-    <string name="batch_download_lyrics_legacy_warning">Você está usando uma versão mais antiga do Android e não será possível salvar as letras em um armazenamento externo. O que você deseja fazer com as músicas no armazenamento externo\?</string>
     <string name="treat_as_failed">Tratar como falha (Pular)</string>
     <string name="way_to_get_token">Maneira de obter o token do Spotify</string>
     <string name="cant_be_empty">Os campos não podem estar vazios</string>
@@ -97,7 +95,7 @@
     <plurals name="this_will_download_lyrics_for_all_songs">
         <item quantity="one">Isso fará o download da letra de uma música. As letras das músicas existentes serão substituídas por novas. Isso pode ser menos preciso do que baixar as letras uma a uma. Você tem certeza que quer continuar\?</item>
         <item quantity="many">Isso fará o download das letras das músicas %1$d. As letras das músicas existentes serão substituídas por novas. Isso pode ser menos preciso do que baixar as letras uma a uma. Você tem certeza que quer continuar\?</item>
-        <item quantity="other"></item>
+        <item quantity="other"/>
     </plurals>
     <string name="error_checking_for_updates">Erro ao verificar atualizações</string>
     <string name="this_track_has_no_lyrics">Está faixa não contém letra</string>
