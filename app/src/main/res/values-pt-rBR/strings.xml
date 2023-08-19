@@ -54,9 +54,9 @@
     <string name="invert_selection">Inverter seleção</string>
     <string name="no_lyrics">Sem letras: %1$d</string>
     <plurals name="this_will_download_lyrics_for_all_songs">
-        <item quantity="one">Isso fará o download da letra de uma música. As letras da música existentes serão substituídas por novas. Isso pode ser menos preciso do que baixar as letras uma a uma. Você tem certeza que quer continuar\?</item>
+        <item quantity="one">Isso fará o download da letras de uma música. As letras da música existentes serão substituídas por novas. Isso pode ser menos preciso do que baixar as letras uma a uma. Você tem certeza que quer continuar\?</item>
         <item quantity="many">Isso fará o download das letras das músicas %1$d. As letras das músicas existentes serão substituídas por novas. Isso pode ser menos preciso do que baixar as letras uma a uma. Você tem certeza que quer continuar\?</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <string name="invalid_query">Consulta inválida</string>
     <string name="clear">Limpar</string>
@@ -68,7 +68,6 @@
     <string name="download">Baixar</string>
     <string name="up_to_date">Você está usando a versão mais recente</string>
     <string name="error_checking_for_updates">Erro ao verificar atualizações</string>
-    <string name="save_to_downloads">Salvar em Downloads</string>
     <string name="close">Fechar</string>
     <string name="filters">Filtros</string>
     <string name="no_lyrics_only">Mostrar apenas músicas sem letras</string>
@@ -78,7 +77,6 @@
     <string name="invalid_credentials">Credenciais inválidas</string>
     <string name="spotify_client_secret">Cliente Secreto Spotify</string>
     <string name="spotify_client_id">ID Cliente Spotify</string>
-    <string name="treat_as_failed">Tratar como falha (Pular)</string>
     <string name="way_to_get_token">Maneira de obter o Token do Spotify</string>
     <string name="cant_be_empty">Os campos não podem estar vazios</string>
     <string name="default_keys">Credenciais de API padrão</string>
@@ -99,4 +97,14 @@
     <string name="close_app">Fechar aplicativo</string>
     <string name="requires_higher_storage_permissions">Este aplicativo requer acesso ao armazenamento para escanear sua biblioteca de músicas e salvar as Letras.</string>
     <string name="lyrics_copied_to_clipboard">Letras copiadas para a área de transferência</string>
+    <string name="theme">Tema</string>
+    <string name="restart_the_app">Reinicie o aplicativo para que as alterações sejam aplicadas</string>
+    <string name="sd_card_path_set_successfully">Caminho do cartão SD definido com sucesso!</string>
+    <string name="set_sd_path_warn">Você está usando uma versão mais antiga do Android. Se certifique de que definiu o caminho do cartão SD nas configurações. Se não tiver, cancele está a operação e selecione.</string>
+    <string name="pure_black_theme">Tema preto sólido</string>
+    <string name="sd_card">Cartão SD</string>
+    <string name="set_sd_path">Defina o caminho para o seu cartão SD aqui. Isso é necessário para o Android 10 e versões inferiores.</string>
+    <string name="no_sd_card_path_set">Nenhum caminho de cartão SD definido!</string>
+    <string name="clear_sd_card_path">Limpar o caminho do cartão SD</string>
+    <string name="set_sd_card_path">Definir o caminho do cartão SD</string>
 </resources>
