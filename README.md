@@ -37,4 +37,4 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 This app uses the [Spotify Web API](https://developer.spotify.com/documentation/web-api/) to get song metadata and the [spotify lyrics API](https://github.com/akashrchandran/spotify-lyrics-api) to get lyrics for songs.
 
 ### Friend projects
-[Symphonica](https://github.com/AkaneTan/Symphonica)
+[Gramophone](https://github.com/AkaneTan/Gramophone)
