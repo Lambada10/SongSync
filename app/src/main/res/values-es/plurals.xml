@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<plurals name="this_will_download_lyrics_for_all_songs">
+		<item quantity="other">Esto descargará las letras de %1$d canciones. Las letras existentes de las canciones se sobrescribirán con las nuevas. Esto puede ser menos preciso que descargar las letras una por una. Estás seguro de que quieres continuar?</item>
+		<item quantity="one">Esto descargará la letra de una canción. Las letras existentes de las canciones se sobrescribirán con las nuevas. Esto puede ser menos preciso que descargar las letras una por una. Estás seguro de que quieres continuar?</item>
+	</plurals>
+</resources>
