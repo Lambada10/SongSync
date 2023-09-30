@@ -4,8 +4,10 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import pl.lambada.songsync.data.api.GithubAPI
+import pl.lambada.songsync.data.api.LRCLibAPI
 import pl.lambada.songsync.data.api.SpotifyAPI
 import pl.lambada.songsync.data.api.SpotifyLyricsAPI
 import pl.lambada.songsync.data.dto.Release
@@ -36,6 +38,9 @@ class MainViewModel : ViewModel() {
     var pureBlack = false
     var sdCardPath = ""
 
+    // LRCLib Track ID
+    // var id = 0
+
     /**
      * Refreshes the access token by sending a request to the Spotify API.
      */
@@ -52,6 +57,11 @@ class MainViewModel : ViewModel() {
     @Throws(UnknownHostException::class, FileNotFoundException::class, NoTrackFoundException::class)
     suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
         return spotifyAPI.getSongInfo(query, offset)
+        /*
+        val result = LRCLibAPI().getSongInfo(query)
+        this.id = result?.id ?: throw NoTrackFoundException()
+        return result
+         */
     }
 
     /**
@@ -61,6 +71,7 @@ class MainViewModel : ViewModel() {
      */
     suspend fun getSyncedLyrics(songLink: String): String? {
         return SpotifyLyricsAPI().getSyncedLyrics(songLink)
+        // return LRCLibAPI().getSyncedLyrics(this.id)
     }
 
     /**

@@ -191,7 +191,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                 SongCard(
                     songName = result.songName ?: stringResource(id = R.string.unknown),
                     artists = result.artistName ?: stringResource(id = R.string.unknown),
-                    coverUrl = result.albumCoverLink ?: nextSong?.imgUri?.toString(),
+                    coverUrl = result.albumCoverLink,
                     modifier = Modifier.clickable { result.songLink?.let { uriHandler.openUri(it) } }
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -226,10 +226,8 @@ fun BrowseScreen(viewModel: MainViewModel) {
                 LaunchedEffect(Unit) {
                     launch(Dispatchers.IO) {
                         try {
-                            if (result.songLink == null)
-                                throw NullPointerException("Song link is null")
                             if (lyricSuccess == LyricsStatus.NotSubmitted) {
-                                lyricsResult = viewModel.getSyncedLyrics(result.songLink!!)
+                                lyricsResult = viewModel.getSyncedLyrics(result.songLink!!) // Todo: ?: "" (for not spotify)
                                 if (lyricsResult == null)
                                     throw NullPointerException("lyricsResult is null")
                                 else

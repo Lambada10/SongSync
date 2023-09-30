@@ -16,6 +16,7 @@ import kotlinx.parcelize.Parcelize
 data class SongInfo(
     var songName: String?,
     var artistName: String? = null,
-    var songLink: String? = null,
-    var albumCoverLink: String? = null,
+    var songLink: String? = null, // Spotify-only
+    var albumCoverLink: String? = null, // Spotify-only
+    var id: Int? = null, // LRCLib-only
 ) : Parcelable
