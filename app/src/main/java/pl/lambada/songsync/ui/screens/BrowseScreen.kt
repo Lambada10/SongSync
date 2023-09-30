@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -45,15 +44,14 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.substring
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.EmptyQueryException
-import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.data.MainViewModel
+import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.data.dto.SongInfo
 import pl.lambada.songsync.data.ext.toLrcFile
@@ -240,7 +238,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                         } catch (e: Exception) {
                             lyricsResult = e.toString()
                             lyricSuccess = LyricsStatus.Failed
-                            if (e is FileNotFoundException) {
+                            if (e is FileNotFoundException || e is NullPointerException) {
                                 lyricsResult = null // Lyrics not found message
                             }
                         }

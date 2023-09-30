@@ -15,6 +15,7 @@ material-icons-extended = "1.5.0-beta01"
 navigation-compose = "2.5.3"
 navigation-runtime-ktx = "2.5.3"
 preference = "1.1.1"
+ktor = "2.3.4"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
@@ -34,7 +35,8 @@ ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview
 material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigation-runtime-ktx" }
 androidx-preference = { group = "androidx.preference", name = "preference-ktx", version.ref = "preference" }
-
+ktor-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

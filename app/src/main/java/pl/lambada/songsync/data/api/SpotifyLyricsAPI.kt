@@ -1,10 +1,11 @@
 package pl.lambada.songsync.data.api
 
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.json.Json
 import pl.lambada.songsync.data.dto.SyncedLinesResponse
-import java.io.BufferedReader
-import java.net.HttpURLConnection
-import java.net.URL
 
 class SpotifyLyricsAPI {
     private val baseURL = "https://spotify-lyric-api.herokuapp.com/"
@@ -15,16 +16,16 @@ class SpotifyLyricsAPI {
      * @param songLink The link to the song.
      * @return The synced lyrics as a string.
      */
-    fun getSyncedLyrics(songLink: String): String? {
-        val url = URL(baseURL + "?url=$songLink&format=lrc")
-        val connection = url.openConnection() as HttpURLConnection
-        connection.requestMethod = "GET"
+    suspend fun getSyncedLyrics(songLink: String): String? {
+        val client = HttpClient(CIO)
+        val response = client.get(baseURL + "?url=$songLink&format=lrc")
+        val responseBody = response.bodyAsText(Charsets.UTF_8)
+        client.close()
 
-        val response = connection.inputStream.bufferedReader().use(BufferedReader::readText)
+        if (response.status.value !in 200..299)
+            return null
 
-        connection.disconnect()
-
-        val json = jsonDec.decodeFromString<SyncedLinesResponse>(response)
+        val json = jsonDec.decodeFromString<SyncedLinesResponse>(responseBody)
 
         if (json.error)
             return null

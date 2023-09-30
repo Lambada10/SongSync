@@ -30,20 +30,16 @@ class MainViewModel : ViewModel() {
     private var hideFolders = blacklistedFolders.isNotEmpty()
 
     // Spotify API token
-    val spotifyAPI = SpotifyAPI()
+    private val spotifyAPI = SpotifyAPI()
 
     // other settings
     var pureBlack = false
     var sdCardPath = ""
 
-    // Responses from Spotify and lyrics API
-    private var spotifyResponse = ""
-    private var lyricsResponse = ""
-
     /**
      * Refreshes the access token by sending a request to the Spotify API.
      */
-    fun refreshToken() {
+    suspend fun refreshToken() {
         spotifyAPI.refreshToken()
     }
 
@@ -54,7 +50,7 @@ class MainViewModel : ViewModel() {
      * @return The SongInfo object containing the song information.
      */
     @Throws(UnknownHostException::class, FileNotFoundException::class, NoTrackFoundException::class)
-    fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
+    suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
         return spotifyAPI.getSongInfo(query, offset)
     }
 
@@ -63,7 +59,7 @@ class MainViewModel : ViewModel() {
      * @param songLink The link to the song.
      * @return The synced lyrics as a string.
      */
-    fun getSyncedLyrics(songLink: String): String? {
+    suspend fun getSyncedLyrics(songLink: String): String? {
         return SpotifyLyricsAPI().getSyncedLyrics(songLink)
     }
 
@@ -71,14 +67,14 @@ class MainViewModel : ViewModel() {
      * Gets latest GitHub release information.
      * @return The latest release version.
      */
-    fun getLatestRelease(): Release {
+    suspend fun getLatestRelease(): Release {
         return GithubAPI().getLatestRelease()
     }
 
     /**
      * Checks if the latest release is newer than the current version.
      */
-    fun isNewerRelease(context: Context): Boolean {
+    suspend fun isNewerRelease(context: Context): Boolean {
         val currentVersion = context.getVersion().replace(".", "").toInt()
         val latestVersion = getLatestRelease().tagName?.replace(".", "")?.replace("v", "")?.toInt()
 
