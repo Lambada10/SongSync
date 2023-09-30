@@ -106,22 +106,12 @@ class MainActivity : ComponentActivity() {
                     viewModel.sdCardPath = sdCardPath
                 }
 
-                val customID = sharedPreferences.getString("custom_id", null)
-                val customSecret = sharedPreferences.getString("custom_secret", null)
-                if (customID != null && customSecret != null) {
-                    viewModel.customID = customID
-                    viewModel.customSecret = customSecret
-                }
                 val blacklist = sharedPreferences.getString("blacklist", null)
                 if (blacklist != null) {
                     viewModel.blacklistedFolders = blacklist.split(",").toMutableList()
                 }
                 val hideLyrics = sharedPreferences.getBoolean("hide_lyrics", false)
                 viewModel.hideLyrics = hideLyrics
-                val tokenType = sharedPreferences.getInt("token_type", -1)
-                if (tokenType != -1) {
-                    viewModel.tokenType = tokenType
-                }
 
                 // Get token upon app start
                 launch(Dispatchers.IO) {

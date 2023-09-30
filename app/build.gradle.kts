@@ -1,5 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
@@ -7,8 +5,6 @@ plugins {
     alias(libs.plugins.parcelize)
 }
 
-val spotifyClientID = gradleLocalProperties(rootDir).getProperty("spotify_client_id") ?: ""
-val spotifyClientSecret = gradleLocalProperties(rootDir).getProperty("spotify_client_secret") ?: ""
 val releaseStoreFile = project.properties["RELEASE_STORE_FILE"] as String?
 val releaseStorePassword = project.properties["RELEASE_STORE_PASSWORD"] as String?
 val releaseKeyAlias = project.properties["RELEASE_KEY_ALIAS"] as String?
@@ -33,9 +29,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
-        buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"$spotifyClientID\"")
-        buildConfigField("String", "SPOTIFY_CLIENT_SECRET", "\"$spotifyClientSecret\"")
     }
     signingConfigs {
         create("release") {
@@ -68,7 +61,6 @@ android {
     }
     buildFeatures {
         compose = true
-        android.buildFeatures.buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"

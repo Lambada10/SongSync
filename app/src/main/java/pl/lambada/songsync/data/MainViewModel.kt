@@ -6,8 +6,6 @@ import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import kotlinx.serialization.json.Json
-import pl.lambada.songsync.BuildConfig
-import pl.lambada.songsync.data.dto.AccessTokenResponse
 import pl.lambada.songsync.data.dto.GithubReleaseResponse
 import pl.lambada.songsync.data.dto.Release
 import pl.lambada.songsync.data.dto.Song
@@ -42,24 +40,9 @@ class MainViewModel : ViewModel() {
     var hideLyrics = false
     private var hideFolders = blacklistedFolders.isNotEmpty()
 
-    // User-defined keys
-    var customID = ""
-    var customSecret = ""
-
-    // Spotify API credentials
-    private var spotifyClientID = BuildConfig.SPOTIFY_CLIENT_ID
-    private var spotifyClientSecret = BuildConfig.SPOTIFY_CLIENT_SECRET
-    val isBuiltWithKeys = !(spotifyClientID == "" || spotifyClientSecret == "")
+    // Spotify API token
     private var spotifyToken = ""
     var tokenTime: Long = 0
-
-    /**
-     * Way to get token
-     * 0 - Default (provided by app)
-     * 1 - Web Player
-     * 2 - Custom (provided by user)
-     */
-    var tokenType = if (isBuiltWithKeys) 0 else 1
 
     // other settings
     var pureBlack = false
@@ -77,46 +60,16 @@ class MainViewModel : ViewModel() {
             return
         }
 
-        if (tokenType == 1) {
-            val url = URL("https://open.spotify.com/get_access_token?reason=transport&productType=web_player")
-            val connection = url.openConnection() as HttpURLConnection
-
-            connection.requestMethod = "GET"
-            connection.setRequestProperty("Content-Type", "application/json")
-
-            val response = connection.inputStream.bufferedReader().use(BufferedReader::readText)
-            connection.disconnect()
-
-            val json = jsonDec.decodeFromString<WebPlayerTokenResponse>(response)
-
-            this.spotifyToken = json.accessToken
-            this.tokenTime = System.currentTimeMillis()
-            return
-        }
-
-        val url = URL("https://accounts.spotify.com/api/token")
+        val url = URL("https://open.spotify.com/get_access_token?reason=transport&productType=web_player")
         val connection = url.openConnection() as HttpURLConnection
 
-        connection.requestMethod = "POST"
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
-        connection.doOutput = true
-
-        val realID = if (tokenType == 2) customID else spotifyClientID
-        val realSecret = if (tokenType == 2) customSecret else spotifyClientSecret
-
-        val postData =
-            "grant_type=client_credentials&client_id=$realID&client_secret=$realSecret"
-        val postDataBytes = postData.toByteArray(StandardCharsets.UTF_8)
-
-        connection.outputStream.use {
-            it.write(postDataBytes)
-        }
+        connection.requestMethod = "GET"
+        connection.setRequestProperty("Content-Type", "application/json")
 
         val response = connection.inputStream.bufferedReader().use(BufferedReader::readText)
-
         connection.disconnect()
+        val json = jsonDec.decodeFromString<WebPlayerTokenResponse>(response)
 
-        val json = jsonDec.decodeFromString<AccessTokenResponse>(response)
         this.spotifyToken = json.accessToken
         this.tokenTime = System.currentTimeMillis()
     }
