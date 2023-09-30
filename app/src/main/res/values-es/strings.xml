@@ -73,10 +73,6 @@
     <string name="select_all">Seleccionar todo</string>
     <string name="invert_selection">Invertir selección</string>
     <string name="no_lyrics">Sin letras: %1$d</string>
-    <plurals name="this_will_download_lyrics_for_all_songs">
-        <item quantity="one">Esto descargará letras para una canción. Las letras existentes serán sobrescritas con las nuevas. Esto puede ser menos preciso que descargar las letras una por una. ¿Estás seguro de que deseas continuar?</item>
-        <item quantity="other">Esto descargará letras para %1$d canciones. Las letras existentes serán sobrescritas con las nuevas. Esto puede ser menos preciso que descargar las letras una por una. ¿Estás seguro de que deseas continuar?</item>
-    </plurals>
     <string name="invalid_query">Consulta inválida</string>
     <string name="clear">Limpiar</string>
     <string name="check_for_updates">Buscar actualizaciones</string>
