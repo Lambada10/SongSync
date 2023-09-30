@@ -5,32 +5,21 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
-import kotlinx.serialization.json.Json
-import pl.lambada.songsync.data.dto.GithubReleaseResponse
+import pl.lambada.songsync.data.api.GithubAPI
+import pl.lambada.songsync.data.api.SpotifyAPI
+import pl.lambada.songsync.data.api.SpotifyLyricsAPI
 import pl.lambada.songsync.data.dto.Release
 import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.data.dto.SongInfo
-import pl.lambada.songsync.data.dto.SyncedLinesResponse
-import pl.lambada.songsync.data.dto.TrackSearchResult
-import pl.lambada.songsync.data.dto.WebPlayerTokenResponse
 import pl.lambada.songsync.data.ext.getVersion
 import pl.lambada.songsync.data.ext.toLrcFile
-import java.io.BufferedReader
 import java.io.FileNotFoundException
-import java.net.HttpURLConnection
-import java.net.URL
-import java.net.URLEncoder
 import java.net.UnknownHostException
-import java.nio.charset.StandardCharsets
 
 /**
  * ViewModel class for the main functionality of the app.
  */
 class MainViewModel : ViewModel() {
-
-    private val jsonDec = Json {
-        ignoreUnknownKeys = true
-    }
     private var cachedSongs: List<Song>? = null
     var nextSong: Song? = null // for fullscreen downloader dialog
 
@@ -41,8 +30,7 @@ class MainViewModel : ViewModel() {
     private var hideFolders = blacklistedFolders.isNotEmpty()
 
     // Spotify API token
-    private var spotifyToken = ""
-    var tokenTime: Long = 0
+    val spotifyAPI = SpotifyAPI()
 
     // other settings
     var pureBlack = false
@@ -56,22 +44,7 @@ class MainViewModel : ViewModel() {
      * Refreshes the access token by sending a request to the Spotify API.
      */
     fun refreshToken() {
-        if (System.currentTimeMillis() - tokenTime < 1800000) { // 30 minutes
-            return
-        }
-
-        val url = URL("https://open.spotify.com/get_access_token?reason=transport&productType=web_player")
-        val connection = url.openConnection() as HttpURLConnection
-
-        connection.requestMethod = "GET"
-        connection.setRequestProperty("Content-Type", "application/json")
-
-        val response = connection.inputStream.bufferedReader().use(BufferedReader::readText)
-        connection.disconnect()
-        val json = jsonDec.decodeFromString<WebPlayerTokenResponse>(response)
-
-        this.spotifyToken = json.accessToken
-        this.tokenTime = System.currentTimeMillis()
+        spotifyAPI.refreshToken()
     }
 
     /**
@@ -82,46 +55,7 @@ class MainViewModel : ViewModel() {
      */
     @Throws(UnknownHostException::class, FileNotFoundException::class, NoTrackFoundException::class)
     fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
-        refreshToken()
-
-        val endpoint = "https://api.spotify.com/v1/search"
-        val search = URLEncoder.encode(
-            "${query.songName} ${query.artistName}",
-            StandardCharsets.UTF_8.toString()
-        )
-
-        if (search == "+")
-            throw EmptyQueryException()
-
-        val url = URL("$endpoint?q=$search&type=track&limit=1&offset=$offset")
-        val connection = url.openConnection() as HttpURLConnection
-
-        connection.requestMethod = "GET"
-        connection.setRequestProperty("Authorization", "Bearer $spotifyToken")
-
-        val response = connection.inputStream.bufferedReader().use(BufferedReader::readText)
-
-        connection.disconnect()
-
-        spotifyResponse = response
-
-        val json = jsonDec.decodeFromString<TrackSearchResult>(response)
-        if (json.tracks.items.isEmpty())
-            throw NoTrackFoundException()
-        val track = json.tracks.items[0]
-
-        val artists = track.artists.joinToString(", ") { it.name }
-
-        val albumArtURL = track.album.images[0].url
-
-        val spotifyURL: String = track.externalUrls.spotify
-
-        return SongInfo(
-            track.name,
-            artists,
-            spotifyURL,
-            albumArtURL
-        )
+        return spotifyAPI.getSongInfo(query, offset)
     }
 
     /**
@@ -130,29 +64,7 @@ class MainViewModel : ViewModel() {
      * @return The synced lyrics as a string.
      */
     fun getSyncedLyrics(songLink: String): String? {
-        val url = URL("https://spotify-lyric-api.herokuapp.com/?url=$songLink&format=lrc")
-        val connection = url.openConnection() as HttpURLConnection
-        connection.requestMethod = "GET"
-
-        val response = connection.inputStream.bufferedReader().use(BufferedReader::readText)
-
-        connection.disconnect()
-
-        lyricsResponse = response
-
-        val json = jsonDec.decodeFromString<SyncedLinesResponse>(response)
-
-        if (json.error)
-            return null
-
-        val lines = json.lines
-        val syncedLyrics = StringBuilder()
-
-        for (line in lines) {
-            syncedLyrics.append("[${line.timeTag}]${line.words}\n")
-        }
-
-        return syncedLyrics.toString().dropLast(1)
+        return SpotifyLyricsAPI().getSyncedLyrics(songLink)
     }
 
     /**
@@ -160,21 +72,7 @@ class MainViewModel : ViewModel() {
      * @return The latest release version.
      */
     fun getLatestRelease(): Release {
-        val url = URL("https://api.github.com/repos/Lambada10/SongSync/releases/latest")
-        val connection = url.openConnection() as HttpURLConnection
-        connection.requestMethod = "GET"
-
-        val response = connection.inputStream.bufferedReader().use(BufferedReader::readText)
-
-        connection.disconnect()
-
-        val json = jsonDec.decodeFromString<GithubReleaseResponse>(response)
-
-        return Release(
-            htmlURL = json.htmlURL,
-            tagName = json.tagName,
-            changelog = json.body
-        )
+        return GithubAPI().getLatestRelease()
     }
 
     /**
