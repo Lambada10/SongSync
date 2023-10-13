@@ -1,10 +1,8 @@
 package pl.lambada.songsync.data.api
 
-import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
-import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.json.Json
 import pl.lambada.songsync.data.EmptyQueryException
@@ -20,7 +18,7 @@ class LRCLibAPI {
     /**
      * Searches for synced lyrics using the song name and artist name.
      * @param query The SongInfo object with songName and artistName fields filled.
-     * @return Search results as a list of LRCLibResponse objects.
+     * @return Search result as a SongInfo object.
      */
     suspend fun getSongInfo(query: SongInfo): SongInfo? {
         val search = URLEncoder.encode(
@@ -46,7 +44,7 @@ class LRCLibAPI {
         return SongInfo(
             songName = json[0].trackName,
             artistName = json[0].artistName,
-            id = json[0].id
+            lrcLibID = json[0].id
         )
     }
 
@@ -67,7 +65,6 @@ class LRCLibAPI {
             return null
 
         val json = jsonDec.decodeFromString<LRCLibResponse>(responseBody)
-        Log.e("LRCLibAPI", json.syncedLyrics.toString())
         return json.syncedLyrics
     }
 }

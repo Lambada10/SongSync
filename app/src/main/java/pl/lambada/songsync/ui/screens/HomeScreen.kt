@@ -740,7 +740,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                         if (queryResult != null) {
                             val lyricsResult: String
                             try {
-                                lyricsResult = viewModel.getSyncedLyrics(queryResult.songLink!!)!!
+                                lyricsResult = viewModel.getSyncedLyrics(queryResult.songLink ?: "")!!
                             } catch (e: Exception) {
                                 when (e) {
                                     is NullPointerException, is FileNotFoundException -> {

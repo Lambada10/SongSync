@@ -227,7 +227,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                     launch(Dispatchers.IO) {
                         try {
                             if (lyricSuccess == LyricsStatus.NotSubmitted) {
-                                lyricsResult = viewModel.getSyncedLyrics(result.songLink!!) // Todo: ?: "" (for not spotify)
+                                lyricsResult = viewModel.getSyncedLyrics(result.songLink ?: "")
                                 if (lyricsResult == null)
                                     throw NullPointerException("lyricsResult is null")
                                 else

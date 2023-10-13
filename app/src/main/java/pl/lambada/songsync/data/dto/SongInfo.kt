@@ -12,11 +12,13 @@ import kotlinx.parcelize.Parcelize
  * @param songLink The link to the song.
  * @param albumCoverLink The link to the album cover.
  */
+@Suppress("SpellCheckingInspection")
 @Parcelize
 data class SongInfo(
     var songName: String?,
     var artistName: String? = null,
-    var songLink: String? = null, // Spotify-only
-    var albumCoverLink: String? = null, // Spotify-only
-    var id: Int? = null, // LRCLib-only
+    var songLink: String? = null,
+    var albumCoverLink: String? = null,
+    var lrcLibID: Int? = null, // LRCLib-only
+    var neteaseID: Int? = null, // Netease-only
 ) : Parcelable
