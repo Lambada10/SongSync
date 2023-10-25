@@ -12,13 +12,13 @@ val releaseKeyPassword = project.properties["RELEASE_KEY_PASSWORD"] as String?
 
 android {
     namespace = "pl.lambada.songsync"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "pl.lambada.songsync"
         minSdk = 21
         //noinspection OldTargetApi
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 220
         versionName = "2.2.0"
 
