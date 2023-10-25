@@ -9,6 +9,7 @@ import android.os.Environment
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,11 +25,13 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -67,6 +70,37 @@ fun AboutScreen(viewModel: MainViewModel) {
             .fillMaxWidth()
             .padding(8.dp)
     ) {
+        item {
+            AboutCard(label = stringResource(R.string.provider)) {
+                var selected = rememberSaveable { mutableStateOf(viewModel.provider) }
+                Column {
+                    Text(stringResource(R.string.provider_summary))
+                    val providers = Providers.values()
+                    providers.forEach {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = selected.value == it,
+                                onClick = {
+                                    selected.value = it
+                                    viewModel.provider = it
+                                    sharedPreferences.edit().putString("provider", it.displayName).apply()
+                                }
+                            )
+                            Text(
+                                text = it.displayName,
+                                modifier = Modifier.clickable {
+                                    selected.value = it
+                                    viewModel.provider = it
+                                    sharedPreferences.edit().putString("provider", it.displayName).apply()
+                                }
+                            )
+
+                        }
+                    }
+                }
+            }
+        }
+
         item {
             if (isSystemInDarkTheme()) {
                 AboutCard(label = stringResource(R.string.theme)) {
@@ -394,4 +428,13 @@ enum class ContributionLevel(val stringResource: Int) {
  */
 enum class UpdateState {
     CHECKING, UP_TO_DATE, UPDATE_AVAILABLE, ERROR
+}
+
+/**
+ * Defines possible provider choices
+ */
+enum class Providers(val displayName: String) {
+    SPOTIFY("Spotify (via SpotifyLyricsAPI)"),
+    LRCLIB("LRCLib"),
+    NETEASE("Netease")
 }

@@ -203,6 +203,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedButton(
+                        enabled = viewModel.provider != Providers.LRCLIB,
                         onClick = {
                             offset += 1
                             queryResult = SongInfo(

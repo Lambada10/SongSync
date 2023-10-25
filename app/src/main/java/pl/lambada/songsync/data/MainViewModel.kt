@@ -6,6 +6,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import pl.lambada.songsync.data.api.GithubAPI
+import pl.lambada.songsync.data.api.LRCLibAPI
 import pl.lambada.songsync.data.api.NeteaseAPI
 import pl.lambada.songsync.data.api.SpotifyAPI
 import pl.lambada.songsync.data.api.SpotifyLyricsAPI
@@ -14,6 +15,7 @@ import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.data.dto.SongInfo
 import pl.lambada.songsync.data.ext.getVersion
 import pl.lambada.songsync.data.ext.toLrcFile
+import pl.lambada.songsync.ui.screens.Providers
 import java.io.FileNotFoundException
 import java.net.UnknownHostException
 
@@ -37,11 +39,15 @@ class MainViewModel : ViewModel() {
     var pureBlack = false
     var sdCardPath = ""
 
+    // selected provider
+    var provider = Providers.SPOTIFY
+
     // LRCLib Track ID
-    // var lrcLibID = 0
+    var lrcLibID = 0
 
     // Netease Track ID
     var neteaseID = 0
+    // TODO: Use values from SongInfo object returned by search instead of storing them here
 
     /**
      * Refreshes the access token by sending a request to the Spotify API.
@@ -58,17 +64,15 @@ class MainViewModel : ViewModel() {
      */
     @Throws(UnknownHostException::class, FileNotFoundException::class, NoTrackFoundException::class)
     suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
-        return spotifyAPI.getSongInfo(query, offset)
-        /*
-        val result = LRCLibAPI().getSongInfo(query)
-        this.id = result?.id ?: throw NoTrackFoundException()
-        return result
-         */
-        /*
-        val result = NeteaseAPI().getSongInfo(query, offset?: 0)!!
-        this.neteaseID = result.neteaseID!!
-        return result
-         */
+        return when (this.provider) {
+            Providers.SPOTIFY -> spotifyAPI.getSongInfo(query, offset)
+            Providers.LRCLIB -> LRCLibAPI().getSongInfo(query).also {
+                    this.lrcLibID = it?.lrcLibID ?: 0
+                } ?: throw NoTrackFoundException()
+            Providers.NETEASE -> NeteaseAPI().getSongInfo(query, offset).also {
+                    this.neteaseID = it?.neteaseID ?: 0
+                } ?: throw NoTrackFoundException()
+        }
     }
 
     /**
@@ -77,9 +81,11 @@ class MainViewModel : ViewModel() {
      * @return The synced lyrics as a string.
      */
     suspend fun getSyncedLyrics(songLink: String): String? {
-        return SpotifyLyricsAPI().getSyncedLyrics(songLink)
-        // return LRCLibAPI().getSyncedLyrics(this.lrcLibID)
-        // return NeteaseAPI().getSyncedLyrics(this.neteaseID)
+        return when (this.provider) {
+            Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink)
+            Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(this.lrcLibID)
+            Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID)
+        }
     }
 
     /**

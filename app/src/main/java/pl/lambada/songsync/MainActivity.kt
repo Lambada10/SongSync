@@ -60,6 +60,7 @@ import pl.lambada.songsync.ui.components.BottomBar
 import pl.lambada.songsync.ui.components.TopBar
 import pl.lambada.songsync.ui.components.dialogs.NoInternetDialog
 import pl.lambada.songsync.ui.screens.LoadingScreen
+import pl.lambada.songsync.ui.screens.Providers
 import pl.lambada.songsync.ui.theme.SongSyncTheme
 import java.io.File
 import java.io.FileNotFoundException
@@ -112,6 +113,9 @@ class MainActivity : ComponentActivity() {
                 }
                 val hideLyrics = sharedPreferences.getBoolean("hide_lyrics", false)
                 viewModel.hideLyrics = hideLyrics
+
+                val provider = sharedPreferences.getString("provider", Providers.SPOTIFY.displayName)
+                viewModel.provider = Providers.values().find { it.displayName == provider }!!
 
                 // Get token upon app start
                 launch(Dispatchers.IO) {

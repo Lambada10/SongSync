@@ -45,7 +45,7 @@ class NeteaseAPI {
      * @return Search result as a SongInfo object.
      */
     @OptIn(ExperimentalSerializationApi::class)
-    suspend fun getSongInfo(query: SongInfo, offset: Int): SongInfo? {
+    suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo? {
         val search = URLEncoder.encode(
             "${query.songName} ${query.artistName}",
             Charsets.UTF_8.toString()

@@ -113,4 +113,6 @@
     <string name="syncedlyrics_py">Syncedlyrics (for Netease headers and LrcLib)</string>
     <string name="statusbar_lyrics_ext">Statusbar lyrics ext (For Netease)</string>
     <string name="open_website">Open website</string>
+    <string name="provider">Lyrics provider</string>
+    <string name="provider_summary">Please select lyrics provider below</string>
 </resources>
