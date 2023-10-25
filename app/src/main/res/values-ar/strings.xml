@@ -96,7 +96,6 @@
     <string name="please_do_not_close_the_app_this_may_take_a_while">يرجى عدم إغلاق التطبيق ، فقد يستغرق ذلك بعض الوقت</string>
     <string name="no_internet_server">لا يوجد اتصال بالإنترنت أو الخادم معطل</string>
     <string name="what_is_songsync">SongSync هو تطبيق يمكّنك من تنزيل كلمات الأغاني المتزامنة (ملفات lrc.) لمكتبة الموسيقى المحلية الخاصة بك.</string>
-    <string name="what_it_uses">يستخدم SongSync واجهة برمجة تطبيقات Spotify للحصول على بيانات الأغنية. يمكنك العثور على مزيد من المعلومات حول Spotify API على موقع الويب الخاص بهم.</string>
     <string name="we_are_open_source">SongSync هو مشروع مفتوح المصدر. يمكنك العثور على شفرة المصدر على GitHub.</string>
     <string name="check_your_connection">يرجى التحقق من اتصالك والمحاولة مرة أخرى.</string>
     <string name="lyrics_copied_to_clipboard">كلمات الأغاني المنسوخة إلى الحافظة</string>
