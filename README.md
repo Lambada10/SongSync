@@ -33,8 +33,11 @@ You can get these values by creating a new app on the [Spotify Developer Dashboa
 ### License
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](https://github.com/Lambada10/SongSync/blob/master/LICENSE) file for details.
 
-### 3rd Party APIs
-This app uses the [Spotify Web API](https://developer.spotify.com/documentation/web-api/) to get song metadata and the [spotify lyrics API](https://github.com/akashrchandran/spotify-lyrics-api) to get lyrics for songs.
+### Thanks to
+* [Spotify](https://developer.spotify.com/documentation/web-api)
+* [SpotifyLyricsAPI](https://github.com/akashrchandran/spotify-lyrics-api)
+* [syncedlyrics](https://github.com/0x7d4/syncedlyrics)
+* [Statusbar Lyric Ext](https://github.com/cjybyjk/StatusBarLyricExt)
 
 ### Friend projects
 [Gramophone](https://github.com/AkaneTan/Gramophone)
