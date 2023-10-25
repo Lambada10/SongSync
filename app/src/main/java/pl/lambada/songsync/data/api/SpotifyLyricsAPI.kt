@@ -8,7 +8,7 @@ import kotlinx.serialization.json.Json
 import pl.lambada.songsync.data.dto.SyncedLinesResponse
 
 class SpotifyLyricsAPI {
-    private val baseURL = "https://spotify-lyric-api.herokuapp.com/"
+    private val baseURL = "https://spotify-lyric-api-984e7b4face0.herokuapp.com/"
     private val jsonDec = Json { ignoreUnknownKeys = true }
 
     /**
