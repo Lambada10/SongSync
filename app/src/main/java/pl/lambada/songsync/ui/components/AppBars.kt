@@ -2,6 +2,7 @@ package pl.lambada.songsync.ui.components
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Deselect
 import androidx.compose.material.icons.filled.Home
@@ -55,7 +56,7 @@ fun TopBar(currentRoute: String?, selected: SnapshotStateList<String>,
                 if (showing) {
                     IconButton(onClick = { selected.clear() }) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(
                                 id = R.string.back
                             )

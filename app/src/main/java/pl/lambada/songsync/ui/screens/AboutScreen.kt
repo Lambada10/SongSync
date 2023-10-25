@@ -56,7 +56,6 @@ fun AboutScreen(viewModel: MainViewModel) {
     val uriHandler = LocalUriHandler.current
     val version = LocalContext.current.getVersion()
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
 
     val sharedPreferences = context.getSharedPreferences(
         "pl.lambada.songsync_preferences",
@@ -101,7 +100,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                 var sdPath by rememberSaveable { mutableStateOf(sdCardPath) }
                 AboutCard(label = stringResource(R.string.sd_card)) {
                     Text(stringResource(R.string.set_sd_path))
-                    if(sdPath == "" || sdPath == null) {
+                    if(sdPath == "") {
                         Text(
                             text = stringResource(R.string.no_sd_card_path_set),
                             color = MaterialTheme.colorScheme.error,

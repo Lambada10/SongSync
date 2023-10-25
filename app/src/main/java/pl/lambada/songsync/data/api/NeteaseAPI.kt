@@ -1,6 +1,5 @@
 package pl.lambada.songsync.data.api
 
-import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
@@ -94,7 +93,6 @@ class NeteaseAPI {
      * @return The synced lyrics as a string.
      */
     suspend fun getSyncedLyrics(id: Int): String? {
-        Log.e("hi", "establishing connection")
         val client = HttpClient(CIO)
         val response = client.get(
             baseURL + "song/lyric"
@@ -105,10 +103,8 @@ class NeteaseAPI {
             parameter("id", id)
             parameter("lv", 1)
         }
-        Log.e("hi", "${response.request}")
         val responseBody = response.bodyAsText(Charsets.UTF_8)
         client.close()
-        Log.e("NeteaseAPI", responseBody)
 
         if (response.status.value !in 200..299 || responseBody == "[]")
             return null

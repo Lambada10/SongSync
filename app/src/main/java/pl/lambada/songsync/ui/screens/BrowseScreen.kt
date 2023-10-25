@@ -271,7 +271,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                                         "SongSync/${result.songName} - ${result.artistName}.lrc"
                                     )
-                                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R || isInternalStorage) {
+                                    if(!isLegacyVersion || isInternalStorage) {
                                         file.writeText(lrc)
                                     } else {
                                         val sd = context.externalCacheDirs[1].absolutePath.substring(0, context.externalCacheDirs[1].absolutePath.indexOf("/Android/data"))
