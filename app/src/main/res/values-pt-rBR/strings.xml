@@ -90,7 +90,6 @@
     <string name="spotify_api_rate_limit_reached">Limite de taxa da API do Spotify atingido</string>
     <string name="no_results">Sem resultados</string>
     <string name="what_is_songsync">SongSync é um aplicativo que permite baixar letras sincronizadas (Arquivos .lrc) para sua Biblioteca De Música Local.</string>
-    <string name="what_it_uses">O SongSync usa a API do Spotify para obter dados de músicas. Você pode encontrar mais informações sobre a API do Spotify no site.</string>
     <string name="how_we_get_lyrics">O SongSync usa a API do SpotifyLyrics para obter as letras das músicas. Você pode encontrar mais informações sobre a API do SpotifyLyrics em nossa página do GitHub.</string>
     <string name="bugs_or_suggestions_contact_us">Encontrou um bug\? Tem uma sugestão\? Quer contribuir\? Se sinta à vontade para entrar em contato comigo no meu grupo do Telegram.</string>
     <string name="contributor">Contribuintes</string>

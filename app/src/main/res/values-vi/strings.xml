@@ -13,7 +13,6 @@
     <string name="no_results">Không có kết quả</string>
     <string name="unknown">Không xác định</string>
     <string name="app_version">Phiên bản ứng dụng: %1$s</string>
-    <string name="what_it_uses">SongSync sử dụng API Spotify để lấy dữ liệu bài hát. Bạn có thể tìm hiểu thêm về API Spotify trên website của họ.</string>
     <string name="spotify_for_developers">Spotify for Developers</string>
     <string name="about_songsync">Về SongSync</string>
     <string name="view_on_github">Xem trên GitHub</string>

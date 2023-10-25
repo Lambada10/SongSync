@@ -28,7 +28,6 @@
     <string name="what_is_songsync">SongSync este o aplicație care vă permite descărcarea versurilor sincronizate (fișiere .lrc) pentru biblioteca dvs. de muzică locală.</string>
     <string name="extra_what_is_songsync">De asemenea, puteți căuta anumite melodii pentru a le obține versurile (și să le salvați în descărcări).</string>
     <string name="app_version">Versiunea aplicației: %1$s</string>
-    <string name="what_it_uses">SongSync utilizează API-ul de la Spotify pentru a obține datele melodiilor. Puteți găsi mai multe informații despre API-ul Spotify pe site-ul lor.</string>
     <string name="spotify_for_developers">Spotify pentru Developeri</string>
     <string name="spotifylyrics_api" translatable="false">SpotifyLyrics API</string>
     <string name="about_songsync">Despre SongSync</string>

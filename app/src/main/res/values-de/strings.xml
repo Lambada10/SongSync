@@ -26,7 +26,6 @@
     <string name="what_is_songsync">SongSync ist eine App, die dich synchronisierte Lyric-Dateien (.lrc) für deine lokale Musikbibliothek herunterladen lässt.</string>
     <string name="extra_what_is_songsync">Du kannst auch nach spezifischen Songs suchen, um ihre Lyrics zu erhalten (und sie in Downloads zu speichern).</string>
     <string name="app_version">App-Version: %1$s</string>
-    <string name="what_it_uses">SongSync nutzt die Spotify-API, um Song-Daten zu erhalten. Du kannst weitere Informationen auf der Spotify-Webseite finden.</string>
     <string name="spotify_for_developers">Spotify für Entwickler</string>
     <string name="about_songsync">Über SongSync</string>
     <string name="how_we_get_lyrics">SongSync nutzt die SpotifyLyrics API, um Song-Lyrics zu erhalten. Du kannst weitere Informationen auf der GitHub-Seite von SpotifyLyrics erhalten.</string>

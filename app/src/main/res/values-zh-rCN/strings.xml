@@ -20,7 +20,6 @@
     <string name="unknown">未知</string>
     <string name="what_is_songsync">SongSync 是一款能够为你的本地曲库下载同步歌词 (.lrc 文件) 的应用。</string>
     <string name="app_version">应用版本: %1$s</string>
-    <string name="what_it_uses">SongSync 使用 Spotify API 来获取歌曲信息。你可以在 Spotify 的网站上找到有关 Spotify API 的更多信息。</string>
     <string name="spotify_for_developers">面向开发者的 Spotify</string>
     <string name="about_songsync">关于 SongSync</string>
     <string name="view_on_github">在 Github 上查看</string>

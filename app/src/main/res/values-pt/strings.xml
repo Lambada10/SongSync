@@ -85,7 +85,6 @@
     <string name="success_failed">Sucesso: %1$d, Sem letras: %2$d, Falhou: %3$d</string>
     <string name="unknown">Desconhecido</string>
     <string name="what_is_songsync">SongSync é um aplicativo que permite baixar letras sincronizadas (Arquivos .lrc) para sua Biblioteca de Música Local.</string>
-    <string name="what_it_uses">O SongSync usa a API do Spotify para obter dados de música. Você pode encontrar mais informações sobre a API do Spotify em seu site.</string>
     <string name="bugs_or_suggestions_contact_us">Encontrou um bug\? Tem uma sugestão\? Quer contribuir\? Se sinta à vontade para entrar em contato comigo no meu grupo do Telegram.</string>
     <string name="developer">Desenvolvedores</string>
     <string name="requires_higher_storage_permissions">Este aplicativo requer acesso ao armazenamento para escanear sua Biblioteca de Músicas e salvar as letras.</string>

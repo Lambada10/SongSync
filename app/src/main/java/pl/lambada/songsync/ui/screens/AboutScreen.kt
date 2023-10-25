@@ -184,38 +184,7 @@ fun AboutScreen(viewModel: MainViewModel) {
                 )
             }
         }
-        item {
-            AboutCard(stringResource(R.string.spotify_api)) {
-                Text(stringResource(R.string.what_it_uses))
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button(
-                        modifier = Modifier.padding(top = 8.dp),
-                        onClick = {
-                            uriHandler.openUri("https://developer.spotify.com/documentation/web-api")
-                        }
-                    ) {
-                        Text(stringResource(R.string.spotify_for_developers))
-                    }
-                }
-            }
-        }
-        item {
-            AboutCard(stringResource(R.string.spotifylyrics_api)) {
-                Text(stringResource(R.string.how_we_get_lyrics))
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button(
-                        modifier = Modifier.padding(top = 8.dp),
-                        onClick = {
-                            uriHandler.openUri("https://github.com/akashrchandran/spotify-lyrics-api")
-                        }
-                    ) {
-                        Text(stringResource(R.string.view_on_github))
-                    }
-                }
-            }
-        }
+
         item {
             AboutCard(stringResource(R.string.source_code)) {
                 Text(stringResource(R.string.we_are_open_source))
@@ -232,6 +201,25 @@ fun AboutScreen(viewModel: MainViewModel) {
                 }
             }
         }
+
+        item {
+            AboutCard(stringResource(R.string.support)) {
+                Text(stringResource(R.string.bugs_or_suggestions_contact_us))
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Button(
+                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                        onClick = {
+                            uriHandler.openUri("https://t.me/LambadaOT")
+                        }
+                    ) {
+                        Text(stringResource(R.string.telegram_group))
+                    }
+                }
+                Text(stringResource(R.string.create_issue))
+            }
+        }
+
         item {
             AboutCard(stringResource(R.string.contributors)) {
                 Contributor.values().forEach {
@@ -264,21 +252,30 @@ fun AboutScreen(viewModel: MainViewModel) {
                 }
             }
         }
+
         item {
-            AboutCard(stringResource(R.string.support)) {
-                Text(stringResource(R.string.bugs_or_suggestions_contact_us))
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button(
-                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                        onClick = {
-                            uriHandler.openUri("https://t.me/LambadaOT")
+            AboutCard(stringResource(R.string.thanks_to)) {
+                val credits = mapOf(
+                    stringResource(R.string.spotify_api) to "https://developer.spotify.com/documentation/web-api",
+                    stringResource(R.string.spotifylyrics_api) to "https://github.com/akashrchandran/spotify-lyrics-api",
+                    stringResource(R.string.syncedlyrics_py) to "https://github.com/0x7d4/syncedlyrics",
+                    stringResource(R.string.statusbar_lyrics_ext) to "https://github.com/cjybyjk/StatusBarLyricExt"
+                )
+
+                credits.forEach { credit ->
+                    Text(text = credit.key)
+                    Row {
+                        Spacer(modifier = Modifier.weight(1f))
+                        Button(
+                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                            onClick = {
+                                uriHandler.openUri(credit.value)
+                            }
+                        ) {
+                            Text(stringResource(R.string.open_website))
                         }
-                    ) {
-                        Text(stringResource(R.string.telegram_group))
                     }
                 }
-                Text(stringResource(R.string.create_issue))
             }
         }
     }

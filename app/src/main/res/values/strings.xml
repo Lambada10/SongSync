@@ -27,7 +27,6 @@
     <string name="what_is_songsync">SongSync is an app that lets you to download synced lyrics (.lrc files) for your local music library.</string>
     <string name="extra_what_is_songsync">You can also search for specific songs to get their lyrics (and save them to downloads).</string>
     <string name="app_version">App version: %1$s</string>
-    <string name="what_it_uses">SongSync uses Spotify API to get song data. You can find more information about Spotify API on their website.</string>
     <string name="spotify_for_developers">Spotify for Developers</string>
     <string name="spotifylyrics_api" translatable="false">SpotifyLyrics API</string>
     <string name="about_songsync">About SongSync</string>
@@ -110,4 +109,8 @@
     <string name="clear_sd_card_path">Clear SD Card path</string>
     <string name="set_sd_card_path">Set SD Card path</string>
     <string name="set_sd_path_warn">You are using an older version of Android. Make sure that you have set the SD card path in the settings. If you have not, please cancel this dialog and set it.</string>
+    <string name="thanks_to">Thanks to</string>
+    <string name="syncedlyrics_py">Syncedlyrics (for Netease headers and LrcLib)</string>
+    <string name="statusbar_lyrics_ext">Statusbar lyrics ext (For Netease)</string>
+    <string name="open_website">Open website</string>
 </resources>
