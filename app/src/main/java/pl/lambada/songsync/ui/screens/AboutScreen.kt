@@ -68,7 +68,12 @@ fun AboutScreen(viewModel: MainViewModel) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(
+                start = 8.dp,
+                end = 8.dp,
+                top = 8.dp,
+                bottom = 0.dp
+            )
     ) {
         item {
             AboutCard(label = stringResource(R.string.provider)) {
