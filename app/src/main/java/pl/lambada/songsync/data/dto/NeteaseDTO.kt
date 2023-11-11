@@ -4,35 +4,35 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NeteaseResponse(
-    val result: Result,
+    val result: NeteaseResult,
     val code: Int
 )
 
 @Serializable
-data class Result(
-    val songs: List<NetEaseSong>,
+data class NeteaseResult(
+    val songs: List<NeteaseSong>,
     val songCount: Int
 )
 
 @Serializable
-data class NetEaseSong(
+data class NeteaseSong(
     val name: String,
     val id: Int,
-    val artists: List<NetEaseArtist>,
+    val artists: List<NeteaseArtist>,
 )
 
 @Serializable
-data class NetEaseArtist(
+data class NeteaseArtist(
     val name: String
 )
 
 @Serializable
 data class NeteaseLyricsResponse(
-    val lrc: NetaaseLyrics,
+    val lrc: NeteaseLyrics,
     val code: Int
 )
 
 @Serializable
-data class NetaaseLyrics(
+data class NeteaseLyrics(
     val lyric: String
 )
