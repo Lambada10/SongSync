@@ -124,8 +124,12 @@ import kotlin.math.roundToInt
  * @param viewModel The [MainViewModel] instance.
  */
 @Composable
-fun HomeScreen(selected: SnapshotStateList<String>, allSongs: List<Song>?,
-               navController: NavHostController, viewModel: MainViewModel) {
+fun HomeScreen(
+    selected: SnapshotStateList<String>,
+    allSongs: List<Song>?,
+    navController: NavHostController,
+    viewModel: MainViewModel
+) {
     if (allSongs == null) {
         LoadingScreen()
     } else {
@@ -159,13 +163,23 @@ data class MyTextFieldValue(val text: String, val cursorStart: Int, val cursorEn
     ExperimentalLayoutApi::class
 )
 @Composable
-fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHostController,
-                     viewModel: MainViewModel, songs: List<Song>) {
+fun HomeScreenLoaded(
+    selected: SnapshotStateList<String>,
+    navController: NavHostController,
+    viewModel: MainViewModel,
+    songs: List<Song>
+) {
     var showingSearch by rememberSaveable { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(showingSearch) }
-    var query by rememberSaveable(stateSaver = Saver(
-        save = { MyTextFieldValue(it.text, it.selection.start, it.selection.end) },
-        restore = { TextFieldValue(it.text, TextRange(it.cursorStart, it.cursorEnd)) })
+    var query by rememberSaveable(
+        stateSaver = Saver(save = {
+            MyTextFieldValue(
+                it.text,
+                it.selection.start,
+                it.selection.end
+            )
+        },
+            restore = { TextFieldValue(it.text, TextRange(it.cursorStart, it.cursorEnd)) })
     ) { mutableStateOf(TextFieldValue()) }
     var isBatchDownload by rememberSaveable { mutableStateOf(false) }
     var showFilters by rememberSaveable { mutableStateOf(false) }
@@ -180,12 +194,10 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
 
     Column {
         if (isBatchDownload) {
-            BatchDownloadLyrics(
-                songs = if (selected.isEmpty()) displaySongs
-                        else songs.filter { selected.contains(it.filePath) }.toList(),
+            BatchDownloadLyrics(songs = if (selected.isEmpty()) displaySongs
+            else songs.filter { selected.contains(it.filePath) }.toList(),
                 viewModel = viewModel,
-                onDone = { isBatchDownload = false }
-            )
+                onDone = { isBatchDownload = false })
         }
         LazyColumn(
             modifier = Modifier
@@ -217,8 +229,7 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
                         showingSearch = false
                     }
                     AnimatedContent(
-                        targetState = showingSearch,
-                        transitionSpec = {
+                        targetState = showingSearch, transitionSpec = {
                             if (targetState) {
                                 (slideInVertically { height -> height } + fadeIn()).togetherWith(
                                     slideOutVertically { height -> -height } + fadeOut())
@@ -228,9 +239,7 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
                             }.using(
                                 SizeTransform()
                             )
-                        },
-                        label = "",
-                        modifier = Modifier
+                        }, label = "", modifier = Modifier
                             .fillMaxWidth()
                             .height(55.dp)
                     ) { showing ->
@@ -239,30 +248,25 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
                                 willShowIme = false
                             }
                             val focusManager = LocalFocusManager.current
-                            TextField(
-                                value = query,
+                            TextField(value = query,
                                 onValueChange = { query = it },
                                 label = { Text(stringResource(id = R.string.search)) },
                                 leadingIcon = {
-                                    Icon(
-                                        Icons.Filled.Search,
+                                    Icon(Icons.Filled.Search,
                                         contentDescription = stringResource(id = R.string.search),
                                         modifier = Modifier.clickable {
                                             showSearch = false
                                             showingSearch = false
-                                        }
-                                    )
+                                        })
                                 },
                                 trailingIcon = {
-                                    Icon(
-                                        Icons.Default.Clear,
+                                    Icon(Icons.Default.Clear,
                                         contentDescription = stringResource(id = R.string.clear),
                                         modifier = Modifier.clickable {
                                             query = TextFieldValue("")
                                             showSearch = false
                                             showingSearch = false
-                                        }
-                                    )
+                                        })
                                 },
                                 shape = ShapeDefaults.ExtraLarge,
                                 colors = TextFieldDefaults.colors(
@@ -291,8 +295,10 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
                                 })
                             )
                         } else {
-                            Row(verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
                                 Button(onClick = { isBatchDownload = true }) {
                                     Text(text = stringResource(R.string.batch_download_lyrics))
                                 }
@@ -306,18 +312,15 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
                                     )
                                 }
 
-                                if (showFilters)
-                                    FiltersDialog(
-                                        viewModel = viewModel,
-                                        context = context,
-                                        onDismiss = { showFilters = false },
-                                        onFilterChange = {
-                                            scope.launch(Dispatchers.Default) {
-                                                filtered = viewModel.filterSongs()
-                                            }
+                                if (showFilters) FiltersDialog(viewModel = viewModel,
+                                    context = context,
+                                    onDismiss = { showFilters = false },
+                                    onFilterChange = {
+                                        scope.launch(Dispatchers.Default) {
+                                            filtered = viewModel.filterSongs()
                                         }
-                                    )
-                                
+                                    })
+
                                 IconButton(onClick = { showSearch = true }) {
                                     Icon(
                                         imageVector = Icons.Default.Search,
@@ -337,9 +340,9 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
                 val songArtistLowercase = song.artist?.lowercaseWithLocale()
                 val queryLowercase = query.text.lowercaseWithLocale()
 
-                if (
-                    songTitleLowercase?.contains(queryLowercase) == true ||
-                    songArtistLowercase?.contains(queryLowercase) == true
+                if (songTitleLowercase?.contains(queryLowercase) == true || songArtistLowercase?.contains(
+                        queryLowercase
+                    ) == true
                 ) {
                     SongItem(
                         selected = selected.contains(song.filePath),
@@ -351,8 +354,8 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
                                 showingSearch = false
                             } else {
                                 selected.remove(song.filePath)
-                                if (selected.size == 0 && query.text.isNotEmpty())
-                                    showingSearch = true // show again but don't focus
+                                if (selected.size == 0 && query.text.isNotEmpty()) showingSearch =
+                                    true // show again but don't focus
                             }
                         },
                         navController = navController,
@@ -371,14 +374,15 @@ fun HomeScreenLoaded(selected: SnapshotStateList<String>, navController: NavHost
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FiltersDialog(viewModel: MainViewModel, context: Context, onDismiss: () -> Unit, onFilterChange: () -> Unit) {
+fun FiltersDialog(
+    viewModel: MainViewModel, context: Context, onDismiss: () -> Unit, onFilterChange: () -> Unit
+) {
     var hideLyrics by remember { mutableStateOf(viewModel.hideLyrics) }
     val folders = viewModel.getSongFolders(context)
     var showFolders by rememberSaveable { mutableStateOf(false) }
 
     val sharedPreferences = LocalContext.current.getSharedPreferences(
-        "pl.lambada.songsync_preferences",
-        Context.MODE_PRIVATE
+        "pl.lambada.songsync_preferences", Context.MODE_PRIVATE
     )
 
     AlertDialog(onDismissRequest = { onDismiss() }) {
@@ -402,14 +406,12 @@ fun FiltersDialog(viewModel: MainViewModel, context: Context, onDismiss: () -> U
                     Row(modifier = Modifier.weight(0.8f)) {
                         Text(stringResource(R.string.no_lyrics_only))
                     }
-                    Switch(
-                        checked = hideLyrics,
-                        onCheckedChange = {
-                            hideLyrics = it
-                            viewModel.hideLyrics = it
-                            sharedPreferences.edit().putBoolean("hide_lyrics", it).apply()
-                            onFilterChange()
-                        })
+                    Switch(checked = hideLyrics, onCheckedChange = {
+                        hideLyrics = it
+                        viewModel.hideLyrics = it
+                        sharedPreferences.edit().putBoolean("hide_lyrics", it).apply()
+                        onFilterChange()
+                    })
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
@@ -430,7 +432,7 @@ fun FiltersDialog(viewModel: MainViewModel, context: Context, onDismiss: () -> U
                 Spacer(modifier = Modifier.height(16.dp))
                 Row {
                     Spacer(modifier = Modifier.weight(1f))
-                    Button(onClick = { onDismiss() } ) {
+                    Button(onClick = { onDismiss() }) {
                         Text(stringResource(R.string.close))
                     }
                 }
@@ -438,7 +440,7 @@ fun FiltersDialog(viewModel: MainViewModel, context: Context, onDismiss: () -> U
         }
     }
 
-    if(showFolders) {
+    if (showFolders) {
         AlertDialog(onDismissRequest = { showFolders = false }) {
             Surface(
                 modifier = Modifier
@@ -448,12 +450,22 @@ fun FiltersDialog(viewModel: MainViewModel, context: Context, onDismiss: () -> U
                 tonalElevation = AlertDialogDefaults.TonalElevation
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = stringResource(R.string.ignore_folders), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        text = stringResource(R.string.ignore_folders),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     Spacer(modifier = Modifier.height(24.dp))
                     LazyColumn {
                         items(folders.size) {
                             val folder = folders[it]
-                            var checked by remember { mutableStateOf(viewModel.blacklistedFolders.contains(folder)) }
+                            var checked by remember {
+                                mutableStateOf(
+                                    viewModel.blacklistedFolders.contains(
+                                        folder
+                                    )
+                                )
+                            }
 
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -461,21 +473,20 @@ fun FiltersDialog(viewModel: MainViewModel, context: Context, onDismiss: () -> U
                                 Row(modifier = Modifier.weight(0.8f)) {
                                     Text(folder)
                                 }
-                                Checkbox(
-                                    checked = checked,
-                                    onCheckedChange = { check ->
-                                        if(check) {
-                                            checked = true
-                                            viewModel.blacklistedFolders.add(folder)
-                                        }
-                                        else {
-                                            checked = false
-                                            viewModel.blacklistedFolders.remove(folder)
-                                        }
-                                        sharedPreferences.edit().putString("blacklist", viewModel.blacklistedFolders.joinToString(",")).apply()
-                                        onFilterChange()
+                                Checkbox(checked = checked, onCheckedChange = { check ->
+                                    if (check) {
+                                        checked = true
+                                        viewModel.blacklistedFolders.add(folder)
+                                    } else {
+                                        checked = false
+                                        viewModel.blacklistedFolders.remove(folder)
                                     }
-                                )
+                                    sharedPreferences.edit().putString(
+                                        "blacklist",
+                                        viewModel.blacklistedFolders.joinToString(",")
+                                    ).apply()
+                                    onFilterChange()
+                                })
                             }
                             Spacer(modifier = Modifier.height(16.dp))
                         }
@@ -483,7 +494,7 @@ fun FiltersDialog(viewModel: MainViewModel, context: Context, onDismiss: () -> U
                             Row {
                                 Spacer(modifier = Modifier.weight(1f))
 
-                                Button(onClick = { showFolders = false } ) {
+                                Button(onClick = { showFolders = false }) {
                                     Text(stringResource(R.string.close))
                                 }
                             }
@@ -497,8 +508,14 @@ fun FiltersDialog(viewModel: MainViewModel, context: Context, onDismiss: () -> U
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SongItem(selected: Boolean, quickSelect: Boolean, onSelectionChanged: (Boolean) -> Unit,
-             navController: NavHostController, song: Song, viewModel: MainViewModel) {
+fun SongItem(
+    selected: Boolean,
+    quickSelect: Boolean,
+    onSelectionChanged: (Boolean) -> Unit,
+    navController: NavHostController,
+    song: Song,
+    viewModel: MainViewModel
+) {
     OutlinedCard(
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
@@ -516,19 +533,19 @@ fun SongItem(selected: Boolean, quickSelect: Boolean, onSelectionChanged: (Boole
             })
     ) {
         val painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current).data(data = song.imgUri)
-                .apply {
-                    placeholder(R.drawable.ic_song)
-                    error(R.drawable.ic_song)
-                }.build(),
-            imageLoader = LocalContext.current.imageLoader
+            ImageRequest.Builder(LocalContext.current).data(data = song.imgUri).apply {
+                placeholder(R.drawable.ic_song)
+                error(R.drawable.ic_song)
+            }.build(), imageLoader = LocalContext.current.imageLoader
         )
         val bgColor = if (selected) MaterialTheme.colorScheme.surfaceVariant
-                        else MaterialTheme.colorScheme.surface
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .height(72.dp)
-            .background(bgColor)) {
+        else MaterialTheme.colorScheme.surface
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(72.dp)
+                .background(bgColor)
+        ) {
             Image(
                 painter = painter,
                 contentDescription = stringResource(id = R.string.album_cover),
@@ -538,11 +555,17 @@ fun SongItem(selected: Boolean, quickSelect: Boolean, onSelectionChanged: (Boole
             )
             Spacer(modifier = Modifier.width(2.dp))
             Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.Top) {
-                MarqueeText(text = song.title ?: stringResource(id = R.string.unknown), fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.contentColorFor(bgColor))
+                MarqueeText(
+                    text = song.title ?: stringResource(id = R.string.unknown),
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.contentColorFor(bgColor)
+                )
                 Spacer(modifier = Modifier.weight(1f))
-                MarqueeText(text = song.artist ?: stringResource(id = R.string.unknown), fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.contentColorFor(bgColor))
+                MarqueeText(
+                    text = song.artist ?: stringResource(id = R.string.unknown),
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.contentColorFor(bgColor)
+                )
             }
         }
     }
@@ -563,14 +586,16 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
     val isLegacyVersion = Build.VERSION.SDK_INT < Build.VERSION_CODES.R
 
     val context = LocalContext.current
-    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     val channelID = getString(context, R.string.batch_download_lyrics)
 
     val resultIntent = Intent(context, MainActivity::class.java)
     resultIntent.addCategory(Intent.CATEGORY_LAUNCHER)
     resultIntent.setAction(Intent.ACTION_MAIN)
     resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    val pendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_IMMUTABLE)
+    val pendingIntent =
+        PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_IMMUTABLE)
 
     when (uiState) {
         UiState.Cancelled -> {
@@ -579,71 +604,59 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
         }
 
         UiState.Warning -> {
-            AlertDialog(
-                title = {
-                    Text(text = stringResource(id = R.string.batch_download_lyrics))
-                },
-                text = {
-                    Column {
-                        Text(text = pluralStringResource(R.plurals.this_will_download_lyrics_for_all_songs, songs.size, songs.size))
-                    }
-                },
-                onDismissRequest = {
-                    uiState = UiState.Cancelled
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            uiState = if (isLegacyVersion) {
-                                UiState.LegacyPrompt
-                            } else {
-                                UiState.Pending
-                            }
-                        }
-                    ) {
-                        Text(text = stringResource(R.string.yes))
-                    }
-                },
-                dismissButton = {
-                    OutlinedButton(onClick = { uiState = UiState.Cancelled }) {
-                        Text(text = stringResource(R.string.no))
-                    }
+            AlertDialog(title = {
+                Text(text = stringResource(id = R.string.batch_download_lyrics))
+            }, text = {
+                Column {
+                    Text(
+                        text = pluralStringResource(
+                            R.plurals.this_will_download_lyrics_for_all_songs,
+                            songs.size,
+                            songs.size
+                        )
+                    )
                 }
-            )
+            }, onDismissRequest = {
+                uiState = UiState.Cancelled
+            }, confirmButton = {
+                Button(onClick = {
+                    uiState = if (isLegacyVersion) {
+                        UiState.LegacyPrompt
+                    } else {
+                        UiState.Pending
+                    }
+                }) {
+                    Text(text = stringResource(R.string.yes))
+                }
+            }, dismissButton = {
+                OutlinedButton(onClick = { uiState = UiState.Cancelled }) {
+                    Text(text = stringResource(R.string.no))
+                }
+            })
         }
 
         UiState.LegacyPrompt -> {
-            AlertDialog(
-                title = {
-                    Text(text = stringResource(id = R.string.batch_download_lyrics))
-                },
-                text = {
-                    Column {
-                        Text(text = stringResource(R.string.set_sd_path_warn))
-                    }
-                },
-                onDismissRequest = {
-                    uiState = UiState.Cancelled
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            uiState = UiState.Pending
-                        }
-                    ) {
-                        Text(text = stringResource(R.string.ok))
-                    }
-                },
-                dismissButton = {
-                    OutlinedButton(
-                        onClick = {
-                            uiState = UiState.Cancelled
-                        }
-                    ) {
-                        Text(text = stringResource(R.string.cancel))
-                    }
+            AlertDialog(title = {
+                Text(text = stringResource(id = R.string.batch_download_lyrics))
+            }, text = {
+                Column {
+                    Text(text = stringResource(R.string.set_sd_path_warn))
                 }
-            )
+            }, onDismissRequest = {
+                uiState = UiState.Cancelled
+            }, confirmButton = {
+                Button(onClick = {
+                    uiState = UiState.Pending
+                }) {
+                    Text(text = stringResource(R.string.ok))
+                }
+            }, dismissButton = {
+                OutlinedButton(onClick = {
+                    uiState = UiState.Cancelled
+                }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            })
         }
 
         UiState.Pending -> {
@@ -657,46 +670,44 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(context.getString(R.string.downloading_lyrics))
                 .setContentText(context.getString(R.string.progress, count, total, percentage))
-                .setProgress(100, percentage, false)
-                .setTimeoutAfter(2000)
+                .setProgress(100, percentage, false).setTimeoutAfter(2000)
                 .setContentIntent(pendingIntent)
 
             notificationManager.notify(1, notificationBuilder.build())
 
-            AlertDialog(
-                title = {
-                    Text(text = stringResource(id = R.string.batch_download_lyrics))
-                },
-                text = {
-                    Column {
-                        Text(text = stringResource(R.string.downloading_lyrics))
-                        MarqueeText(
-                            stringResource(
-                                R.string.song,
-                                songs.getOrNull((count) % total.coerceAtLeast(1))?.title ?: unknownString,
-                            )
+            AlertDialog(title = {
+                Text(text = stringResource(id = R.string.batch_download_lyrics))
+            }, text = {
+                Column {
+                    Text(text = stringResource(R.string.downloading_lyrics))
+                    MarqueeText(
+                        stringResource(
+                            R.string.song,
+                            songs.getOrNull((count) % total.coerceAtLeast(1))?.title
+                                ?: unknownString,
                         )
-                        Text(text = stringResource(R.string.progress, count, total, percentage))
-                        Text(text = stringResource(R.string.success_failed, successCount, noLyricsCount, failedCount))
-                        Text(text = stringResource(R.string.please_do_not_close_the_app_this_may_take_a_while))
-                    }
-                },
-                onDismissRequest = {
-                    /*
-                       it's easy to accidentally dismiss the dialog, and since it's a long running task
-                       we don't want to accidentally cancel it, so we don't allow dismissing the dialog
-                       user can cancel the task by pressing the cancel button
-                     */
-                },
-                confirmButton = {
-                    // no button but compose cries when I don't use confirmButton
-                },
-                dismissButton = {
-                    OutlinedButton(onClick = { uiState = UiState.Cancelled }) {
-                        Text(text = stringResource(R.string.cancel))
-                    }
+                    )
+                    Text(text = stringResource(R.string.progress, count, total, percentage))
+                    Text(
+                        text = stringResource(
+                            R.string.success_failed, successCount, noLyricsCount, failedCount
+                        )
+                    )
+                    Text(text = stringResource(R.string.please_do_not_close_the_app_this_may_take_a_while))
                 }
-            )
+            }, onDismissRequest = {
+                /*
+                   it's easy to accidentally dismiss the dialog, and since it's a long running task
+                   we don't want to accidentally cancel it, so we don't allow dismissing the dialog
+                   user can cancel the task by pressing the cancel button
+                 */
+            }, confirmButton = {
+                // no button but compose cries when I don't use confirmButton
+            }, dismissButton = {
+                OutlinedButton(onClick = { uiState = UiState.Cancelled }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            })
 
             var notFoundInARow by rememberSaveable { mutableIntStateOf(0) }
             var downloadJob by remember { mutableStateOf<Job?>(null) }
@@ -731,10 +742,12 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                                     }
                                     continue
                                 }
+
                                 is NoTrackFoundException, is EmptyQueryException -> {
                                     // not increasing notFoundInARow because that is for rate limit
                                     failedCount++
                                 }
+
                                 else -> throw e
                             }
                         }
@@ -742,7 +755,8 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                         if (queryResult != null) {
                             val lyricsResult: String
                             try {
-                                lyricsResult = viewModel.getSyncedLyrics(queryResult.songLink ?: "")!!
+                                lyricsResult =
+                                    viewModel.getSyncedLyrics(queryResult.songLink ?: "")!!
                             } catch (e: Exception) {
                                 when (e) {
                                     is NullPointerException, is FileNotFoundException -> {
@@ -754,19 +768,22 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                                 }
                             }
                             val lrc =
-                                "[ti:${queryResult.songName}]\n" +
-                                        "[ar:${queryResult.artistName}]\n" +
-                                        "[by:$generatedUsingString]\n" +
-                                        lyricsResult
+                                "[ti:${queryResult.songName}]\n" + "[ar:${queryResult.artistName}]\n" + "[by:$generatedUsingString]\n" + lyricsResult
                             try {
                                 file?.writeText(lrc)
                             } catch (e: FileNotFoundException) {
-                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && !song.filePath!!.contains("/storage/emulated/0")) {
-                                    val sd = context.externalCacheDirs[1].absolutePath.substring(0, context.externalCacheDirs[1].absolutePath.indexOf("/Android/data"))
-                                    val path = file?.absolutePath?.substringAfter(sd)?.split("/")?.dropLast(1)
+                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && !song.filePath!!.contains(
+                                        "/storage/emulated/0"
+                                    )
+                                ) {
+                                    val sd = context.externalCacheDirs[1].absolutePath.substring(
+                                        0,
+                                        context.externalCacheDirs[1].absolutePath.indexOf("/Android/data")
+                                    )
+                                    val path = file?.absolutePath?.substringAfter(sd)?.split("/")
+                                        ?.dropLast(1)
                                     var sdCardFiles = DocumentFile.fromTreeUri(
-                                        context,
-                                        Uri.parse(viewModel.sdCardPath)
+                                        context, Uri.parse(viewModel.sdCardPath)
                                     )
                                     for (element in path!!) {
                                         for (sdCardFile in sdCardFiles!!.listFiles()) {
@@ -776,16 +793,17 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                                         }
                                     }
                                     sdCardFiles?.listFiles()?.forEach {
-                                        if(it.name == file.name) {
+                                        if (it.name == file.name) {
                                             it.delete()
                                             return@forEach
                                         }
                                     }
                                     sdCardFiles?.createFile(
-                                        "text/lrc",
-                                        file.name
+                                        "text/lrc", file.name
                                     )?.let {
-                                        context.contentResolver.openOutputStream(it.uri)?.write(lrc.toByteArray())
+                                        val outputStream = context.contentResolver.openOutputStream(it.uri)
+                                        outputStream?.write(lrc.toByteArray())
+                                        outputStream?.close()
                                     }
                                 } else {
                                     throw e
@@ -804,58 +822,50 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
 
             val notificationBuilder = NotificationCompat.Builder(context, channelID)
                 .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle(context.getString(R.string.download_complete))
-                .setContentText(context.getString(R.string.success_failed, successCount, noLyricsCount, failedCount))
-                .setContentIntent(pendingIntent)
+                .setContentTitle(context.getString(R.string.download_complete)).setContentText(
+                    context.getString(
+                        R.string.success_failed, successCount, noLyricsCount, failedCount
+                    )
+                ).setContentIntent(pendingIntent)
 
             notificationManager.notify(2, notificationBuilder.build())
 
-            AlertDialog(
-                title = {
-                    Text(text = stringResource(id = R.string.batch_download_lyrics))
-                },
-                text = {
-                    Column {
-                        Text(text = stringResource(R.string.download_complete))
-                        Text(text = stringResource(R.string.success, successCount))
-                        Text(text = stringResource(R.string.no_lyrics, noLyricsCount))
-                        Text(text = stringResource(R.string.failed, failedCount))
-                    }
-                },
-                onDismissRequest = {
-                    uiState = UiState.Cancelled
-                },
-                confirmButton = {
-                    Button(onClick = { uiState = UiState.Cancelled }) {
-                        Text(text = stringResource(id = R.string.ok))
-                    }
+            AlertDialog(title = {
+                Text(text = stringResource(id = R.string.batch_download_lyrics))
+            }, text = {
+                Column {
+                    Text(text = stringResource(R.string.download_complete))
+                    Text(text = stringResource(R.string.success, successCount))
+                    Text(text = stringResource(R.string.no_lyrics, noLyricsCount))
+                    Text(text = stringResource(R.string.failed, failedCount))
                 }
-            )
+            }, onDismissRequest = {
+                uiState = UiState.Cancelled
+            }, confirmButton = {
+                Button(onClick = { uiState = UiState.Cancelled }) {
+                    Text(text = stringResource(id = R.string.ok))
+                }
+            })
         }
 
         UiState.RateLimited -> {
             notificationManager.cancelAll()
 
-            AlertDialog(
-                title = {
-                    Text(text = stringResource(id = R.string.batch_download_lyrics))
-                },
-                text = {
-                    Column {
-                        Text(text = stringResource(R.string.spotify_api_rate_limit_reached))
-                        Text(text = stringResource(R.string.please_try_again_later))
-                        Text(text = stringResource(R.string.change_api_strategy))
-                    }
-                },
-                onDismissRequest = {
-                    uiState = UiState.Cancelled
-                },
-                confirmButton = {
-                    Button(onClick = { uiState = UiState.Cancelled }) {
-                        Text(text = stringResource(id = R.string.ok))
-                    }
+            AlertDialog(title = {
+                Text(text = stringResource(id = R.string.batch_download_lyrics))
+            }, text = {
+                Column {
+                    Text(text = stringResource(R.string.spotify_api_rate_limit_reached))
+                    Text(text = stringResource(R.string.please_try_again_later))
+                    Text(text = stringResource(R.string.change_api_strategy))
                 }
-            )
+            }, onDismissRequest = {
+                uiState = UiState.Cancelled
+            }, confirmButton = {
+                Button(onClick = { uiState = UiState.Cancelled }) {
+                    Text(text = stringResource(id = R.string.ok))
+                }
+            })
         }
     }
 }

@@ -4,6 +4,8 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.data.NoTrackFoundException
@@ -31,7 +33,10 @@ class SpotifyAPI {
         val response = client.get(
             webPlayerURL + "get_access_token?reason=transport&productType=web_player"
         ) {
-            headers.append("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
+            headers.append(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+            )
         }
         val responseBody = response.bodyAsText(Charsets.UTF_8)
         client.close()
@@ -50,14 +55,16 @@ class SpotifyAPI {
      */
     @Throws(UnknownHostException::class, FileNotFoundException::class, NoTrackFoundException::class)
     suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
-        if(System.currentTimeMillis() - tokenTime > 1800000) // 30 minutes
+        if (System.currentTimeMillis() - tokenTime > 1800000) // 30 minutes
             refreshToken()
 
         val client = HttpClient(CIO)
-        val search = URLEncoder.encode(
-            "${query.songName} ${query.artistName}",
-            StandardCharsets.UTF_8.toString()
-        )
+        val search = withContext(Dispatchers.IO) {
+            URLEncoder.encode(
+                "${query.songName} ${query.artistName}",
+                StandardCharsets.UTF_8.toString()
+            )
+        }
 
         if (search == "+")
             throw EmptyQueryException()

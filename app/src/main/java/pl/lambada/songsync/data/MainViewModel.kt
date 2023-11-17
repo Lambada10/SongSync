@@ -4,6 +4,8 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import pl.lambada.songsync.data.api.GithubAPI
 import pl.lambada.songsync.data.api.LRCLibAPI
@@ -36,7 +38,7 @@ class MainViewModel : ViewModel() {
     private val spotifyAPI = SpotifyAPI()
 
     // other settings
-    var pureBlack = false
+    var pureBlack: MutableState<Boolean> = mutableStateOf(false)
     var sdCardPath = ""
 
     // selected provider
@@ -67,11 +69,12 @@ class MainViewModel : ViewModel() {
         return when (this.provider) {
             Providers.SPOTIFY -> spotifyAPI.getSongInfo(query, offset)
             Providers.LRCLIB -> LRCLibAPI().getSongInfo(query).also {
-                    this.lrcLibID = it?.lrcLibID ?: 0
-                } ?: throw NoTrackFoundException()
+                this.lrcLibID = it?.lrcLibID ?: 0
+            } ?: throw NoTrackFoundException()
+
             Providers.NETEASE -> NeteaseAPI().getSongInfo(query, offset).also {
-                    this.neteaseID = it?.neteaseID ?: 0
-                } ?: throw NoTrackFoundException()
+                this.neteaseID = it?.neteaseID ?: 0
+            } ?: throw NoTrackFoundException()
         }
     }
 
@@ -194,14 +197,31 @@ class MainViewModel : ViewModel() {
         hideFolders = blacklistedFolders.isNotEmpty()
         return when {
             hideLyrics && hideFolders -> {
-                cachedSongs!!.filter { it.filePath.toLrcFile()?.exists() != true && !blacklistedFolders.contains(it.filePath!!.substring(0, it.filePath.lastIndexOf("/"))) }
+                cachedSongs!!.filter {
+                    it.filePath.toLrcFile()?.exists() != true && !blacklistedFolders.contains(
+                        it.filePath!!.substring(
+                            0,
+                            it.filePath.lastIndexOf("/")
+                        )
+                    )
+                }
             }
+
             hideLyrics -> {
                 cachedSongs!!.filter { it.filePath.toLrcFile()?.exists() != true }
             }
+
             hideFolders -> {
-                cachedSongs!!.filter { !blacklistedFolders.contains(it.filePath!!.substring(0, it.filePath.lastIndexOf("/"))) }
+                cachedSongs!!.filter {
+                    !blacklistedFolders.contains(
+                        it.filePath!!.substring(
+                            0,
+                            it.filePath.lastIndexOf("/")
+                        )
+                    )
+                }
             }
+
             else -> {
                 null
             }

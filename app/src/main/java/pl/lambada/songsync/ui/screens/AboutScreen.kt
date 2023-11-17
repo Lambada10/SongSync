@@ -31,10 +31,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -77,7 +75,7 @@ fun AboutScreen(viewModel: MainViewModel) {
     ) {
         item {
             AboutCard(label = stringResource(R.string.provider)) {
-                var selected = rememberSaveable { mutableStateOf(viewModel.provider) }
+                val selected = rememberSaveable { mutableStateOf(viewModel.provider) }
                 Column {
                     Text(stringResource(R.string.provider_summary))
                     val providers = Providers.values()
@@ -88,7 +86,8 @@ fun AboutScreen(viewModel: MainViewModel) {
                                 onClick = {
                                     selected.value = it
                                     viewModel.provider = it
-                                    sharedPreferences.edit().putString("provider", it.displayName).apply()
+                                    sharedPreferences.edit().putString("provider", it.displayName)
+                                        .apply()
                                 }
                             )
                             Text(
@@ -96,7 +95,8 @@ fun AboutScreen(viewModel: MainViewModel) {
                                 modifier = Modifier.clickable {
                                     selected.value = it
                                     viewModel.provider = it
-                                    sharedPreferences.edit().putString("provider", it.displayName).apply()
+                                    sharedPreferences.edit().putString("provider", it.displayName)
+                                        .apply()
                                 }
                             )
 
@@ -113,33 +113,28 @@ fun AboutScreen(viewModel: MainViewModel) {
                         Text(stringResource(R.string.pure_black_theme))
                         Spacer(modifier = Modifier.weight(1f))
                         val pureBlack = viewModel.pureBlack
-                        var selected by remember { mutableStateOf(pureBlack) }
+                        var selected by remember { mutableStateOf(pureBlack.value) }
                         Switch(
                             checked = selected,
                             onCheckedChange = {
-                                viewModel.pureBlack = it
+                                viewModel.pureBlack.value = it
                                 selected = it
                                 sharedPreferences.edit().putBoolean("pure_black", it).apply()
                             }
                         )
                     }
-                    Text(
-                        text = stringResource(R.string.restart_the_app),
-                        modifier = Modifier.padding(top = 8.dp),
-                        fontSize = MaterialTheme.typography.bodySmall.fontSize
-                    )
                 }
             }
         }
 
         item {
-            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                 var picker by remember { mutableStateOf(false) }
                 val sdCardPath = viewModel.sdCardPath
                 var sdPath by rememberSaveable { mutableStateOf(sdCardPath) }
                 AboutCard(label = stringResource(R.string.sd_card)) {
                     Text(stringResource(R.string.set_sd_path))
-                    if(sdPath == "") {
+                    if (sdPath == "") {
                         Text(
                             text = stringResource(R.string.no_sd_card_path_set),
                             color = MaterialTheme.colorScheme.error,
@@ -177,16 +172,18 @@ fun AboutScreen(viewModel: MainViewModel) {
                     }
 
                     if (picker) {
-                        val sdCardPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) {
-                            if (it == null) {
+                        val sdCardPicker =
+                            rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) {
+                                if (it == null) {
+                                    picker = false
+                                    return@rememberLauncherForActivityResult
+                                }
+                                sdPath = it.toString()
+                                viewModel.sdCardPath = it.toString()
+                                sharedPreferences.edit().putString("sd_card_path", it.toString())
+                                    .apply()
                                 picker = false
-                                return@rememberLauncherForActivityResult
                             }
-                            sdPath = it.toString()
-                            viewModel.sdCardPath = it.toString()
-                            sharedPreferences.edit().putString("sd_card_path", it.toString()).apply()
-                            picker = false
-                        }
                         LaunchedEffect(Unit) {
                             sdCardPicker.launch(Uri.parse(Environment.getExternalStorageDirectory().absolutePath))
                         }
@@ -357,6 +354,7 @@ fun CheckForUpdates(
                 }
             }
         }
+
         UpdateState.UPDATE_AVAILABLE -> {
             AlertDialog(
                 onDismissRequest = onDismiss,
@@ -387,6 +385,7 @@ fun CheckForUpdates(
                 }
             )
         }
+
         UpdateState.UP_TO_DATE -> {
             Toast.makeText(
                 context,
@@ -395,6 +394,7 @@ fun CheckForUpdates(
             ).show()
             onDismiss()
         }
+
         UpdateState.ERROR -> {
             Toast.makeText(
                 context,
@@ -407,16 +407,26 @@ fun CheckForUpdates(
 }
 
 @Suppress("SpellCheckingInspection")
-enum class Contributor(val devName: String, val contributionLevel: ContributionLevel,
-                       val github: String? = null, val telegram: String? = null) {
-    LAMBADA10("Lambada10", ContributionLevel.LEAD_DEVELOPER,
-        github = "https://github.com/Lambada10", telegram = "https://t.me/Lambada10"),
-    NIFT4("Nick", ContributionLevel.DEVELOPER,
-        github = "https://github.com/nift4", telegram = "https://t.me/nift4"),
-    BOBBYESP("BobbyESP", ContributionLevel.CONTRIBUTOR,
-        github = "https://github.com/BobbyESP"),
-    AKANETAN("AkaneTan", ContributionLevel.CONTRIBUTOR,
-        github = "https://github.com/AkaneTan")
+enum class Contributor(
+    val devName: String, val contributionLevel: ContributionLevel,
+    val github: String? = null, val telegram: String? = null
+) {
+    LAMBADA10(
+        "Lambada10", ContributionLevel.LEAD_DEVELOPER,
+        github = "https://github.com/Lambada10", telegram = "https://t.me/Lambada10"
+    ),
+    NIFT4(
+        "Nick", ContributionLevel.DEVELOPER,
+        github = "https://github.com/nift4", telegram = "https://t.me/nift4"
+    ),
+    BOBBYESP(
+        "BobbyESP", ContributionLevel.CONTRIBUTOR,
+        github = "https://github.com/BobbyESP"
+    ),
+    AKANETAN(
+        "AkaneTan", ContributionLevel.CONTRIBUTOR,
+        github = "https://github.com/AkaneTan"
+    )
 }
 
 /**

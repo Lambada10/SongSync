@@ -3,7 +3,6 @@ package pl.lambada.songsync.ui.components
 import androidx.compose.animation.Crossfade
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Deselect
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
@@ -36,8 +35,10 @@ import pl.lambada.songsync.ui.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(currentRoute: String?, selected: SnapshotStateList<String>,
-           allSongs: List<Song>?) {
+fun TopBar(
+    currentRoute: String?, selected: SnapshotStateList<String>,
+    allSongs: List<Song>?
+) {
     val screens = Screens.values()
     val currentScreen = screens.firstOrNull { it.name == currentRoute }
     var cachedSize by remember { mutableIntStateOf(1) }
@@ -119,13 +120,13 @@ fun TopBar(currentRoute: String?, selected: SnapshotStateList<String>,
                 }
             },
             colors =
-                if (showing) {
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    )
-                } else {
-                    TopAppBarDefaults.topAppBarColors()
-                }
+            if (showing) {
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            } else {
+                TopAppBarDefaults.topAppBarColors()
+            }
         )
     }
 }
@@ -140,7 +141,10 @@ fun BottomBar(currentRoute: String?, navController: NavController) {
                 onClick = {
                     if (currentRoute != screen.name) {
                         if (screen == Screens.Home) {
-                            navController.popBackStack(navController.graph.startDestinationId, false)
+                            navController.popBackStack(
+                                navController.graph.startDestinationId,
+                                false
+                            )
                         } else {
                             navController.navigate(screen.name)
                         }

@@ -6,12 +6,12 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.request
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.data.NoTrackFoundException
-import pl.lambada.songsync.data.dto.LRCLibResponse
 import pl.lambada.songsync.data.dto.NeteaseLyricsResponse
 import pl.lambada.songsync.data.dto.NeteaseResponse
 import pl.lambada.songsync.data.dto.SongInfo
@@ -46,10 +46,12 @@ class NeteaseAPI {
      */
     @OptIn(ExperimentalSerializationApi::class)
     suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo? {
-        val search = URLEncoder.encode(
-            "${query.songName} ${query.artistName}",
-            Charsets.UTF_8.toString()
-        )
+        val search = withContext(Dispatchers.IO) {
+            URLEncoder.encode(
+                "${query.songName} ${query.artistName}",
+                Charsets.UTF_8.toString()
+            )
+        }
         if (search == "+")
             throw EmptyQueryException()
 
