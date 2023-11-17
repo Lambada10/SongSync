@@ -7,11 +7,11 @@ import android.provider.MediaStore
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import pl.lambada.songsync.data.api.GithubAPI
-import pl.lambada.songsync.data.api.LRCLibAPI
-import pl.lambada.songsync.data.api.NeteaseAPI
-import pl.lambada.songsync.data.api.SpotifyAPI
-import pl.lambada.songsync.data.api.SpotifyLyricsAPI
+import pl.lambada.songsync.data.remote.github.GithubAPI
+import pl.lambada.songsync.data.remote.lyrics_providers.others.LRCLibAPI
+import pl.lambada.songsync.data.remote.lyrics_providers.others.NeteaseAPI
+import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyAPI
+import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyLyricsAPI
 import pl.lambada.songsync.data.dto.Release
 import pl.lambada.songsync.data.dto.Song
 import pl.lambada.songsync.data.dto.SongInfo
@@ -96,7 +96,7 @@ class MainViewModel : ViewModel() {
      * @return The latest release version.
      */
     suspend fun getLatestRelease(): Release {
-        return GithubAPI().getLatestRelease()
+        return GithubAPI.getLatestRelease()
     }
 
     /**
@@ -104,9 +104,9 @@ class MainViewModel : ViewModel() {
      */
     suspend fun isNewerRelease(context: Context): Boolean {
         val currentVersion = context.getVersion().replace(".", "").toInt()
-        val latestVersion = getLatestRelease().tagName?.replace(".", "")?.replace("v", "")?.toInt()
+        val latestVersion = getLatestRelease().tagName.replace(".", "").replace("v", "").toInt()
 
-        return latestVersion!! > currentVersion
+        return latestVersion > currentVersion
     }
 
     /**

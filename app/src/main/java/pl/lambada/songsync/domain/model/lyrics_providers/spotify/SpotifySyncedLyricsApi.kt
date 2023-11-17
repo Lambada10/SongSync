@@ -1,4 +1,4 @@
-package pl.lambada.songsync.data.dto
+package pl.lambada.songsync.domain.model.lyrics_providers.spotify
 
 import kotlinx.serialization.Serializable
 

@@ -1,13 +1,15 @@
-package pl.lambada.songsync.data.api
+package pl.lambada.songsync.data.remote.lyrics_providers.others
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import pl.lambada.songsync.data.EmptyQueryException
-import pl.lambada.songsync.data.dto.LRCLibResponse
 import pl.lambada.songsync.data.dto.SongInfo
+import pl.lambada.songsync.domain.model.lyrics_providers.others.LRCLibResponse
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -21,10 +23,12 @@ class LRCLibAPI {
      * @return Search result as a SongInfo object.
      */
     suspend fun getSongInfo(query: SongInfo): SongInfo? {
-        val search = URLEncoder.encode(
-            "${query.songName}", // it doesn't work with artist name and song name together
-            StandardCharsets.UTF_8.toString()
-        )
+        val search = withContext(Dispatchers.IO) {
+            URLEncoder.encode(
+                "${query.songName}", // it doesn't work with artist name and song name together
+                StandardCharsets.UTF_8.toString()
+            )
+        }
 
         if (search == "")
             throw EmptyQueryException()

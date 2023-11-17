@@ -1,11 +1,11 @@
-package pl.lambada.songsync.data.api
+package pl.lambada.songsync.data.remote.lyrics_providers.spotify
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.json.Json
-import pl.lambada.songsync.data.dto.SyncedLinesResponse
+import pl.lambada.songsync.domain.model.lyrics_providers.spotify.SyncedLinesResponse
 
 class SpotifyLyricsAPI {
     private val baseURL = "https://spotify-lyric-api-984e7b4face0.herokuapp.com/"

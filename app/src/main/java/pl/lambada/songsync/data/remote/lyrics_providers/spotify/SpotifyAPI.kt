@@ -1,4 +1,4 @@
-package pl.lambada.songsync.data.api
+package pl.lambada.songsync.data.remote.lyrics_providers.spotify
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -10,8 +10,8 @@ import kotlinx.serialization.json.Json
 import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.data.dto.SongInfo
-import pl.lambada.songsync.data.dto.TrackSearchResult
-import pl.lambada.songsync.data.dto.WebPlayerTokenResponse
+import pl.lambada.songsync.domain.model.lyrics_providers.spotify.TrackSearchResult
+import pl.lambada.songsync.domain.model.lyrics_providers.spotify.WebPlayerTokenResponse
 import java.io.FileNotFoundException
 import java.net.URLEncoder
 import java.net.UnknownHostException

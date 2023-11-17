@@ -1,4 +1,4 @@
-package pl.lambada.songsync.data.api
+package pl.lambada.songsync.data.remote.lyrics_providers.others
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -12,8 +12,8 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.data.NoTrackFoundException
-import pl.lambada.songsync.data.dto.NeteaseLyricsResponse
-import pl.lambada.songsync.data.dto.NeteaseResponse
+import pl.lambada.songsync.domain.model.lyrics_providers.others.NeteaseLyricsResponse
+import pl.lambada.songsync.domain.model.lyrics_providers.others.NeteaseResponse
 import pl.lambada.songsync.data.dto.SongInfo
 import java.net.URLEncoder
 

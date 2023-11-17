@@ -2,10 +2,16 @@ package pl.lambada.songsync.data.dto
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Parcelize
+@Serializable
 data class Release(
-    val htmlURL: String? = null,
-    val tagName: String? = null,
+    @SerialName("html_url")
+    val htmlURL: String,
+    @SerialName("tag_name")
+    val tagName: String,
+    @SerialName("body")
     val changelog: String? = null
 ) : Parcelable

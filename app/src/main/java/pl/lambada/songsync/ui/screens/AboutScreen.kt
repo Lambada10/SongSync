@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -65,13 +66,8 @@ fun AboutScreen(viewModel: MainViewModel) {
 
     LazyColumn(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                start = 8.dp,
-                end = 8.dp,
-                top = 8.dp,
-                bottom = 0.dp
-            )
+            .fillMaxWidth(),
+        contentPadding = PaddingValues(top = 8.dp, start = 8.dp, end = 8.dp)
     ) {
         item {
             AboutCard(label = stringResource(R.string.provider)) {
@@ -326,7 +322,7 @@ fun CheckForUpdates(
     version: String
 ) {
     var updateState by rememberSaveable { mutableStateOf(UpdateState.CHECKING) }
-    var latest by rememberSaveable { mutableStateOf(Release()) }
+    var latest: Release? by rememberSaveable { mutableStateOf(null) }
     var isUpdate by rememberSaveable { mutableStateOf(false) }
 
     when (updateState) {
@@ -363,14 +359,14 @@ fun CheckForUpdates(
                     Column(
                         modifier = Modifier.verticalScroll(rememberScrollState())
                     ) {
-                        Text("v$version -> ${latest.tagName}")
-                        Text(stringResource(R.string.changelog, latest.changelog!!))
+                        Text("v$version -> ${latest?.tagName}")
+                        Text(stringResource(R.string.changelog, latest?.changelog!!))
                     }
                 },
                 confirmButton = {
                     Button(
                         onClick = {
-                            onDownload(latest.htmlURL!!)
+                            onDownload(latest?.htmlURL!!)
                         }
                     ) {
                         Text(stringResource(R.string.download))

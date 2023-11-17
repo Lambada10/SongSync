@@ -1,16 +1,15 @@
-package pl.lambada.songsync.data.api
+package pl.lambada.songsync.data.remote.github
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.json.Json
-import pl.lambada.songsync.data.dto.GithubReleaseResponse
 import pl.lambada.songsync.data.dto.Release
 
 
-class GithubAPI {
-    private val baseURL = "https://api.github.com/"
+object GithubAPI {
+    private const val baseURL = "https://api.github.com/"
     private val jsonDec = Json { ignoreUnknownKeys = true }
 
     /**
@@ -23,12 +22,6 @@ class GithubAPI {
         val responseBody = response.bodyAsText(Charsets.UTF_8)
         client.close()
 
-        val json = jsonDec.decodeFromString<GithubReleaseResponse>(responseBody)
-
-        return Release(
-            htmlURL = json.htmlURL,
-            tagName = json.tagName,
-            changelog = json.body
-        )
+        return jsonDec.decodeFromString<Release>(responseBody)
     }
 }
