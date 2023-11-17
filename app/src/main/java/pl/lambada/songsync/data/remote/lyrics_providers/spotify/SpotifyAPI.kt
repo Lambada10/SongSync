@@ -9,7 +9,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.data.NoTrackFoundException
-import pl.lambada.songsync.data.dto.SongInfo
+import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.lyrics_providers.spotify.TrackSearchResult
 import pl.lambada.songsync.domain.model.lyrics_providers.spotify.WebPlayerTokenResponse
 import java.io.FileNotFoundException

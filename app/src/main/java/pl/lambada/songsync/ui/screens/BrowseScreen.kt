@@ -52,8 +52,8 @@ import pl.lambada.songsync.R
 import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.NoTrackFoundException
-import pl.lambada.songsync.data.dto.Song
-import pl.lambada.songsync.data.dto.SongInfo
+import pl.lambada.songsync.domain.model.Song
+import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.data.ext.toLrcFile
 import pl.lambada.songsync.ui.components.CommonTextField
 import pl.lambada.songsync.ui.components.SongCard

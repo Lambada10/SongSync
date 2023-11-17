@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import pl.lambada.songsync.data.EmptyQueryException
-import pl.lambada.songsync.data.dto.SongInfo
+import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.lyrics_providers.others.LRCLibResponse
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets

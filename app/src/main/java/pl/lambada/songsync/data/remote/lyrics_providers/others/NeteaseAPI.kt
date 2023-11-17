@@ -14,7 +14,7 @@ import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.domain.model.lyrics_providers.others.NeteaseLyricsResponse
 import pl.lambada.songsync.domain.model.lyrics_providers.others.NeteaseResponse
-import pl.lambada.songsync.data.dto.SongInfo
+import pl.lambada.songsync.domain.model.SongInfo
 import java.net.URLEncoder
 
 class NeteaseAPI {

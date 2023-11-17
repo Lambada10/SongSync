@@ -54,7 +54,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.data.MainViewModel
-import pl.lambada.songsync.data.dto.Song
+import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.ui.Navigator
 import pl.lambada.songsync.ui.components.BottomBar
 import pl.lambada.songsync.ui.components.TopBar

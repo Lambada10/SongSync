@@ -12,9 +12,9 @@ import pl.lambada.songsync.data.remote.lyrics_providers.others.LRCLibAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.NeteaseAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyLyricsAPI
-import pl.lambada.songsync.data.dto.Release
-import pl.lambada.songsync.data.dto.Song
-import pl.lambada.songsync.data.dto.SongInfo
+import pl.lambada.songsync.domain.model.Release
+import pl.lambada.songsync.domain.model.Song
+import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.data.ext.getVersion
 import pl.lambada.songsync.data.ext.toLrcFile
 import pl.lambada.songsync.ui.screens.Providers

@@ -29,7 +29,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import pl.lambada.songsync.R
-import pl.lambada.songsync.data.dto.Song
+import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.data.ext.BackPressHandler
 import pl.lambada.songsync.ui.Screens
 

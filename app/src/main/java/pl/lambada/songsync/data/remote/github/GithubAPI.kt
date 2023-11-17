@@ -5,7 +5,7 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.json.Json
-import pl.lambada.songsync.data.dto.Release
+import pl.lambada.songsync.domain.model.Release
 
 
 object GithubAPI {

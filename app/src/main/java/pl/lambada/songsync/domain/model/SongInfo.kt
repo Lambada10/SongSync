@@ -1,4 +1,4 @@
-package pl.lambada.songsync.data.dto
+package pl.lambada.songsync.domain.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
-import pl.lambada.songsync.data.dto.Song
+import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.ui.screens.AboutScreen
 import pl.lambada.songsync.ui.screens.BrowseScreen
 import pl.lambada.songsync.ui.screens.HomeScreen

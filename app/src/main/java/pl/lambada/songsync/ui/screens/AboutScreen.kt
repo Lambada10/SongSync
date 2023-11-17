@@ -46,7 +46,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
-import pl.lambada.songsync.data.dto.Release
+import pl.lambada.songsync.domain.model.Release
 import pl.lambada.songsync.data.ext.getVersion
 import pl.lambada.songsync.ui.components.AboutCard
 
