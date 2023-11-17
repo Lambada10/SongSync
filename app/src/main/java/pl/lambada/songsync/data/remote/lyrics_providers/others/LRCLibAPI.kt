@@ -35,7 +35,6 @@ class LRCLibAPI {
             baseURL + "search?q=$search"
         )
         val responseBody = response.bodyAsText(Charsets.UTF_8)
-        client.close()
 
         if (responseBody == "[]" || response.status.value !in 200..299)
             return null
@@ -59,7 +58,6 @@ class LRCLibAPI {
             baseURL + "get/$id"
         )
         val responseBody = response.bodyAsText(Charsets.UTF_8)
-        client.close()
 
         if (response.status.value !in 200..299 || responseBody == "[]")
             return null

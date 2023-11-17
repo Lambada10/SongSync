@@ -36,7 +36,6 @@ class SpotifyAPI {
             )
         }
         val responseBody = response.bodyAsText(Charsets.UTF_8)
-        client.close()
 
         val json = json.decodeFromString<WebPlayerTokenResponse>(responseBody)
 
@@ -71,7 +70,6 @@ class SpotifyAPI {
             headers.append("Authorization", "Bearer $spotifyToken")
         }
         val responseBody = response.bodyAsText(Charsets.UTF_8)
-        client.close()
 
         val json = json.decodeFromString<TrackSearchResult>(responseBody)
         if (json.tracks.items.isEmpty())

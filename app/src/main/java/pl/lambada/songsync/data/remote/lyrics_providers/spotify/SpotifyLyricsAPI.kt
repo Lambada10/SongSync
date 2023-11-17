@@ -17,7 +17,6 @@ class SpotifyLyricsAPI {
     suspend fun getSyncedLyrics(songLink: String): String? {
         val response = client.get("$baseURL?url=$songLink&format=lrc")
         val responseBody = response.bodyAsText(Charsets.UTF_8)
-        client.close()
 
         if (response.status.value !in 200..299)
             return null

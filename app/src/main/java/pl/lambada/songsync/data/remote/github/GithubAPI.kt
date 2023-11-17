@@ -17,7 +17,6 @@ object GithubAPI {
     suspend fun getLatestRelease(): Release {
         val response = client.get(BASE_URL + "repos/Lambada10/SongSync/releases/latest")
         val responseBody = response.bodyAsText(Charsets.UTF_8)
-        client.close()
 
         return json.decodeFromString<Release>(responseBody)
     }
