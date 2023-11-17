@@ -111,8 +111,8 @@ import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
-import pl.lambada.songsync.data.ext.lowercaseWithLocale
-import pl.lambada.songsync.data.ext.toLrcFile
+import pl.lambada.songsync.util.ext.lowercaseWithLocale
+import pl.lambada.songsync.util.ext.toLrcFile
 import pl.lambada.songsync.ui.Screens
 import pl.lambada.songsync.ui.components.MarqueeText
 import java.io.FileNotFoundException

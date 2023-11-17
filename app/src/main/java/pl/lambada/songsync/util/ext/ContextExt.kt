@@ -1,4 +1,4 @@
-package pl.lambada.songsync.data.ext
+package pl.lambada.songsync.util.ext
 
 import android.content.Context
 import android.content.pm.PackageInfo
