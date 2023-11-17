@@ -15,9 +15,9 @@ import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyLyricsAPI
 import pl.lambada.songsync.domain.model.Release
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
+import pl.lambada.songsync.ui.screens.Providers
 import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.util.ext.toLrcFile
-import pl.lambada.songsync.ui.screens.Providers
 import java.io.FileNotFoundException
 import java.net.UnknownHostException
 

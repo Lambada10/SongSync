@@ -47,8 +47,8 @@ import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.domain.model.Release
-import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.ui.components.AboutCard
+import pl.lambada.songsync.util.ext.getVersion
 
 /**
  * Composable function for AboutScreen component.

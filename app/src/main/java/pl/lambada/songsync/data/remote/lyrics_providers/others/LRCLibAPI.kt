@@ -1,21 +1,19 @@
 package pl.lambada.songsync.data.remote.lyrics_providers.others
 
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.lyrics_providers.others.LRCLibResponse
+import pl.lambada.songsync.util.networking.Ktor.client
+import pl.lambada.songsync.util.networking.Ktor.json
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 class LRCLibAPI {
     private val baseURL = "https://lrclib.net/api/"
-    private val jsonDec = Json { ignoreUnknownKeys = true }
 
     /**
      * Searches for synced lyrics using the song name and artist name.
@@ -33,7 +31,6 @@ class LRCLibAPI {
         if (search == "")
             throw EmptyQueryException()
 
-        val client = HttpClient(CIO)
         val response = client.get(
             baseURL + "search?q=$search"
         )
@@ -43,7 +40,7 @@ class LRCLibAPI {
         if (responseBody == "[]" || response.status.value !in 200..299)
             return null
 
-        val json = jsonDec.decodeFromString<List<LRCLibResponse>>(responseBody)
+        val json = json.decodeFromString<List<LRCLibResponse>>(responseBody)
 
         return SongInfo(
             songName = json[0].trackName,
@@ -58,7 +55,6 @@ class LRCLibAPI {
      * @return The synced lyrics as a string.
      */
     suspend fun getSyncedLyrics(id: Int): String? {
-        val client = HttpClient(CIO)
         val response = client.get(
             baseURL + "get/$id"
         )
@@ -68,7 +64,7 @@ class LRCLibAPI {
         if (response.status.value !in 200..299 || responseBody == "[]")
             return null
 
-        val json = jsonDec.decodeFromString<LRCLibResponse>(responseBody)
+        val json = json.decodeFromString<LRCLibResponse>(responseBody)
         return json.syncedLyrics
     }
 }

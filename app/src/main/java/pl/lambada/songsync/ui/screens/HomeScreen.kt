@@ -111,10 +111,10 @@ import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
-import pl.lambada.songsync.util.ext.lowercaseWithLocale
-import pl.lambada.songsync.util.ext.toLrcFile
 import pl.lambada.songsync.ui.Screens
 import pl.lambada.songsync.ui.components.MarqueeText
+import pl.lambada.songsync.util.ext.lowercaseWithLocale
+import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.FileNotFoundException
 import kotlin.math.roundToInt
 

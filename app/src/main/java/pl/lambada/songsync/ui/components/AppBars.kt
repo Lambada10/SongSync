@@ -30,8 +30,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import pl.lambada.songsync.R
 import pl.lambada.songsync.domain.model.Song
-import pl.lambada.songsync.util.ext.BackPressHandler
 import pl.lambada.songsync.ui.Screens
+import pl.lambada.songsync.util.ext.BackPressHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

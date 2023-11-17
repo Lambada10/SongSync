@@ -54,9 +54,9 @@ import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
-import pl.lambada.songsync.util.ext.toLrcFile
 import pl.lambada.songsync.ui.components.CommonTextField
 import pl.lambada.songsync.ui.components.SongCard
+import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.UnknownHostException

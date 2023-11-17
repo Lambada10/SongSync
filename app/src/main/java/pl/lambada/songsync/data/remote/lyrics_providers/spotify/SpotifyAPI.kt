@@ -1,17 +1,16 @@
 package pl.lambada.songsync.data.remote.lyrics_providers.spotify
 
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.lyrics_providers.spotify.TrackSearchResult
 import pl.lambada.songsync.domain.model.lyrics_providers.spotify.WebPlayerTokenResponse
+import pl.lambada.songsync.util.networking.Ktor.client
+import pl.lambada.songsync.util.networking.Ktor.json
 import java.io.FileNotFoundException
 import java.net.URLEncoder
 import java.net.UnknownHostException
@@ -20,7 +19,6 @@ import java.nio.charset.StandardCharsets
 class SpotifyAPI {
     private val webPlayerURL = "https://open.spotify.com/"
     private val baseURL = "https://api.spotify.com/v1/"
-    private val jsonDec = Json { ignoreUnknownKeys = true }
 
     private var spotifyToken = ""
     private var tokenTime: Long = 0
@@ -29,7 +27,6 @@ class SpotifyAPI {
      * Refreshes the access token by sending a request to the Spotify API.
      */
     suspend fun refreshToken() {
-        val client = HttpClient(CIO)
         val response = client.get(
             webPlayerURL + "get_access_token?reason=transport&productType=web_player"
         ) {
@@ -41,7 +38,7 @@ class SpotifyAPI {
         val responseBody = response.bodyAsText(Charsets.UTF_8)
         client.close()
 
-        val json = jsonDec.decodeFromString<WebPlayerTokenResponse>(responseBody)
+        val json = json.decodeFromString<WebPlayerTokenResponse>(responseBody)
 
         this.spotifyToken = json.accessToken
         this.tokenTime = System.currentTimeMillis()
@@ -58,7 +55,6 @@ class SpotifyAPI {
         if (System.currentTimeMillis() - tokenTime > 1800000) // 30 minutes
             refreshToken()
 
-        val client = HttpClient(CIO)
         val search = withContext(Dispatchers.IO) {
             URLEncoder.encode(
                 "${query.songName} ${query.artistName}",
@@ -77,7 +73,7 @@ class SpotifyAPI {
         val responseBody = response.bodyAsText(Charsets.UTF_8)
         client.close()
 
-        val json = jsonDec.decodeFromString<TrackSearchResult>(responseBody)
+        val json = json.decodeFromString<TrackSearchResult>(responseBody)
         if (json.tracks.items.isEmpty())
             throw NoTrackFoundException()
         val track = json.tracks.items[0]
