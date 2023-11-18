@@ -17,6 +17,7 @@ import androidx.compose.ui.CombinedModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -63,7 +64,7 @@ fun SongCard(
                 modifier = Modifier.padding(12.dp),
                 verticalArrangement = Arrangement.Top
             ) {
-                MarqueeText(text = songName, fontSize = 18.sp)
+                MarqueeText(text = songName, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
                 Spacer(modifier = Modifier.weight(1f))
                 MarqueeText(text = artists, fontSize = 14.sp)
             }

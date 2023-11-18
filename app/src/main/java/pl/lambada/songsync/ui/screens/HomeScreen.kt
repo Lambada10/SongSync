@@ -89,6 +89,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -508,7 +509,7 @@ fun FiltersDialog(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SongItem(
+private fun SongItem(
     selected: Boolean,
     quickSelect: Boolean,
     onSelectionChanged: (Boolean) -> Unit,
@@ -558,7 +559,8 @@ fun SongItem(
                 MarqueeText(
                     text = song.title ?: stringResource(id = R.string.unknown),
                     fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.contentColorFor(bgColor)
+                    color = MaterialTheme.colorScheme.contentColorFor(bgColor),
+                    fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 MarqueeText(
