@@ -182,6 +182,7 @@ class MainActivity : ComponentActivity() {
                     Scaffold(
                         topBar = {
                             TopBar(
+                                viewModel = viewModel,
                                 selected = selected,
                                 currentRoute = currentRoute,
                                 allSongs = allSongs

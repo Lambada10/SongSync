@@ -23,12 +23,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import pl.lambada.songsync.R
+import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.ui.Screens
 import pl.lambada.songsync.util.ext.BackPressHandler
@@ -36,7 +39,9 @@ import pl.lambada.songsync.util.ext.BackPressHandler
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
-    currentRoute: String?, selected: SnapshotStateList<String>,
+    viewModel: MainViewModel,
+    currentRoute: String?,
+    selected: SnapshotStateList<String>,
     allSongs: List<Song>?
 ) {
     val screens = Screens.values()
@@ -46,6 +51,9 @@ fun TopBar(
         // keep displaying "1 selected" during fade-out, don't say "0 selected"
         cachedSize = selected.size
     }
+    var ableToSelect by remember { mutableStateOf<List<Song>?>(null) }
+
+    ableToSelect = viewModel.cachedFilteredSongs ?: allSongs
 
     BackPressHandler(enabled = selected.size > 0, onBackPressed = { selected.clear() })
     Crossfade(
@@ -85,7 +93,7 @@ fun TopBar(
                 if (showing) {
                     IconButton(onClick = {
                         selected.clear()
-                        allSongs?.map { it.filePath }?.forEach {
+                        ableToSelect?.map { it.filePath }?.forEach {
                             if (it != null) {
                                 selected.add(it)
                             }
@@ -99,7 +107,7 @@ fun TopBar(
                         )
                     }
                     IconButton(onClick = {
-                        val willBeSelected = allSongs?.map { it.filePath }?.toMutableList()
+                        val willBeSelected = ableToSelect?.map { it.filePath }?.toMutableList()
                         for (song in selected) {
                             willBeSelected?.remove(song)
                         }

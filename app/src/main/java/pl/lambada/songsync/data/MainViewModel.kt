@@ -33,6 +33,7 @@ class MainViewModel : ViewModel() {
     var blacklistedFolders = mutableListOf<String>()
     var hideLyrics = false
     private var hideFolders = blacklistedFolders.isNotEmpty()
+    var cachedFilteredSongs: List<Song>? = null
 
     // Spotify API token
     private val spotifyAPI = SpotifyAPI()
@@ -197,18 +198,21 @@ class MainViewModel : ViewModel() {
         hideFolders = blacklistedFolders.isNotEmpty()
         return when {
             hideLyrics && hideFolders -> {
-                cachedSongs!!.filter {
-                    it.filePath.toLrcFile()?.exists() != true && !blacklistedFolders.contains(
-                        it.filePath!!.substring(
-                            0,
-                            it.filePath.lastIndexOf("/")
+                cachedSongs!!
+                    .filter {
+                        it.filePath.toLrcFile()?.exists() != true && !blacklistedFolders.contains(
+                            it.filePath!!.substring(
+                                0, it.filePath.lastIndexOf("/")
+                            )
                         )
-                    )
-                }
+                    }
+                    .also { cachedFilteredSongs = it }
             }
 
             hideLyrics -> {
-                cachedSongs!!.filter { it.filePath.toLrcFile()?.exists() != true }
+                cachedSongs!!
+                    .filter { it.filePath.toLrcFile()?.exists() != true }
+                    .also { cachedFilteredSongs = it }
             }
 
             hideFolders -> {
@@ -223,7 +227,9 @@ class MainViewModel : ViewModel() {
             }
 
             else -> {
-                null
+                null.also {
+                    cachedFilteredSongs = null
+                }
             }
         }
     }
