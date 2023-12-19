@@ -1,25 +1,23 @@
-package pl.lambada.songsync.data.api
+package pl.lambada.songsync.data.remote.lyrics_providers.others
 
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.request
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.data.NoTrackFoundException
-import pl.lambada.songsync.data.dto.LRCLibResponse
-import pl.lambada.songsync.data.dto.NeteaseLyricsResponse
-import pl.lambada.songsync.data.dto.NeteaseResponse
-import pl.lambada.songsync.data.dto.SongInfo
+import pl.lambada.songsync.domain.model.SongInfo
+import pl.lambada.songsync.domain.model.lyrics_providers.others.NeteaseLyricsResponse
+import pl.lambada.songsync.domain.model.lyrics_providers.others.NeteaseResponse
+import pl.lambada.songsync.util.networking.Ktor.client
+import pl.lambada.songsync.util.networking.Ktor.json
 import java.net.URLEncoder
 
 class NeteaseAPI {
     private val baseURL = "http://music.163.com/api/"
-    private val jsonDec = Json { ignoreUnknownKeys = true }
 
     // stolen from github https://github.com/0x7d4/syncedlyrics/blob/ab744c9ebb96d310861364142ef95706c36a6b1a/syncedlyrics/providers/netease.py#L19C19-L19C19
     private val reqHeaders = mapOf(
@@ -46,14 +44,15 @@ class NeteaseAPI {
      */
     @OptIn(ExperimentalSerializationApi::class)
     suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo? {
-        val search = URLEncoder.encode(
-            "${query.songName} ${query.artistName}",
-            Charsets.UTF_8.toString()
-        )
+        val search = withContext(Dispatchers.IO) {
+            URLEncoder.encode(
+                "${query.songName} ${query.artistName}",
+                Charsets.UTF_8.toString()
+            )
+        }
         if (search == "+")
             throw EmptyQueryException()
 
-        val client = HttpClient(CIO)
         val response = client.get(
             baseURL + "search/pc"
         ) {
@@ -66,24 +65,23 @@ class NeteaseAPI {
             parameter("s", search)
         }
         val responseBody = response.bodyAsText(Charsets.UTF_8)
-        client.close()
 
         if (responseBody == "[]" || response.status.value !in 200..299)
             return null
 
-        val json: NeteaseResponse
+        val neteaseResponse: NeteaseResponse
         try {
-            json = jsonDec.decodeFromString<NeteaseResponse>(responseBody)
+            neteaseResponse = json.decodeFromString<NeteaseResponse>(responseBody)
         } catch (e: kotlinx.serialization.MissingFieldException) {
             throw NoTrackFoundException()
         }
 
-        val artists = json.result.songs[0].artists.joinToString(", ") { it.name }
+        val artists = neteaseResponse.result.songs[0].artists.joinToString(", ") { it.name }
 
         return SongInfo(
-            songName = json.result.songs[0].name,
+            songName = neteaseResponse.result.songs[0].name,
             artistName = artists,
-            neteaseID = json.result.songs[0].id
+            neteaseID = neteaseResponse.result.songs[0].id
         )
     }
 
@@ -93,7 +91,6 @@ class NeteaseAPI {
      * @return The synced lyrics as a string.
      */
     suspend fun getSyncedLyrics(id: Int): String? {
-        val client = HttpClient(CIO)
         val response = client.get(
             baseURL + "song/lyric"
         ) {
@@ -104,12 +101,11 @@ class NeteaseAPI {
             parameter("lv", 1)
         }
         val responseBody = response.bodyAsText(Charsets.UTF_8)
-        client.close()
 
         if (response.status.value !in 200..299 || responseBody == "[]")
             return null
 
-        val json = jsonDec.decodeFromString<NeteaseLyricsResponse>(responseBody)
+        val json = json.decodeFromString<NeteaseLyricsResponse>(responseBody)
         return if (json.lrc.lyric != "") json.lrc.lyric else null
     }
 }

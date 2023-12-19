@@ -1,4 +1,4 @@
-package pl.lambada.songsync.data.ext
+package pl.lambada.songsync.util.ext
 
 import java.io.File
 import java.util.Locale

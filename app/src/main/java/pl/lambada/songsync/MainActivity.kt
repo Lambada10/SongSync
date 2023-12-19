@@ -54,7 +54,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.data.MainViewModel
-import pl.lambada.songsync.data.dto.Song
+import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.ui.Navigator
 import pl.lambada.songsync.ui.components.BottomBar
 import pl.lambada.songsync.ui.components.TopBar
@@ -99,7 +99,7 @@ class MainActivity : ComponentActivity() {
                 )
 
                 val pureBlack = sharedPreferences.getBoolean("pure_black", false)
-                viewModel.pureBlack = pureBlack
+                viewModel.pureBlack.value = pureBlack
                 themeDefined = true
 
                 val sdCardPath = sharedPreferences.getString("sd_card_path", null)
@@ -114,7 +114,8 @@ class MainActivity : ComponentActivity() {
                 val hideLyrics = sharedPreferences.getBoolean("hide_lyrics", false)
                 viewModel.hideLyrics = hideLyrics
 
-                val provider = sharedPreferences.getString("provider", Providers.SPOTIFY.displayName)
+                val provider =
+                    sharedPreferences.getString("provider", Providers.SPOTIFY.displayName)
                 viewModel.provider = Providers.values().find { it.displayName == provider }!!
 
                 // Get token upon app start
@@ -154,99 +155,105 @@ class MainActivity : ComponentActivity() {
             }
 
             if (themeDefined)
-            SongSyncTheme(pureBlack = viewModel.pureBlack) {
-                // I'll cry if this crashes due to memory concerns
-                val selected = rememberSaveable(saver = Saver(
-                    save = { it.toTypedArray() }, restore = { mutableStateListOf(*it) }
-                )) { mutableStateListOf<String>() }
-                var allSongs by remember { mutableStateOf<List<Song>?>(null) }
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.destination?.route
+                SongSyncTheme(pureBlack = viewModel.pureBlack.value) {
+                    // I'll cry if this crashes due to memory concerns
+                    val selected = rememberSaveable(saver = Saver(
+                        save = { it.toTypedArray() }, restore = { mutableStateListOf(*it) }
+                    )) { mutableStateListOf<String>() }
+                    var allSongs by remember { mutableStateOf<List<Song>?>(null) }
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentRoute = navBackStackEntry?.destination?.route
 
-                // Check for permissions and get all songs
-                RequestPermissions(
-                    onGranted = { hasPermissions = true },
-                    context = context,
-                    onDone = {
-                        if (hasPermissions) {
-                            // Get all songs
-                            scope.launch(Dispatchers.IO) {
-                                allSongs = viewModel.getAllSongs(context)
+                    // Check for permissions and get all songs
+                    RequestPermissions(
+                        onGranted = { hasPermissions = true },
+                        context = context,
+                        onDone = {
+                            if (hasPermissions) {
+                                // Get all songs
+                                scope.launch(Dispatchers.IO) {
+                                    allSongs = viewModel.getAllSongs(context)
+                                }
                             }
+                            hasLoadedPermissions = true
                         }
-                        hasLoadedPermissions = true
-                    }
-                )
+                    )
 
-                Scaffold(
-                    topBar = {
-                        TopBar(
-                            selected = selected, currentRoute = currentRoute, allSongs = allSongs)
-                    },
-                    bottomBar = {
-                        BottomBar(currentRoute = currentRoute, navController = navController)
-                    }
-                ) { paddingValues ->
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .imePadding()
-                            .let {
-                                if (WindowInsets.isImeVisible) {
-                                    // exclude bottom bar if ime is visible
-                                    it.padding(
-                                        PaddingValues(
-                                            top = paddingValues.calculateTopPadding(),
-                                            start = paddingValues.calculateStartPadding(
-                                                LocalLayoutDirection.current
-                                            ),
-                                            end = paddingValues.calculateEndPadding(
-                                                LocalLayoutDirection.current
+                    Scaffold(
+                        topBar = {
+                            TopBar(
+                                selected = selected,
+                                currentRoute = currentRoute,
+                                allSongs = allSongs
+                            )
+                        },
+                        bottomBar = {
+                            BottomBar(currentRoute = currentRoute, navController = navController)
+                        }
+                    ) { paddingValues ->
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .imePadding()
+                                .let {
+                                    if (WindowInsets.isImeVisible) {
+                                        // exclude bottom bar if ime is visible
+                                        it.padding(
+                                            PaddingValues(
+                                                top = paddingValues.calculateTopPadding(),
+                                                start = paddingValues.calculateStartPadding(
+                                                    LocalLayoutDirection.current
+                                                ),
+                                                end = paddingValues.calculateEndPadding(
+                                                    LocalLayoutDirection.current
+                                                )
                                             )
                                         )
-                                    )
-                                } else {
-                                    it.padding(paddingValues)
+                                    } else {
+                                        it.padding(paddingValues)
+                                    }
                                 }
-                            }
-                    ) {
-                        if (!hasLoadedPermissions) {
-                            LoadingScreen()
-                        } else if (!hasPermissions) {
-                            AlertDialog(
-                                onDismissRequest = { /* don't dismiss */ },
-                                confirmButton = {
-                                    OutlinedButton(
-                                        onClick = {
-                                            finishAndRemoveTask()
+                        ) {
+                            if (!hasLoadedPermissions) {
+                                LoadingScreen()
+                            } else if (!hasPermissions) {
+                                AlertDialog(
+                                    onDismissRequest = { /* don't dismiss */ },
+                                    confirmButton = {
+                                        OutlinedButton(
+                                            onClick = {
+                                                finishAndRemoveTask()
+                                            }
+                                        ) {
+                                            Text(stringResource(R.string.close_app))
                                         }
-                                    ) {
-                                        Text(stringResource(R.string.close_app))
+                                    },
+                                    title = { Text(stringResource(R.string.permission_denied)) },
+                                    text = {
+                                        Column {
+                                            Text(stringResource(R.string.requires_higher_storage_permissions))
+                                        }
                                     }
-                                },
-                                title = { Text(stringResource(R.string.permission_denied)) },
-                                text = {
-                                    Column {
-                                        Text(stringResource(R.string.requires_higher_storage_permissions))
-                                    }
+                                )
+                            } else if (!internetConnection) {
+                                NoInternetDialog {
+                                    finishAndRemoveTask()
                                 }
-                            )
-                        } else if (!internetConnection) {
-                            NoInternetDialog {
-                                finishAndRemoveTask()
+                            } else {
+                                Navigator(
+                                    navController = navController, selected = selected,
+                                    allSongs = allSongs, viewModel = viewModel
+                                )
                             }
-                        } else {
-                            Navigator(navController = navController, selected = selected,
-                                allSongs = allSongs, viewModel = viewModel)
                         }
                     }
                 }
-            }
         }
     }
 
     override fun onResume() {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(2) // "Done" notification
         super.onResume()
     }
@@ -254,7 +261,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun RequestPermissions(onGranted : () -> Unit, context: Context, onDone : () -> Unit) {
+fun RequestPermissions(onGranted: () -> Unit, context: Context, onDone: () -> Unit) {
     var storageManager: ActivityResultLauncher<Intent>? = null
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         storageManager =

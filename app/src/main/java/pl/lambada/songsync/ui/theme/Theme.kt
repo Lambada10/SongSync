@@ -56,10 +56,12 @@ fun SongSyncTheme(
             else
                 dynamicLightColorScheme(context)
         }
+
         pureBlack -> darkColorScheme.copy(
             surface = Color.Black,
             background = Color.Black,
         )
+
         darkTheme -> darkColorScheme
         else -> lightColorScheme
     }
@@ -69,8 +71,10 @@ fun SongSyncTheme(
         LaunchedEffect(Unit) {
             val window = (view.context as Activity).window
             WindowCompat.setDecorFitsSystemWindows(window, false)
-            sysUiController.setSystemBarsColor(color = Color.Transparent, darkIcons = !darkTheme,
-                isNavigationBarContrastEnforced = false)
+            sysUiController.setSystemBarsColor(
+                color = Color.Transparent, darkIcons = !darkTheme,
+                isNavigationBarContrastEnforced = false
+            )
         }
     }
 

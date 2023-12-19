@@ -18,7 +18,7 @@ fun CommonTextField(
     singleLine: Boolean = true,
     imeAction: ImeAction = ImeAction.Done,
     readOnly: Boolean = false,
-    ) {
+) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,

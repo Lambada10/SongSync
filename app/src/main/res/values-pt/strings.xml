@@ -92,7 +92,7 @@
     <plurals name="this_will_download_lyrics_for_all_songs">
         <item quantity="one">Isso fará o download da letra de uma música. As letras das músicas existentes serão substituídas por novas. Isso pode ser menos preciso do que baixar as letras uma a uma. Você tem certeza que quer continuar\?</item>
         <item quantity="many">Isso fará o download das letras das músicas %1$d. As letras das músicas existentes serão substituídas por novas. Isso pode ser menos preciso do que baixar as letras uma a uma. Você tem certeza que quer continuar\?</item>
-        <item quantity="other"/>
+        <item quantity="other" />
     </plurals>
     <string name="error_checking_for_updates">Erro ao verificar atualizações</string>
     <string name="this_track_has_no_lyrics">Está faixa não contém letra</string>

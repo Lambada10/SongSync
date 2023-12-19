@@ -4,18 +4,20 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import pl.lambada.songsync.data.api.GithubAPI
-import pl.lambada.songsync.data.api.LRCLibAPI
-import pl.lambada.songsync.data.api.NeteaseAPI
-import pl.lambada.songsync.data.api.SpotifyAPI
-import pl.lambada.songsync.data.api.SpotifyLyricsAPI
-import pl.lambada.songsync.data.dto.Release
-import pl.lambada.songsync.data.dto.Song
-import pl.lambada.songsync.data.dto.SongInfo
-import pl.lambada.songsync.data.ext.getVersion
-import pl.lambada.songsync.data.ext.toLrcFile
+import pl.lambada.songsync.data.remote.github.GithubAPI
+import pl.lambada.songsync.data.remote.lyrics_providers.others.LRCLibAPI
+import pl.lambada.songsync.data.remote.lyrics_providers.others.NeteaseAPI
+import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyAPI
+import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyLyricsAPI
+import pl.lambada.songsync.domain.model.Release
+import pl.lambada.songsync.domain.model.Song
+import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.screens.Providers
+import pl.lambada.songsync.util.ext.getVersion
+import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.FileNotFoundException
 import java.net.UnknownHostException
 
@@ -36,7 +38,7 @@ class MainViewModel : ViewModel() {
     private val spotifyAPI = SpotifyAPI()
 
     // other settings
-    var pureBlack = false
+    var pureBlack: MutableState<Boolean> = mutableStateOf(false)
     var sdCardPath = ""
 
     // selected provider
@@ -67,11 +69,12 @@ class MainViewModel : ViewModel() {
         return when (this.provider) {
             Providers.SPOTIFY -> spotifyAPI.getSongInfo(query, offset)
             Providers.LRCLIB -> LRCLibAPI().getSongInfo(query).also {
-                    this.lrcLibID = it?.lrcLibID ?: 0
-                } ?: throw NoTrackFoundException()
+                this.lrcLibID = it?.lrcLibID ?: 0
+            } ?: throw NoTrackFoundException()
+
             Providers.NETEASE -> NeteaseAPI().getSongInfo(query, offset).also {
-                    this.neteaseID = it?.neteaseID ?: 0
-                } ?: throw NoTrackFoundException()
+                this.neteaseID = it?.neteaseID ?: 0
+            } ?: throw NoTrackFoundException()
         }
     }
 
@@ -93,7 +96,7 @@ class MainViewModel : ViewModel() {
      * @return The latest release version.
      */
     suspend fun getLatestRelease(): Release {
-        return GithubAPI().getLatestRelease()
+        return GithubAPI.getLatestRelease()
     }
 
     /**
@@ -101,9 +104,9 @@ class MainViewModel : ViewModel() {
      */
     suspend fun isNewerRelease(context: Context): Boolean {
         val currentVersion = context.getVersion().replace(".", "").toInt()
-        val latestVersion = getLatestRelease().tagName?.replace(".", "")?.replace("v", "")?.toInt()
+        val latestVersion = getLatestRelease().tagName.replace(".", "").replace("v", "").toInt()
 
-        return latestVersion!! > currentVersion
+        return latestVersion > currentVersion
     }
 
     /**
@@ -194,14 +197,31 @@ class MainViewModel : ViewModel() {
         hideFolders = blacklistedFolders.isNotEmpty()
         return when {
             hideLyrics && hideFolders -> {
-                cachedSongs!!.filter { it.filePath.toLrcFile()?.exists() != true && !blacklistedFolders.contains(it.filePath!!.substring(0, it.filePath.lastIndexOf("/"))) }
+                cachedSongs!!.filter {
+                    it.filePath.toLrcFile()?.exists() != true && !blacklistedFolders.contains(
+                        it.filePath!!.substring(
+                            0,
+                            it.filePath.lastIndexOf("/")
+                        )
+                    )
+                }
             }
+
             hideLyrics -> {
                 cachedSongs!!.filter { it.filePath.toLrcFile()?.exists() != true }
             }
+
             hideFolders -> {
-                cachedSongs!!.filter { !blacklistedFolders.contains(it.filePath!!.substring(0, it.filePath.lastIndexOf("/"))) }
+                cachedSongs!!.filter {
+                    !blacklistedFolders.contains(
+                        it.filePath!!.substring(
+                            0,
+                            it.filePath.lastIndexOf("/")
+                        )
+                    )
+                }
             }
+
             else -> {
                 null
             }

@@ -1,4 +1,4 @@
-package pl.lambada.songsync.data.ext
+package pl.lambada.songsync.util.ext
 
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher

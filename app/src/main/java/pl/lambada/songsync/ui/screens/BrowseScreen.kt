@@ -52,11 +52,11 @@ import pl.lambada.songsync.R
 import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.NoTrackFoundException
-import pl.lambada.songsync.data.dto.Song
-import pl.lambada.songsync.data.dto.SongInfo
-import pl.lambada.songsync.data.ext.toLrcFile
+import pl.lambada.songsync.domain.model.Song
+import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.components.CommonTextField
 import pl.lambada.songsync.ui.components.SongCard
+import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.UnknownHostException
@@ -90,8 +90,11 @@ fun BrowseScreen(viewModel: MainViewModel) {
         val generatedUsingString = stringResource(id = R.string.generated_using)
 
         // queryStatus: "Not submitted", "Pending", "Success", "Failed" - used to show different UI
-        var queryStatus by rememberSaveable { mutableStateOf(
-            if (nextSong != null) QueryStatus.Pending else QueryStatus.NotSubmitted) }
+        var queryStatus by rememberSaveable {
+            mutableStateOf(
+                if (nextSong != null) QueryStatus.Pending else QueryStatus.NotSubmitted
+            )
+        }
 
         // querySong, queryArtist - used to store user input, offset - for search again
         var querySong by rememberSaveable { mutableStateOf(nextSong?.title ?: "") }
@@ -99,9 +102,13 @@ fun BrowseScreen(viewModel: MainViewModel) {
         var offset by rememberSaveable { mutableIntStateOf(0) }
 
         // queryResult - used to store result of query, failReason - used to store error message if error occurs
-        var queryResult: SongInfo? by rememberSaveable { mutableStateOf(SongInfo(
-            songName = querySong, artistName = queryArtist
-        )) }
+        var queryResult: SongInfo? by rememberSaveable {
+            mutableStateOf(
+                SongInfo(
+                    songName = querySong, artistName = queryArtist
+                )
+            )
+        }
         var failReason: Exception? by rememberSaveable { mutableStateOf(null) }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -214,9 +221,9 @@ fun BrowseScreen(viewModel: MainViewModel) {
                         Text(text = stringResource(id = R.string.try_again))
                     }
                     OutlinedButton(
-                            onClick = {
-                                queryStatus = QueryStatus.NotSubmitted
-                            }) {
+                        onClick = {
+                            queryStatus = QueryStatus.NotSubmitted
+                        }) {
                         Text(text = stringResource(id = R.string.edit))
                     }
                 }
@@ -255,7 +262,8 @@ fun BrowseScreen(viewModel: MainViewModel) {
                         val lyrics = lyricsResult!!
 
                         val isLegacyVersion = Build.VERSION.SDK_INT < Build.VERSION_CODES.R
-                        val isInternalStorage = nextSong?.filePath?.contains("/storage/emulated/0/") ?: true // true because it's not a local song
+                        val isInternalStorage = nextSong?.filePath?.contains("/storage/emulated/0/")
+                            ?: true // true because it's not a local song
 
                         Row(
                             modifier = Modifier
@@ -272,11 +280,18 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                                         "SongSync/${result.songName} - ${result.artistName}.lrc"
                                     )
-                                    if(!isLegacyVersion || isInternalStorage) {
+                                    if (!isLegacyVersion || isInternalStorage) {
                                         file.writeText(lrc)
                                     } else {
-                                        val sd = context.externalCacheDirs[1].absolutePath.substring(0, context.externalCacheDirs[1].absolutePath.indexOf("/Android/data"))
-                                        val path = nextSong!!.filePath?.toLrcFile()?.absolutePath?.substringAfter(sd)?.split("/")?.dropLast(1)
+                                        val sd =
+                                            context.externalCacheDirs[1].absolutePath.substring(
+                                                0,
+                                                context.externalCacheDirs[1].absolutePath.indexOf("/Android/data")
+                                            )
+                                        val path =
+                                            nextSong!!.filePath?.toLrcFile()?.absolutePath?.substringAfter(
+                                                sd
+                                            )?.split("/")?.dropLast(1)
                                         var sdCardFiles = DocumentFile.fromTreeUri(
                                             context,
                                             Uri.parse(viewModel.sdCardPath)
@@ -289,7 +304,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                             }
                                         }
                                         sdCardFiles?.listFiles()?.forEach {
-                                            if(it.name == file.name) {
+                                            if (it.name == file.name) {
                                                 it.delete()
                                                 return@forEach
                                             }
@@ -298,7 +313,9 @@ fun BrowseScreen(viewModel: MainViewModel) {
                                             "text/lrc",
                                             file.name
                                         )?.let {
-                                            context.contentResolver.openOutputStream(it.uri)?.write(lrc.toByteArray())
+                                            val outputStream = context.contentResolver.openOutputStream(it.uri)
+                                            outputStream?.write(lrc.toByteArray())
+                                            outputStream?.close()
                                         }
                                     }
 
@@ -351,7 +368,10 @@ fun BrowseScreen(viewModel: MainViewModel) {
 
                     LyricsStatus.Failed -> {
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = lyricsResult ?: stringResource(id = R.string.this_track_has_no_lyrics))
+                        Text(
+                            text = lyricsResult
+                                ?: stringResource(id = R.string.this_track_has_no_lyrics)
+                        )
                     }
                 }
 
