@@ -67,15 +67,19 @@ class MainViewModel : ViewModel() {
      */
     @Throws(UnknownHostException::class, FileNotFoundException::class, NoTrackFoundException::class)
     suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
-        return when (this.provider) {
-            Providers.SPOTIFY -> spotifyAPI.getSongInfo(query, offset)
-            Providers.LRCLIB -> LRCLibAPI().getSongInfo(query).also {
-                this.lrcLibID = it?.lrcLibID ?: 0
-            } ?: throw NoTrackFoundException()
+        return try {
+            when (this.provider) {
+                Providers.SPOTIFY -> spotifyAPI.getSongInfo(query, offset)
+                Providers.LRCLIB -> LRCLibAPI().getSongInfo(query).also {
+                    this.lrcLibID = it?.lrcLibID ?: 0
+                } ?: throw NoTrackFoundException()
 
-            Providers.NETEASE -> NeteaseAPI().getSongInfo(query, offset).also {
-                this.neteaseID = it?.neteaseID ?: 0
-            } ?: throw NoTrackFoundException()
+                Providers.NETEASE -> NeteaseAPI().getSongInfo(query, offset).also {
+                    this.neteaseID = it?.neteaseID ?: 0
+                } ?: throw NoTrackFoundException()
+            }
+        } catch (e: Exception) {
+            throw NoTrackFoundException()
         }
     }
 
@@ -85,10 +89,14 @@ class MainViewModel : ViewModel() {
      * @return The synced lyrics as a string.
      */
     suspend fun getSyncedLyrics(songLink: String): String? {
-        return when (this.provider) {
-            Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink)
-            Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(this.lrcLibID)
-            Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID)
+        return try {
+            when (this.provider) {
+                Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink)
+                Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(this.lrcLibID)
+                Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID)
+            }
+        } catch (e: Exception) {
+            null
         }
     }
 
