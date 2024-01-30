@@ -115,4 +115,5 @@
     <string name="open_website">Open website</string>
     <string name="provider">Lyrics provider</string>
     <string name="provider_summary">Please select lyrics provider below</string>
+    <string name="ignore">Ignore</string>
 </resources>

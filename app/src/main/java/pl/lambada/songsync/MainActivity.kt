@@ -123,10 +123,7 @@ class MainActivity : ComponentActivity() {
                     try {
                         viewModel.refreshToken()
                     } catch (e: Exception) {
-                        if (e is UnknownHostException || e is FileNotFoundException || e is IOException)
-                            internetConnection = false
-                        else
-                            throw e
+                        internetConnection = false
                     }
                 }
 
@@ -237,9 +234,14 @@ class MainActivity : ComponentActivity() {
                                     }
                                 )
                             } else if (!internetConnection) {
-                                NoInternetDialog {
-                                    finishAndRemoveTask()
-                                }
+                                NoInternetDialog(
+                                    onConfirm = {
+                                        finishAndRemoveTask()
+                                    },
+                                    onIgnore = {
+                                        internetConnection = true // assume connected (if spotify is down, can use other providers)
+                                    }
+                                )
                             } else {
                                 Navigator(
                                     navController = navController, selected = selected,
