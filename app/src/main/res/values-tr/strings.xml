@@ -2,7 +2,7 @@
     <string name="app_name" translatable="false">SongSync</string>
     <string name="batch_download_lyrics">Şarkı sözlerini toplu indir</string>
     <string name="get_lyrics">Şarkı sözlerini edinin</string>
-    <string name="try_again">Tekrar deneyin</string>
+    <string name="try_again">Tekrar dene</string>
     <string name="cancel">İptal</string>
     <string name="error">Hata</string>
     <string name="this_track_has_no_lyrics">Bu parçanın sözleri yok</string>
