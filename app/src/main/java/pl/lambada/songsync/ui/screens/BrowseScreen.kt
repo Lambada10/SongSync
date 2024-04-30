@@ -3,6 +3,7 @@ package pl.lambada.songsync.ui.screens
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,6 +51,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.EmptyQueryException
+import pl.lambada.songsync.data.InternalErrorException
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.domain.model.Song
@@ -68,6 +70,7 @@ import java.net.UnknownHostException
  */
 @Composable
 fun BrowseScreen(viewModel: MainViewModel) {
+    val tag = "BrowseScreen"
 
     var nextSong: Song? by rememberSaveable { mutableStateOf(null) }
     if (viewModel.nextSong != null) {
@@ -177,6 +180,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
 
                                 else -> {
                                     queryStatus = QueryStatus.Failed
+                                    Log.e(tag, Log.getStackTraceString(e))
                                     failReason = e
                                 }
                             }
@@ -386,10 +390,16 @@ fun BrowseScreen(viewModel: MainViewModel) {
                     },
                     title = { Text(text = stringResource(id = R.string.error)) },
                     text = {
-                        when (failReason) {
+                        when (val e = failReason) {
                             is NoTrackFoundException -> {
                                 Text(
                                     text = stringResource(R.string.no_results)
+                                )
+                            }
+
+                            is InternalErrorException -> {
+                                Text(
+                                    text = stringResource(R.string.internal_error, e.message.toString())
                                 )
                             }
 
@@ -408,7 +418,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                             }
 
                             else -> {
-                                Text(text = failReason.toString())
+                                Text(text = e.toString())
                             }
                         }
                     })

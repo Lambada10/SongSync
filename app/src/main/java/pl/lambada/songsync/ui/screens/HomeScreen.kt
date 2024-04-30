@@ -108,6 +108,7 @@ import kotlinx.parcelize.Parcelize
 import pl.lambada.songsync.MainActivity
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.EmptyQueryException
+import pl.lambada.songsync.data.InternalErrorException
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.domain.model.Song
@@ -745,7 +746,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                                     continue
                                 }
 
-                                is NoTrackFoundException, is EmptyQueryException -> {
+                                is NoTrackFoundException, is EmptyQueryException, is InternalErrorException -> {
                                     // not increasing notFoundInARow because that is for rate limit
                                     failedCount++
                                 }

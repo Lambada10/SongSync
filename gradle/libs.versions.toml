@@ -1,7 +1,7 @@
 [versions]
 accompanist-systemuicontroller = "0.31.3-beta"
 accompanist-permissions = "0.31.5-beta"
-agp = "8.2.0-rc01"
+agp = "8.3.2"
 coil-compose = "2.1.0"
 kotlin = "1.8.10"
 core-ktx = "1.12.0"

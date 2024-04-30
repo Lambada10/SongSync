@@ -20,5 +20,5 @@ data class SongInfo(
     var songLink: String? = null,
     var albumCoverLink: String? = null,
     var lrcLibID: Int? = null, // LRCLib-only
-    var neteaseID: Int? = null, // Netease-only
+    var neteaseID: Long? = null, // Netease-only
 ) : Parcelable

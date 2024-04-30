@@ -4,6 +4,7 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -46,10 +47,10 @@ class MainViewModel : ViewModel() {
     var provider = Providers.SPOTIFY
 
     // LRCLib Track ID
-    var lrcLibID = 0
+    private var lrcLibID = 0
 
     // Netease Track ID
-    var neteaseID = 0
+    private var neteaseID = 0L
     // TODO: Use values from SongInfo object returned by search instead of storing them here
 
     /**
@@ -65,7 +66,10 @@ class MainViewModel : ViewModel() {
      * @param offset (optional) The offset used for trying to find a better match or searching again.
      * @return The SongInfo object containing the song information.
      */
-    @Throws(UnknownHostException::class, FileNotFoundException::class, NoTrackFoundException::class)
+    @Throws(
+        UnknownHostException::class, FileNotFoundException::class, NoTrackFoundException::class,
+        EmptyQueryException::class, InternalErrorException::class
+    )
     suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
         return try {
             when (this.provider) {
@@ -78,8 +82,14 @@ class MainViewModel : ViewModel() {
                     this.neteaseID = it?.neteaseID ?: 0
                 } ?: throw NoTrackFoundException()
             }
+        } catch (e: InternalErrorException) {
+            throw e
+        } catch (e: NoTrackFoundException) {
+            throw e
+        } catch (e: EmptyQueryException) {
+            throw e
         } catch (e: Exception) {
-            throw NoTrackFoundException()
+            throw InternalErrorException(Log.getStackTraceString(e))
         }
     }
 
@@ -244,5 +254,7 @@ class MainViewModel : ViewModel() {
 }
 
 class NoTrackFoundException : Exception()
+
+class InternalErrorException(msg: String) : Exception(msg)
 
 class EmptyQueryException : Exception()

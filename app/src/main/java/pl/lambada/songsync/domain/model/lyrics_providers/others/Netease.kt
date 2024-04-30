@@ -17,7 +17,7 @@ data class NeteaseResult(
 @Serializable
 data class NeteaseSong(
     val name: String,
-    val id: Int,
+    val id: Long,
     val artists: List<NeteaseArtist>,
 )
 
