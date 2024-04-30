@@ -10,7 +10,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.data.InternalErrorException
-import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.lyrics_providers.others.NeteaseLyricsResponse
 import pl.lambada.songsync.domain.model.lyrics_providers.others.NeteaseResponse
@@ -68,7 +67,7 @@ class NeteaseAPI {
         }
         val responseBody = response.bodyAsText(Charsets.UTF_8)
 
-        if (responseBody == "[]" || response.status.value !in 200..299)
+        if (responseBody == "[]" || response.status.value !in 200..299 || responseBody.contains("\"songCount\":0"))
             return null
 
         val neteaseResponse: NeteaseResponse
