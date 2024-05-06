@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -26,10 +27,12 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -43,28 +46,37 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Deselect
 import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -79,17 +91,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -114,6 +127,7 @@ import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.Screens
 import pl.lambada.songsync.ui.components.MarqueeText
+import pl.lambada.songsync.util.ext.BackPressHandler
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
 import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.FileNotFoundException
@@ -124,6 +138,7 @@ import kotlin.math.roundToInt
  *
  * @param viewModel The [MainViewModel] instance.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     selected: SnapshotStateList<String>,
@@ -134,12 +149,150 @@ fun HomeScreen(
     if (allSongs == null) {
         LoadingScreen()
     } else {
-        HomeScreenLoaded(
-            navController = navController,
-            viewModel = viewModel,
-            songs = allSongs,
-            selected = selected
-        )
+        val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+        var isBatchDownload by remember { mutableStateOf(false) }
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                var cachedSize by remember { mutableIntStateOf(1) }
+                if (selected.size > 0) {
+                    // keep displaying "1 selected" during fade-out, don't say "0 selected"
+                    cachedSize = selected.size
+                }
+                var ableToSelect by remember { mutableStateOf<List<Song>?>(null) }
+
+                ableToSelect = viewModel.cachedFilteredSongs ?: allSongs
+
+                BackPressHandler(enabled = selected.size > 0, onBackPressed = { selected.clear() })
+                Crossfade(
+                    targetState = selected.size > 0,
+                    label = ""
+                ) { showing ->
+                    MediumTopAppBar(
+                        navigationIcon = {
+                            if (showing) {
+                                IconButton(onClick = { selected.clear() }) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = stringResource(R.string.back)
+                                    )
+                                }
+                            }
+                        },
+                        title = {
+                            if (showing) {
+                                Crossfade(
+                                    targetState = cachedSize,
+                                    label = ""
+                                ) { size ->
+                                    Text(
+                                        modifier = Modifier.padding(start = 8.dp),
+                                        text = stringResource(id = R.string.selected_count, size)
+                                    )
+                                }
+                            } else {
+                                Text(
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    text = stringResource(R.string.app_name)
+                                )
+                            }
+                        },
+                        actions = {
+                            if (showing) {
+                                IconButton(
+                                    onClick = {
+                                        selected.clear()
+                                        ableToSelect?.map { it.filePath }?.forEach {
+                                            if (it != null) { selected.add(it) }
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.SelectAll,
+                                        contentDescription = stringResource(R.string.select_all)
+                                    )
+                                }
+                                IconButton(
+                                    onClick = {
+                                        val willBeSelected = ableToSelect?.map { it.filePath }?.toMutableList()
+                                        for (song in selected) {
+                                            willBeSelected?.remove(song)
+                                        }
+                                        selected.clear()
+                                        if (willBeSelected != null) {
+                                            for (song in willBeSelected) {
+                                                song?.let { selected.add(it) }
+                                            }
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Deselect,
+                                        contentDescription = stringResource(
+                                            id = R.string.invert_selection
+                                        )
+                                    )
+                                }
+                            } else {
+                                var expanded by remember { mutableStateOf(false) }
+                                IconButton(onClick = { expanded = !expanded }) {
+                                    Icon(
+                                        imageVector = Icons.Default.MoreVert,
+                                        contentDescription = "More"
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false }
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text(text = stringResource(R.string.batch_download_lyrics)) },
+                                        onClick = {
+                                            isBatchDownload = true
+                                            expanded = false
+                                        }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text(text = "About") },
+                                        onClick = {
+                                            navController.navigate("About")
+                                            expanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        },
+                        colors = if (showing) {
+                            TopAppBarDefaults.topAppBarColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                scrolledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            )
+                        } else {
+                            TopAppBarDefaults.topAppBarColors()
+                        },
+                        scrollBehavior = scrollBehavior,
+                    )
+                }
+            },
+            floatingActionButton = {
+                FloatingActionButton(onClick = { navController.navigate(Screens.Search.name) }) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search lyrics"
+                    )
+                }
+            }
+        ) { paddingValues ->
+            HomeScreenLoaded(
+                navController = navController,
+                viewModel = viewModel,
+                selected = selected,
+                songs = allSongs,
+                paddingValues = paddingValues,
+                isBatchDownload = isBatchDownload,
+                onBatchDownload = { onBatchDownload -> isBatchDownload = onBatchDownload },
+            )
+        }
     }
 }
 
@@ -160,15 +313,16 @@ fun LoadingScreen() {
 @Parcelize
 data class MyTextFieldValue(val text: String, val cursorStart: Int, val cursorEnd: Int) : Parcelable
 
-@OptIn(
-    ExperimentalLayoutApi::class
-)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun HomeScreenLoaded(
     selected: SnapshotStateList<String>,
     navController: NavHostController,
     viewModel: MainViewModel,
-    songs: List<Song>
+    songs: List<Song>,
+    paddingValues: PaddingValues,
+    isBatchDownload: Boolean,
+    onBatchDownload: (Boolean) -> Unit,
 ) {
     var showingSearch by rememberSaveable { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(showingSearch) }
@@ -182,7 +336,6 @@ fun HomeScreenLoaded(
         },
             restore = { TextFieldValue(it.text, TextRange(it.cursorStart, it.cursorEnd)) })
     ) { mutableStateOf(TextFieldValue()) }
-    var isBatchDownload by rememberSaveable { mutableStateOf(false) }
     var showFilters by rememberSaveable { mutableStateOf(false) }
     var filtered by remember { mutableStateOf<List<Song>?>(null) }
     val scope = rememberCoroutineScope()
@@ -195,15 +348,15 @@ fun HomeScreenLoaded(
 
     Column {
         if (isBatchDownload) {
-            BatchDownloadLyrics(songs = if (selected.isEmpty()) displaySongs
-            else songs.filter { selected.contains(it.filePath) }.toList(),
+            BatchDownloadLyrics(
+                songs = if (selected.isEmpty()) displaySongs else songs.filter { selected.contains(it.filePath) }.toList(),
                 viewModel = viewModel,
-                onDone = { isBatchDownload = false })
+                onDone = { onBatchDownload(false) })
         }
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(paddingValues),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -216,7 +369,7 @@ fun HomeScreenLoaded(
                                 stiffness = Spring.StiffnessLow
                             )
                         )
-                        .padding(vertical = 5.dp),
+                        .padding(vertical = 5.dp, horizontal = 24.dp),
                 ) {
                     val focusRequester = remember { FocusRequester() }
                     var willShowIme by remember { mutableStateOf(false) }
@@ -300,9 +453,7 @@ fun HomeScreenLoaded(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                Button(onClick = { isBatchDownload = true }) {
-                                    Text(text = stringResource(R.string.batch_download_lyrics))
-                                }
+                                Text(text = "${displaySongs.size} songs")
                                 Spacer(modifier = Modifier.weight(1f))
                                 IconButton(onClick = {
                                     showFilters = true
@@ -313,14 +464,18 @@ fun HomeScreenLoaded(
                                     )
                                 }
 
-                                if (showFilters) FiltersDialog(viewModel = viewModel,
-                                    context = context,
-                                    onDismiss = { showFilters = false },
-                                    onFilterChange = {
-                                        scope.launch(Dispatchers.Default) {
-                                            filtered = viewModel.filterSongs()
-                                        }
-                                    })
+                                if (showFilters) {
+                                    FiltersDialog(
+                                        viewModel = viewModel,
+                                        context = context,
+                                        onDismiss = { showFilters = false },
+                                        onFilterChange = {
+                                            scope.launch(Dispatchers.Default) {
+                                                filtered = viewModel.filterSongs()
+                                            }
+                                        },
+                                    )
+                                }
 
                                 IconButton(onClick = { showSearch = true }) {
                                     Icon(
@@ -332,7 +487,6 @@ fun HomeScreenLoaded(
                         }
                     }
                 }
-                HorizontalDivider()
             }
 
             items(displaySongs.size) { i ->
@@ -366,9 +520,7 @@ fun HomeScreenLoaded(
                 }
             }
 
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+            item { Spacer(modifier = Modifier.height(4.dp)) }
         }
     }
 }
@@ -376,7 +528,10 @@ fun HomeScreenLoaded(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FiltersDialog(
-    viewModel: MainViewModel, context: Context, onDismiss: () -> Unit, onFilterChange: () -> Unit
+    viewModel: MainViewModel,
+    context: Context,
+    onDismiss: () -> Unit,
+    onFilterChange: () -> Unit
 ) {
     var hideLyrics by remember { mutableStateOf(viewModel.hideLyrics) }
     val folders = viewModel.getSongFolders(context)
@@ -386,7 +541,7 @@ fun FiltersDialog(
         "pl.lambada.songsync_preferences", Context.MODE_PRIVATE
     )
 
-    AlertDialog(onDismissRequest = { onDismiss() }) {
+    BasicAlertDialog(onDismissRequest = { onDismiss() }) {
         Surface(
             modifier = Modifier
                 .wrapContentWidth()
@@ -442,7 +597,7 @@ fun FiltersDialog(
     }
 
     if (showFolders) {
-        AlertDialog(onDismissRequest = { showFolders = false }) {
+        BasicAlertDialog(onDismissRequest = { showFolders = false }) {
             Surface(
                 modifier = Modifier
                     .wrapContentWidth()
@@ -517,58 +672,55 @@ private fun SongItem(
     song: Song,
     viewModel: MainViewModel
 ) {
-    OutlinedCard(
-        shape = RoundedCornerShape(10.dp),
+    val painter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current).data(data = song.imgUri).apply {
+            placeholder(R.drawable.ic_song)
+            error(R.drawable.ic_song)
+        }.build(), imageLoader = LocalContext.current.imageLoader
+    )
+    val bgColor = if (selected) MaterialTheme.colorScheme.surfaceVariant
+    else MaterialTheme.colorScheme.surface
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
-            .combinedClickable(onClick = {
-                if (quickSelect) {
-                    onSelectionChanged(!selected)
-                } else {
-                    viewModel.nextSong = song
-                    navController.navigate(Screens.Browse.name)
-                }
-            }, onLongClick = {
-                onSelectionChanged(!selected)
-            })
-    ) {
-        val painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current).data(data = song.imgUri).apply {
-                placeholder(R.drawable.ic_song)
-                error(R.drawable.ic_song)
-            }.build(), imageLoader = LocalContext.current.imageLoader
-        )
-        val bgColor = if (selected) MaterialTheme.colorScheme.surfaceVariant
-        else MaterialTheme.colorScheme.surface
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(72.dp)
-                .background(bgColor)
-        ) {
-            Image(
-                painter = painter,
-                contentDescription = stringResource(id = R.string.album_cover),
-                modifier = Modifier
-                    .height(72.dp)
-                    .aspectRatio(1f)
+            .height(76.dp)
+            .background(bgColor)
+            .combinedClickable(
+                onClick = {
+                    if (quickSelect) {
+                        onSelectionChanged(!selected)
+                    } else {
+                        viewModel.nextSong = song
+                        navController.navigate(Screens.Search.name)
+                    }
+                },
+                onLongClick = { onSelectionChanged(!selected) }
             )
-            Spacer(modifier = Modifier.width(2.dp))
-            Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.Top) {
-                MarqueeText(
-                    text = song.title ?: stringResource(id = R.string.unknown),
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.contentColorFor(bgColor),
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                MarqueeText(
-                    text = song.artist ?: stringResource(id = R.string.unknown),
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.contentColorFor(bgColor)
-                )
-            }
+            .padding(vertical = 12.dp, horizontal = 24.dp)
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = stringResource(id = R.string.album_cover),
+            modifier = Modifier
+                .fillMaxHeight()
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(20f))
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            MarqueeText(
+                text = song.title ?: stringResource(id = R.string.unknown),
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.contentColorFor(bgColor),
+            )
+            MarqueeText(
+                text = song.artist ?: stringResource(id = R.string.unknown),
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.contentColorFor(bgColor)
+            )
         }
     }
 }
@@ -606,59 +758,77 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
         }
 
         UiState.Warning -> {
-            AlertDialog(title = {
-                Text(text = stringResource(id = R.string.batch_download_lyrics))
-            }, text = {
-                Column {
-                    Text(
-                        text = pluralStringResource(
-                            R.plurals.this_will_download_lyrics_for_all_songs,
-                            songs.size,
-                            songs.size
+            AlertDialog(
+                title = {
+                    Text(text = stringResource(id = R.string.batch_download_lyrics))
+                },
+                text = {
+                    Column {
+                        Text(
+                            text = pluralStringResource(
+                                R.plurals.this_will_download_lyrics_for_all_songs,
+                                songs.size,
+                                songs.size
+                            )
                         )
-                    )
-                }
-            }, onDismissRequest = {
-                uiState = UiState.Cancelled
-            }, confirmButton = {
-                Button(onClick = {
-                    uiState = if (isLegacyVersion) {
-                        UiState.LegacyPrompt
-                    } else {
-                        UiState.Pending
                     }
-                }) {
-                    Text(text = stringResource(R.string.yes))
+                },
+                onDismissRequest = {
+                    uiState = UiState.Cancelled
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            uiState = if (isLegacyVersion) {
+                                UiState.LegacyPrompt
+                            } else {
+                                UiState.Pending
+                            }
+                        },
+                    ) {
+                        Text(text = stringResource(R.string.yes))
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(onClick = { uiState = UiState.Cancelled }) {
+                        Text(text = stringResource(R.string.no))
+                    }
                 }
-            }, dismissButton = {
-                OutlinedButton(onClick = { uiState = UiState.Cancelled }) {
-                    Text(text = stringResource(R.string.no))
-                }
-            })
+            )
         }
 
         UiState.LegacyPrompt -> {
-            AlertDialog(title = {
-                Text(text = stringResource(id = R.string.batch_download_lyrics))
-            }, text = {
-                Column {
-                    Text(text = stringResource(R.string.set_sd_path_warn))
-                }
-            }, onDismissRequest = {
-                uiState = UiState.Cancelled
-            }, confirmButton = {
-                Button(onClick = {
-                    uiState = UiState.Pending
-                }) {
-                    Text(text = stringResource(R.string.ok))
-                }
-            }, dismissButton = {
-                OutlinedButton(onClick = {
+            AlertDialog(
+                title = {
+                    Text(text = stringResource(id = R.string.batch_download_lyrics))
+                },
+                text = {
+                    Column {
+                        Text(text = stringResource(R.string.set_sd_path_warn))
+                    }
+                },
+                onDismissRequest = {
                     uiState = UiState.Cancelled
-                }) {
-                    Text(text = stringResource(R.string.cancel))
-                }
-            })
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            uiState = UiState.Pending
+                        },
+                    ) {
+                        Text(text = stringResource(R.string.ok))
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(
+                        onClick = {
+                            uiState = UiState.Cancelled
+                        },
+                    ) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                },
+            )
         }
 
         UiState.Pending -> {
@@ -677,39 +847,45 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
 
             notificationManager.notify(1, notificationBuilder.build())
 
-            AlertDialog(title = {
-                Text(text = stringResource(id = R.string.batch_download_lyrics))
-            }, text = {
-                Column {
-                    Text(text = stringResource(R.string.downloading_lyrics))
-                    MarqueeText(
-                        stringResource(
-                            R.string.song,
-                            songs.getOrNull((count) % total.coerceAtLeast(1))?.title
-                                ?: unknownString,
+            AlertDialog(
+                title = {
+                    Text(text = stringResource(id = R.string.batch_download_lyrics))
+                },
+                text = {
+                    Column {
+                        Text(text = stringResource(R.string.downloading_lyrics))
+                        MarqueeText(
+                            stringResource(
+                                R.string.song,
+                                songs.getOrNull((count) % total.coerceAtLeast(1))?.title
+                                    ?: unknownString,
+                            )
                         )
-                    )
-                    Text(text = stringResource(R.string.progress, count, total, percentage))
-                    Text(
-                        text = stringResource(
-                            R.string.success_failed, successCount, noLyricsCount, failedCount
+                        Text(text = stringResource(R.string.progress, count, total, percentage))
+                        Text(
+                            text = stringResource(
+                                R.string.success_failed, successCount, noLyricsCount, failedCount
+                            )
                         )
-                    )
-                    Text(text = stringResource(R.string.please_do_not_close_the_app_this_may_take_a_while))
-                }
-            }, onDismissRequest = {
-                /*
+                        Text(text = stringResource(R.string.please_do_not_close_the_app_this_may_take_a_while))
+                    }
+                },
+                onDismissRequest = {
+                    /*
                    it's easy to accidentally dismiss the dialog, and since it's a long running task
                    we don't want to accidentally cancel it, so we don't allow dismissing the dialog
                    user can cancel the task by pressing the cancel button
                  */
-            }, confirmButton = {
-                // no button but compose cries when I don't use confirmButton
-            }, dismissButton = {
-                OutlinedButton(onClick = { uiState = UiState.Cancelled }) {
-                    Text(text = stringResource(R.string.cancel))
+                },
+                confirmButton = {
+                    // no button but compose cries when I don't use confirmButton
+                },
+                dismissButton = {
+                    OutlinedButton(onClick = { uiState = UiState.Cancelled }) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
                 }
-            })
+            )
 
             var notFoundInARow by rememberSaveable { mutableIntStateOf(0) }
             var downloadJob by remember { mutableStateOf<Job?>(null) }

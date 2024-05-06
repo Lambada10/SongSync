@@ -54,7 +54,6 @@
     <string name="check_your_connection">Please check your connection and try again.</string>
     <string name="if_connected_spotify_down">If you are connected, Spotify might be down. Please try again later.</string>
     <string name="home">Home</string>
-    <string name="browse">Browse</string>
     <string name="about">About</string>
     <string name="song_name_no_args">Song name</string>
     <string name="artist_name_no_args">Artist name</string>

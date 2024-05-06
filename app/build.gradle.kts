@@ -92,4 +92,12 @@ dependencies {
     implementation(libs.androidx.preference)
     implementation(libs.ktor.core)
     implementation(libs.ktor.cio)
+
+    implementation(libs.ui.graphics)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.compose.animation)
 }

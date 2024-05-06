@@ -2,14 +2,17 @@ package pl.lambada.songsync.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.ui.screens.AboutScreen
-import pl.lambada.songsync.ui.screens.BrowseScreen
+import pl.lambada.songsync.ui.screens.SearchScreen
 import pl.lambada.songsync.ui.screens.HomeScreen
 
 /**
@@ -20,21 +23,31 @@ import pl.lambada.songsync.ui.screens.HomeScreen
  */
 @Composable
 fun Navigator(
-    navController: NavHostController, selected: SnapshotStateList<String>,
-    allSongs: List<Song>?, viewModel: MainViewModel
+    navController: NavHostController,
+    selected: SnapshotStateList<String>,
+    allSongs: List<Song>?,
+    viewModel: MainViewModel
 ) {
     NavHost(navController = navController, startDestination = Screens.Home.name) {
         composable(Screens.Home.name) {
             HomeScreen(
-                navController = navController, selected = selected,
-                allSongs = allSongs, viewModel = viewModel
+                navController = navController,
+                selected = selected,
+                allSongs = allSongs,
+                viewModel = viewModel,
             )
         }
-        composable(Screens.Browse.name) {
-            BrowseScreen(viewModel = viewModel)
+        composable(Screens.Search.name) {
+            SearchScreen(
+                viewModel = viewModel,
+                navController = navController,
+            )
         }
         composable(Screens.About.name) {
-            AboutScreen(viewModel = viewModel)
+            AboutScreen(
+                viewModel = viewModel,
+                navController = navController
+            )
         }
     }
 }
@@ -44,6 +57,6 @@ fun Navigator(
  */
 enum class Screens(val stringResource: Int) {
     Home(R.string.home),
-    Browse(R.string.browse),
+    Search(R.string.search),
     About(R.string.about)
 }

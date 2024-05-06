@@ -17,17 +17,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.isImeVisible
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +35,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -56,16 +48,11 @@ import kotlinx.coroutines.launch
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.ui.Navigator
-import pl.lambada.songsync.ui.components.BottomBar
-import pl.lambada.songsync.ui.components.TopBar
 import pl.lambada.songsync.ui.components.dialogs.NoInternetDialog
 import pl.lambada.songsync.ui.screens.LoadingScreen
 import pl.lambada.songsync.ui.screens.Providers
 import pl.lambada.songsync.ui.theme.SongSyncTheme
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.net.UnknownHostException
 
 /**
  * The main activity of the SongSync app.
@@ -78,7 +65,7 @@ class MainActivity : ComponentActivity() {
      * @param savedInstanceState The saved instance state.
      */
     @SuppressLint("SuspiciousIndentation")
-    @OptIn(ExperimentalLayoutApi::class)
+    @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -176,83 +163,69 @@ class MainActivity : ComponentActivity() {
                         }
                     )
 
-                    Scaffold(
-                        topBar = {
-                            TopBar(
-                                viewModel = viewModel,
-                                selected = selected,
-                                currentRoute = currentRoute,
-                                allSongs = allSongs
-                            )
-                        },
-                        bottomBar = {
-                            BottomBar(currentRoute = currentRoute, navController = navController)
-                        }
-                    ) { paddingValues ->
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .imePadding()
-                                .let {
-                                    if (WindowInsets.isImeVisible) {
-                                        // exclude bottom bar if ime is visible
-                                        it.padding(
-                                            PaddingValues(
-                                                top = paddingValues.calculateTopPadding(),
-                                                start = paddingValues.calculateStartPadding(
-                                                    LocalLayoutDirection.current
-                                                ),
-                                                end = paddingValues.calculateEndPadding(
-                                                    LocalLayoutDirection.current
-                                                )
-                                            )
-                                        )
-                                    } else {
-                                        it.padding(paddingValues)
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+//                                .imePadding()
+//                                .let {
+//                                    if (WindowInsets.isImeVisible) {
+//                                        // exclude bottom bar if ime is visible
+//                                        it.padding(
+//                                            PaddingValues(
+//                                                top = paddingValues.calculateTopPadding(),
+//                                                start = paddingValues.calculateStartPadding(
+//                                                    LocalLayoutDirection.current
+//                                                ),
+//                                                end = paddingValues.calculateEndPadding(
+//                                                    LocalLayoutDirection.current
+//                                                )
+//                                            )
+//                                        )
+//                                    } else {
+//                                        it.padding(paddingValues)
+//                                    }
+//                                }
+                    ) {
+                        if (!hasLoadedPermissions) {
+                            LoadingScreen()
+                        } else if (!hasPermissions) {
+                            AlertDialog(
+                                onDismissRequest = { /* don't dismiss */ },
+                                confirmButton = {
+                                    OutlinedButton(
+                                        onClick = {
+                                            finishAndRemoveTask()
+                                        }
+                                    ) {
+                                        Text(stringResource(R.string.close_app))
+                                    }
+                                },
+                                title = { Text(stringResource(R.string.permission_denied)) },
+                                text = {
+                                    Column {
+                                        Text(stringResource(R.string.requires_higher_storage_permissions))
                                     }
                                 }
-                        ) {
-                            if (!hasLoadedPermissions) {
-                                LoadingScreen()
-                            } else if (!hasPermissions) {
-                                AlertDialog(
-                                    onDismissRequest = { /* don't dismiss */ },
-                                    confirmButton = {
-                                        OutlinedButton(
-                                            onClick = {
-                                                finishAndRemoveTask()
-                                            }
-                                        ) {
-                                            Text(stringResource(R.string.close_app))
-                                        }
-                                    },
-                                    title = { Text(stringResource(R.string.permission_denied)) },
-                                    text = {
-                                        Column {
-                                            Text(stringResource(R.string.requires_higher_storage_permissions))
-                                        }
-                                    }
-                                )
-                            } else if (!internetConnection) {
-                                NoInternetDialog(
-                                    onConfirm = {
-                                        finishAndRemoveTask()
-                                    },
-                                    onIgnore = {
-                                        internetConnection = true // assume connected (if spotify is down, can use other providers)
-                                    }
-                                )
-                            } else {
-                                Navigator(
-                                    navController = navController, selected = selected,
-                                    allSongs = allSongs, viewModel = viewModel
-                                )
-                            }
+                            )
+                        } else if (!internetConnection) {
+                            NoInternetDialog(
+                                onConfirm = { finishAndRemoveTask() },
+                                onIgnore = {
+                                    internetConnection = true // assume connected (if spotify is down, can use other providers)
+                                }
+                            )
+                        } else {
+                            Navigator(
+                                navController = navController,
+                                selected = selected,
+                                allSongs = allSongs,
+                                viewModel = viewModel
+                            )
                         }
-                    }
                 }
         }
     }
+}
 
     override fun onResume() {
         val notificationManager =

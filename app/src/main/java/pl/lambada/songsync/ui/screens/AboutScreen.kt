@@ -22,13 +22,22 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,10 +47,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
@@ -53,8 +64,12 @@ import pl.lambada.songsync.util.ext.getVersion
 /**
  * Composable function for AboutScreen component.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutScreen(viewModel: MainViewModel) {
+fun AboutScreen(
+    viewModel: MainViewModel,
+    navController: NavController
+) {
     val uriHandler = LocalUriHandler.current
     val version = LocalContext.current.getVersion()
     val context = LocalContext.current
@@ -64,247 +79,277 @@ fun AboutScreen(viewModel: MainViewModel) {
         Context.MODE_PRIVATE
     )
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth(),
-        contentPadding = PaddingValues(top = 8.dp, start = 8.dp, end = 8.dp)
-    ) {
-        item {
-            AboutCard(label = stringResource(R.string.provider)) {
-                val selected = rememberSaveable { mutableStateOf(viewModel.provider) }
-                Column {
-                    Text(stringResource(R.string.provider_summary))
-                    val providers = Providers.values()
-                    providers.forEach {
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            MediumTopAppBar(
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.popBackStack(
+                                navController.graph.startDestinationId,
+                                false
+                            )
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                        )
+                    }
+                },
+                title = { Text(text = stringResource(id = R.string.about)) },
+                scrollBehavior = scrollBehavior
+            )
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentPadding = paddingValues
+        ) {
+            item {
+                AboutCard(label = stringResource(R.string.provider)) {
+                    val selected = rememberSaveable { mutableStateOf(viewModel.provider) }
+                    Column {
+                        Text(stringResource(R.string.provider_summary))
+                        val providers = Providers.values()
+                        providers.forEach {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                RadioButton(
+                                    selected = selected.value == it,
+                                    onClick = {
+                                        selected.value = it
+                                        viewModel.provider = it
+                                        sharedPreferences.edit()
+                                            .putString("provider", it.displayName)
+                                            .apply()
+                                    }
+                                )
+                                Text(
+                                    text = it.displayName,
+                                    modifier = Modifier.clickable {
+                                        selected.value = it
+                                        viewModel.provider = it
+                                        sharedPreferences.edit()
+                                            .putString("provider", it.displayName)
+                                            .apply()
+                                    }
+                                )
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            item {
+                if (isSystemInDarkTheme()) {
+                    AboutCard(label = stringResource(R.string.theme)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(
-                                selected = selected.value == it,
-                                onClick = {
-                                    selected.value = it
-                                    viewModel.provider = it
-                                    sharedPreferences.edit().putString("provider", it.displayName)
-                                        .apply()
+                            Text(stringResource(R.string.pure_black_theme))
+                            Spacer(modifier = Modifier.weight(1f))
+                            val pureBlack = viewModel.pureBlack
+                            var selected by remember { mutableStateOf(pureBlack.value) }
+                            Switch(
+                                checked = selected,
+                                onCheckedChange = {
+                                    viewModel.pureBlack.value = it
+                                    selected = it
+                                    sharedPreferences.edit().putBoolean("pure_black", it).apply()
                                 }
                             )
+                        }
+                    }
+                }
+            }
+
+            item {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                    var picker by remember { mutableStateOf(false) }
+                    val sdCardPath = viewModel.sdCardPath
+                    var sdPath by rememberSaveable { mutableStateOf(sdCardPath) }
+                    AboutCard(label = stringResource(R.string.sd_card)) {
+                        Text(stringResource(R.string.set_sd_path))
+                        if (sdPath == "") {
                             Text(
-                                text = it.displayName,
-                                modifier = Modifier.clickable {
-                                    selected.value = it
-                                    viewModel.provider = it
-                                    sharedPreferences.edit().putString("provider", it.displayName)
-                                        .apply()
-                                }
+                                text = stringResource(R.string.no_sd_card_path_set),
+                                color = MaterialTheme.colorScheme.error,
                             )
+                        } else {
+                            Text(
+                                text = stringResource(R.string.sd_card_path_set_successfully),
+                                color = MaterialTheme.colorScheme.tertiary,
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
 
+                        Row {
+                            Spacer(modifier = Modifier.weight(1f))
+                            OutlinedButton(
+                                onClick = {
+                                    sdPath = ""
+                                    viewModel.sdCardPath = ""
+                                    sharedPreferences.edit().remove("sd_card_path").apply()
+                                }
+                            ) {
+                                Text(stringResource(R.string.clear_sd_card_path))
+                            }
+                        }
+                        Row {
+                            Spacer(modifier = Modifier.weight(1f))
+                            Button(
+                                modifier = Modifier.padding(top = 8.dp),
+                                onClick = {
+                                    picker = true
+                                }
+                            ) {
+                                Text(stringResource(R.string.set_sd_card_path))
+                            }
+                        }
+
+                        if (picker) {
+                            val sdCardPicker =
+                                rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) {
+                                    if (it == null) {
+                                        picker = false
+                                        return@rememberLauncherForActivityResult
+                                    }
+                                    sdPath = it.toString()
+                                    viewModel.sdCardPath = it.toString()
+                                    sharedPreferences.edit()
+                                        .putString("sd_card_path", it.toString())
+                                        .apply()
+                                    picker = false
+                                }
+                            LaunchedEffect(Unit) {
+                                sdCardPicker.launch(Uri.parse(Environment.getExternalStorageDirectory().absolutePath))
+                            }
                         }
                     }
                 }
             }
-        }
 
-        item {
-            if (isSystemInDarkTheme()) {
-                AboutCard(label = stringResource(R.string.theme)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.pure_black_theme))
-                        Spacer(modifier = Modifier.weight(1f))
-                        val pureBlack = viewModel.pureBlack
-                        var selected by remember { mutableStateOf(pureBlack.value) }
-                        Switch(
-                            checked = selected,
-                            onCheckedChange = {
-                                viewModel.pureBlack.value = it
-                                selected = it
-                                sharedPreferences.edit().putBoolean("pure_black", it).apply()
-                            }
-                        )
-                    }
-                }
-            }
-        }
-
-        item {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-                var picker by remember { mutableStateOf(false) }
-                val sdCardPath = viewModel.sdCardPath
-                var sdPath by rememberSaveable { mutableStateOf(sdCardPath) }
-                AboutCard(label = stringResource(R.string.sd_card)) {
-                    Text(stringResource(R.string.set_sd_path))
-                    if (sdPath == "") {
-                        Text(
-                            text = stringResource(R.string.no_sd_card_path_set),
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    } else {
-                        Text(
-                            text = stringResource(R.string.sd_card_path_set_successfully),
-                            color = MaterialTheme.colorScheme.tertiary,
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Row {
-                        Spacer(modifier = Modifier.weight(1f))
-                        OutlinedButton(
-                            onClick = {
-                                sdPath = ""
-                                viewModel.sdCardPath = ""
-                                sharedPreferences.edit().remove("sd_card_path").apply()
-                            }
-                        ) {
-                            Text(stringResource(R.string.clear_sd_card_path))
-                        }
-                    }
+            item {
+                var update by rememberSaveable { mutableStateOf(false) }
+                AboutCard(stringResource(R.string.about_songsync)) {
+                    Text(stringResource(R.string.what_is_songsync))
+                    Text(stringResource(R.string.extra_what_is_songsync))
+                    Text("")
+                    Text(stringResource(R.string.app_version, version))
                     Row {
                         Spacer(modifier = Modifier.weight(1f))
                         Button(
                             modifier = Modifier.padding(top = 8.dp),
-                            onClick = {
-                                picker = true
-                            }
+                            onClick = { update = true }
                         ) {
-                            Text(stringResource(R.string.set_sd_card_path))
-                        }
-                    }
-
-                    if (picker) {
-                        val sdCardPicker =
-                            rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) {
-                                if (it == null) {
-                                    picker = false
-                                    return@rememberLauncherForActivityResult
-                                }
-                                sdPath = it.toString()
-                                viewModel.sdCardPath = it.toString()
-                                sharedPreferences.edit().putString("sd_card_path", it.toString())
-                                    .apply()
-                                picker = false
-                            }
-                        LaunchedEffect(Unit) {
-                            sdCardPicker.launch(Uri.parse(Environment.getExternalStorageDirectory().absolutePath))
+                            Text(stringResource(R.string.check_for_updates))
                         }
                     }
                 }
-            }
-        }
 
-        item {
-            var update by rememberSaveable { mutableStateOf(false) }
-            AboutCard(stringResource(R.string.about_songsync)) {
-                Text(stringResource(R.string.what_is_songsync))
-                Text(stringResource(R.string.extra_what_is_songsync))
-                Text("")
-                Text(stringResource(R.string.app_version, version))
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button(
-                        modifier = Modifier.padding(top = 8.dp),
-                        onClick = { update = true }
-                    ) {
-                        Text(stringResource(R.string.check_for_updates))
-                    }
+                if (update) {
+                    CheckForUpdates(
+                        onDismiss = { update = false },
+                        onDownload = { uriHandler.openUri(it) },
+                        context = LocalContext.current,
+                        viewModel = viewModel,
+                        version = version
+                    )
                 }
             }
 
-            if (update) {
-                CheckForUpdates(
-                    onDismiss = { update = false },
-                    onDownload = { uriHandler.openUri(it) },
-                    context = LocalContext.current,
-                    viewModel = viewModel,
-                    version = version
-                )
-            }
-        }
-
-        item {
-            AboutCard(stringResource(R.string.source_code)) {
-                Text(stringResource(R.string.we_are_open_source))
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button(
-                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                        onClick = {
-                            uriHandler.openUri("https://github.com/Lambada10/SongSync")
-                        }
-                    ) {
-                        Text(stringResource(id = R.string.view_on_github))
-                    }
-                }
-            }
-        }
-
-        item {
-            AboutCard(stringResource(R.string.support)) {
-                Text(stringResource(R.string.bugs_or_suggestions_contact_us))
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button(
-                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                        onClick = {
-                            uriHandler.openUri("https://t.me/LambadaOT")
-                        }
-                    ) {
-                        Text(stringResource(R.string.telegram_group))
-                    }
-                }
-                Text(stringResource(R.string.create_issue))
-            }
-        }
-
-        item {
-            AboutCard(stringResource(R.string.contributors)) {
-                Contributor.values().forEach {
-                    val additionalInfo = stringResource(id = it.contributionLevel.stringResource)
-                    Text(text = "${it.devName} ($additionalInfo)")
-                    Row {
-                        Spacer(modifier = Modifier.weight(1f))
-                        if (it.github != null) {
-                            Button(
-                                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                                onClick = {
-                                    uriHandler.openUri(it.github)
-                                }
-                            ) {
-                                Text(stringResource(R.string.github))
-                            }
-                        }
-                        if (it.telegram != null) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Button(
-                                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                                onClick = {
-                                    uriHandler.openUri(it.telegram)
-                                }
-                            ) {
-                                Text(stringResource(R.string.telegram))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        item {
-            AboutCard(stringResource(R.string.thanks_to)) {
-                val credits = mapOf(
-                    stringResource(R.string.spotify_api) to "https://developer.spotify.com/documentation/web-api",
-                    stringResource(R.string.spotifylyrics_api) to "https://github.com/akashrchandran/spotify-lyrics-api",
-                    stringResource(R.string.syncedlyrics_py) to "https://github.com/0x7d4/syncedlyrics",
-                    stringResource(R.string.statusbar_lyrics_ext) to "https://github.com/cjybyjk/StatusBarLyricExt"
-                )
-
-                credits.forEach { credit ->
-                    Text(text = credit.key)
+            item {
+                AboutCard(stringResource(R.string.source_code)) {
+                    Text(stringResource(R.string.we_are_open_source))
                     Row {
                         Spacer(modifier = Modifier.weight(1f))
                         Button(
                             modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
                             onClick = {
-                                uriHandler.openUri(credit.value)
+                                uriHandler.openUri("https://github.com/Lambada10/SongSync")
                             }
                         ) {
-                            Text(stringResource(R.string.open_website))
+                            Text(stringResource(id = R.string.view_on_github))
+                        }
+                    }
+                }
+            }
+
+            item {
+                AboutCard(stringResource(R.string.support)) {
+                    Text(stringResource(R.string.bugs_or_suggestions_contact_us))
+                    Row {
+                        Spacer(modifier = Modifier.weight(1f))
+                        Button(
+                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                            onClick = {
+                                uriHandler.openUri("https://t.me/LambadaOT")
+                            }
+                        ) {
+                            Text(stringResource(R.string.telegram_group))
+                        }
+                    }
+                    Text(stringResource(R.string.create_issue))
+                }
+            }
+
+            item {
+                AboutCard(stringResource(R.string.contributors)) {
+                    Contributor.values().forEach {
+                        val additionalInfo =
+                            stringResource(id = it.contributionLevel.stringResource)
+                        Text(text = "${it.devName} ($additionalInfo)")
+                        Row {
+                            Spacer(modifier = Modifier.weight(1f))
+                            if (it.github != null) {
+                                Button(
+                                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                                    onClick = {
+                                        uriHandler.openUri(it.github)
+                                    }
+                                ) {
+                                    Text(stringResource(R.string.github))
+                                }
+                            }
+                            if (it.telegram != null) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Button(
+                                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                                    onClick = {
+                                        uriHandler.openUri(it.telegram)
+                                    }
+                                ) {
+                                    Text(stringResource(R.string.telegram))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            item {
+                AboutCard(stringResource(R.string.thanks_to)) {
+                    val credits = mapOf(
+                        stringResource(R.string.spotify_api) to "https://developer.spotify.com/documentation/web-api",
+                        stringResource(R.string.spotifylyrics_api) to "https://github.com/akashrchandran/spotify-lyrics-api",
+                        stringResource(R.string.syncedlyrics_py) to "https://github.com/0x7d4/syncedlyrics",
+                        stringResource(R.string.statusbar_lyrics_ext) to "https://github.com/cjybyjk/StatusBarLyricExt"
+                    )
+
+                    credits.forEach { credit ->
+                        Text(text = credit.key)
+                        Row {
+                            Spacer(modifier = Modifier.weight(1f))
+                            Button(
+                                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                                onClick = {
+                                    uriHandler.openUri(credit.value)
+                                }
+                            ) {
+                                Text(stringResource(R.string.open_website))
+                            }
                         }
                     }
                 }

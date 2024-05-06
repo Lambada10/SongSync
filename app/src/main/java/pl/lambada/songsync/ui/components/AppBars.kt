@@ -1,25 +1,32 @@
 package pl.lambada.songsync.ui.components
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Deselect
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -27,8 +34,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
@@ -42,7 +51,9 @@ fun TopBar(
     viewModel: MainViewModel,
     currentRoute: String?,
     selected: SnapshotStateList<String>,
-    allSongs: List<Song>?
+    allSongs: List<Song>?,
+    scrollBehavior: TopAppBarScrollBehavior,
+    navController: NavController,
 ) {
     val screens = Screens.values()
     val currentScreen = screens.firstOrNull { it.name == currentRoute }
@@ -60,7 +71,7 @@ fun TopBar(
         targetState = selected.size > 0,
         label = ""
     ) { showing ->
-        TopAppBar(
+        MediumTopAppBar(
             navigationIcon = {
                 if (showing) {
                     IconButton(onClick = { selected.clear() }) {
@@ -79,13 +90,17 @@ fun TopBar(
                         targetState = cachedSize,
                         label = ""
                     ) { size ->
-                        Text(text = stringResource(id = R.string.selected_count, size))
+                        Text(
+                            modifier = Modifier.padding(start = 10.dp),
+                            text = stringResource(id = R.string.selected_count, size)
+                        )
                     }
                 } else {
                     Text(
-                        text =
-                        currentScreen?.let { stringResource(it.stringResource) }
-                            ?: currentRoute.toString()
+                        modifier = Modifier.padding(start = 10.dp),
+                        text = if (currentScreen?.let { stringResource(it.stringResource) } == "Home") {
+                            "SongSync"
+                        } else { currentRoute.toString() }
                     )
                 }
             },
@@ -125,16 +140,45 @@ fun TopBar(
                             )
                         )
                     }
+                } else {
+                    var expanded by remember { mutableStateOf(false) }
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert, 
+                            contentDescription = "More"
+                        )
+                    }
+                    Box(
+                        modifier = Modifier.clip(RoundedCornerShape(100f)),
+                    ) {
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(text = "Batch sync lyrics") },
+                                onClick = { /*TODO*/ }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(text = "About") },
+                                onClick = {
+                                    navController.navigate("About")
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
                 }
             },
-            colors =
-            if (showing) {
+            colors = if (showing) {
                 TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             } else {
                 TopAppBarDefaults.topAppBarColors()
-            }
+            },
+            scrollBehavior = scrollBehavior,
         )
     }
 }
@@ -162,7 +206,7 @@ fun BottomBar(currentRoute: String?, navController: NavController) {
                     val isSelected = currentRoute == screen.name
                     val imageVector = when (screen) {
                         Screens.Home -> if (isSelected) Icons.Default.Home else Icons.Outlined.Home
-                        Screens.Browse -> if (isSelected) Icons.Default.Search else Icons.Outlined.Search
+                        Screens.Search -> if (isSelected) Icons.Default.Search else Icons.Outlined.Search
                         Screens.About -> if (isSelected) Icons.Default.Info else Icons.Outlined.Info
                     }
                     Icon(imageVector, contentDescription = stringResource(screen.stringResource))
