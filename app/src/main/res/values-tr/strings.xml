@@ -6,7 +6,7 @@
     <string name="cancel">İptal</string>
     <string name="error">Hata</string>
     <string name="this_track_has_no_lyrics">Bu parçanın sözleri yok</string>
-    <string name="ok">TAMAM</string>
+    <string name="ok">Tamam</string>
     <string name="yes">Evet</string>
     <string name="no">Hayır</string>
     <string name="downloading_lyrics">Şarkı sözleri indiriliyor</string>
@@ -116,4 +116,5 @@
     <string name="provider">Şarkı sözü sağlayıcısı</string>
     <string name="provider_summary">Lütfen aşağıdaki şarkı sözü sağlayıcısını seçin</string>
     <string name="ignore">Yoksay</string>
+    <string name="internal_error">Dahili hata: %s</string>
 </resources>
