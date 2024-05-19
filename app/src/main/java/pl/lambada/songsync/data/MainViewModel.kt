@@ -41,6 +41,7 @@ class MainViewModel : ViewModel() {
 
     // other settings
     var pureBlack: MutableState<Boolean> = mutableStateOf(false)
+    var disableMarquee: MutableState<Boolean> = mutableStateOf(false)
     var sdCardPath = ""
 
     // selected provider

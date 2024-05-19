@@ -40,6 +40,24 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import pl.lambada.songsync.data.MainViewModel
+
+@Composable
+fun AnimatedText(
+    animate: Boolean,
+    text: String,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    color: Color = Color.Unspecified,
+    modifier: Modifier = Modifier,
+) {
+    if (animate) {
+        MarqueeText(text = text, fontSize = fontSize, fontWeight = fontWeight, modifier = modifier, color = color)
+    }
+    else {
+        Text(text = text, fontSize = fontSize, fontWeight = fontWeight, modifier = modifier, color = color, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
 
 @Composable
 fun MarqueeText(

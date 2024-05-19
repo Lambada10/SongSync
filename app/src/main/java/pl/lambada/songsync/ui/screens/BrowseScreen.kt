@@ -125,6 +125,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                 Text(stringResource(R.string.local_song))
             }
             SongCard(
+                animateText = !viewModel.disableMarquee.value,
                 songName = nextSong?.title ?: stringResource(id = R.string.unknown),
                 artists = nextSong?.artist ?: stringResource(id = R.string.unknown),
                 coverUrl = nextSong?.imgUri?.toString()
@@ -200,6 +201,7 @@ fun BrowseScreen(viewModel: MainViewModel) {
                     Text(stringResource(R.string.cloud_song))
                 }
                 SongCard(
+                    animateText = !viewModel.disableMarquee.value,
                     songName = result.songName ?: stringResource(id = R.string.unknown),
                     artists = result.artistName ?: stringResource(id = R.string.unknown),
                     coverUrl = result.albumCoverLink,

@@ -98,6 +98,9 @@ class MainActivity : ComponentActivity() {
                     Context.MODE_PRIVATE
                 )
 
+                val disableMarquee = sharedPreferences.getBoolean("marquee_disable", false)
+                viewModel.disableMarquee.value = disableMarquee
+
                 val pureBlack = sharedPreferences.getBoolean("pure_black", false)
                 viewModel.pureBlack.value = pureBlack
                 themeDefined = true

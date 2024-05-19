@@ -6,6 +6,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -119,6 +120,25 @@ fun AboutScreen(viewModel: MainViewModel) {
                             }
                         )
                     }
+                }
+            }
+        }
+
+        item {
+            AboutCard(label = stringResource(R.string.disable_marquee)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.disable_marquee_summary))
+                    Spacer(modifier = Modifier.weight(1f))
+                    val disableMarquee = viewModel.disableMarquee
+                    var selected by remember { mutableStateOf(disableMarquee.value) }
+                    Switch(
+                        checked = selected,
+                        onCheckedChange = {
+                            viewModel.disableMarquee.value = it
+                            selected = it
+                            sharedPreferences.edit().putBoolean("marquee_disable", it).apply()
+                        }
+                    )
                 }
             }
         }

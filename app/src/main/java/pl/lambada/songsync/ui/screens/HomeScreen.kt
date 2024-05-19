@@ -114,7 +114,7 @@ import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.Screens
-import pl.lambada.songsync.ui.components.MarqueeText
+import pl.lambada.songsync.ui.components.AnimatedText
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
 import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.FileNotFoundException
@@ -557,14 +557,16 @@ private fun SongItem(
             )
             Spacer(modifier = Modifier.width(2.dp))
             Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.Top) {
-                MarqueeText(
+                AnimatedText(
+                    animate = !viewModel.disableMarquee.value,
                     text = song.title ?: stringResource(id = R.string.unknown),
                     fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.contentColorFor(bgColor),
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                MarqueeText(
+                AnimatedText(
+                    animate = !viewModel.disableMarquee.value,
                     text = song.artist ?: stringResource(id = R.string.unknown),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.contentColorFor(bgColor)
@@ -683,7 +685,8 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
             }, text = {
                 Column {
                     Text(text = stringResource(R.string.downloading_lyrics))
-                    MarqueeText(
+                    AnimatedText(
+                        animate = !viewModel.disableMarquee.value,
                         stringResource(
                             R.string.song,
                             songs.getOrNull((count) % total.coerceAtLeast(1))?.title

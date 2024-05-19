@@ -24,9 +24,11 @@ import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import pl.lambada.songsync.R
+import pl.lambada.songsync.data.MainViewModel
 
 @Composable
 fun SongCard(
+    animateText: Boolean,
     modifier: Modifier = Modifier,
     songName: String,
     artists: String,
@@ -64,9 +66,9 @@ fun SongCard(
                 modifier = Modifier.padding(12.dp),
                 verticalArrangement = Arrangement.Top
             ) {
-                MarqueeText(text = songName, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                AnimatedText(animate = animateText, text = songName, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
                 Spacer(modifier = Modifier.weight(1f))
-                MarqueeText(text = artists, fontSize = 14.sp)
+                AnimatedText(animate = animateText, text = artists, fontSize = 14.sp)
             }
         }
     }
