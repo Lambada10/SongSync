@@ -49,6 +49,7 @@ import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -387,7 +388,7 @@ fun FiltersDialog(
         "pl.lambada.songsync_preferences", Context.MODE_PRIVATE
     )
 
-    AlertDialog(onDismissRequest = { onDismiss() }) {
+    BasicAlertDialog(onDismissRequest = { onDismiss() }) {
         Surface(
             modifier = Modifier
                 .wrapContentWidth()
@@ -443,7 +444,7 @@ fun FiltersDialog(
     }
 
     if (showFolders) {
-        AlertDialog(onDismissRequest = { showFolders = false }) {
+        BasicAlertDialog(onDismissRequest = { showFolders = false }) {
             Surface(
                 modifier = Modifier
                     .wrapContentWidth()
