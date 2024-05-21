@@ -125,7 +125,8 @@ import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
-import pl.lambada.songsync.ui.Screens
+import pl.lambada.songsync.ui.ScreenAbout
+import pl.lambada.songsync.ui.ScreenSearch
 import pl.lambada.songsync.ui.components.MarqueeText
 import pl.lambada.songsync.util.ext.BackPressHandler
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
@@ -146,143 +147,143 @@ fun HomeScreen(
     navController: NavHostController,
     viewModel: MainViewModel
 ) {
-    if (allSongs == null) {
-        LoadingScreen()
-    } else {
-        val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-        var isBatchDownload by remember { mutableStateOf(false) }
-        Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                var cachedSize by remember { mutableIntStateOf(1) }
-                if (selected.size > 0) {
-                    // keep displaying "1 selected" during fade-out, don't say "0 selected"
-                    cachedSize = selected.size
-                }
-                var ableToSelect by remember { mutableStateOf<List<Song>?>(null) }
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    var isBatchDownload by remember { mutableStateOf(false) }
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            var cachedSize by remember { mutableIntStateOf(1) }
+            if (selected.size > 0) {
+                // keep displaying "1 selected" during fade-out, don't say "0 selected"
+                cachedSize = selected.size
+            }
+            var ableToSelect by remember { mutableStateOf<List<Song>?>(null) }
 
-                ableToSelect = viewModel.cachedFilteredSongs ?: allSongs
+            ableToSelect = viewModel.cachedFilteredSongs ?: allSongs
 
-                BackPressHandler(enabled = selected.size > 0, onBackPressed = { selected.clear() })
-                Crossfade(
-                    targetState = selected.size > 0,
-                    label = ""
-                ) { showing ->
-                    MediumTopAppBar(
-                        navigationIcon = {
-                            if (showing) {
-                                IconButton(onClick = { selected.clear() }) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = stringResource(R.string.back)
-                                    )
-                                }
-                            }
-                        },
-                        title = {
-                            if (showing) {
-                                Crossfade(
-                                    targetState = cachedSize,
-                                    label = ""
-                                ) { size ->
-                                    Text(
-                                        modifier = Modifier.padding(start = 8.dp),
-                                        text = stringResource(id = R.string.selected_count, size)
-                                    )
-                                }
-                            } else {
-                                Text(
-                                    modifier = Modifier.padding(start = 8.dp),
-                                    text = stringResource(R.string.app_name)
+            BackPressHandler(enabled = selected.size > 0, onBackPressed = { selected.clear() })
+            Crossfade(
+                targetState = selected.size > 0,
+                label = ""
+            ) { showing ->
+                MediumTopAppBar(
+                    navigationIcon = {
+                        if (showing) {
+                            IconButton(onClick = { selected.clear() }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(R.string.back)
                                 )
                             }
-                        },
-                        actions = {
-                            if (showing) {
-                                IconButton(
-                                    onClick = {
-                                        selected.clear()
-                                        ableToSelect?.map { it.filePath }?.forEach {
-                                            if (it != null) { selected.add(it) }
-                                        }
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.SelectAll,
-                                        contentDescription = stringResource(R.string.select_all)
-                                    )
-                                }
-                                IconButton(
-                                    onClick = {
-                                        val willBeSelected = ableToSelect?.map { it.filePath }?.toMutableList()
-                                        for (song in selected) {
-                                            willBeSelected?.remove(song)
-                                        }
-                                        selected.clear()
-                                        if (willBeSelected != null) {
-                                            for (song in willBeSelected) {
-                                                song?.let { selected.add(it) }
-                                            }
-                                        }
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Deselect,
-                                        contentDescription = stringResource(
-                                            id = R.string.invert_selection
-                                        )
-                                    )
-                                }
-                            } else {
-                                var expanded by remember { mutableStateOf(false) }
-                                IconButton(onClick = { expanded = !expanded }) {
-                                    Icon(
-                                        imageVector = Icons.Default.MoreVert,
-                                        contentDescription = "More"
-                                    )
-                                }
-                                DropdownMenu(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false }
-                                ) {
-                                    DropdownMenuItem(
-                                        text = { Text(text = stringResource(R.string.batch_download_lyrics)) },
-                                        onClick = {
-                                            isBatchDownload = true
-                                            expanded = false
-                                        }
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text(text = "About") },
-                                        onClick = {
-                                            navController.navigate("About")
-                                            expanded = false
-                                        }
-                                    )
-                                }
+                        }
+                    },
+                    title = {
+                        if (showing) {
+                            Crossfade(
+                                targetState = cachedSize,
+                                label = ""
+                            ) { size ->
+                                Text(
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    text = stringResource(id = R.string.selected_count, size)
+                                )
                             }
-                        },
-                        colors = if (showing) {
-                            TopAppBarDefaults.topAppBarColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                scrolledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            )
                         } else {
-                            TopAppBarDefaults.topAppBarColors()
-                        },
-                        scrollBehavior = scrollBehavior,
-                    )
-                }
-            },
-            floatingActionButton = {
-                FloatingActionButton(onClick = { navController.navigate(Screens.Search.name) }) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search lyrics"
-                    )
-                }
+                            Text(
+                                modifier = Modifier.padding(start = 8.dp),
+                                text = stringResource(R.string.app_name)
+                            )
+                        }
+                    },
+                    actions = {
+                        if (showing) {
+                            IconButton(
+                                onClick = {
+                                    selected.clear()
+                                    ableToSelect?.map { it.filePath }?.forEach {
+                                        if (it != null) { selected.add(it) }
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.SelectAll,
+                                    contentDescription = stringResource(R.string.select_all)
+                                )
+                            }
+                            IconButton(
+                                onClick = {
+                                    val willBeSelected = ableToSelect?.map { it.filePath }?.toMutableList()
+                                    for (song in selected) {
+                                        willBeSelected?.remove(song)
+                                    }
+                                    selected.clear()
+                                    if (willBeSelected != null) {
+                                        for (song in willBeSelected) {
+                                            song?.let { selected.add(it) }
+                                        }
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Deselect,
+                                    contentDescription = stringResource(
+                                        id = R.string.invert_selection
+                                    )
+                                )
+                            }
+                        } else {
+                            var expanded by remember { mutableStateOf(false) }
+                            IconButton(onClick = { expanded = !expanded }) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "More"
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(text = stringResource(R.string.batch_download_lyrics)) },
+                                    onClick = {
+                                        isBatchDownload = true
+                                        expanded = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(text = "About") },
+                                    onClick = {
+                                        navController.navigate(ScreenAbout)
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    },
+                    colors = if (showing) {
+                        TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            scrolledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        )
+                    } else {
+                        TopAppBarDefaults.topAppBarColors()
+                    },
+                    scrollBehavior = scrollBehavior,
+                )
             }
-        ) { paddingValues ->
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { navController.navigate(ScreenSearch) }) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search lyrics"
+                )
+            }
+        }
+    ) { paddingValues ->
+        if (allSongs == null) {
+            LoadingScreen()
+        } else {
             HomeScreenLoaded(
                 navController = navController,
                 viewModel = viewModel,
@@ -691,7 +692,7 @@ private fun SongItem(
                         onSelectionChanged(!selected)
                     } else {
                         viewModel.nextSong = song
-                        navController.navigate(Screens.Search.name)
+                        navController.navigate(ScreenSearch)
                     }
                 },
                 onLongClick = { onSelectionChanged(!selected) }

@@ -145,8 +145,6 @@ class MainActivity : ComponentActivity() {
                         save = { it.toTypedArray() }, restore = { mutableStateListOf(*it) }
                     )) { mutableStateListOf<String>() }
                     var allSongs by remember { mutableStateOf<List<Song>?>(null) }
-                    val navBackStackEntry by navController.currentBackStackEntryAsState()
-                    val currentRoute = navBackStackEntry?.destination?.route
 
                     // Check for permissions and get all songs
                     RequestPermissions(
@@ -163,29 +161,7 @@ class MainActivity : ComponentActivity() {
                         }
                     )
 
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxSize()
-//                                .imePadding()
-//                                .let {
-//                                    if (WindowInsets.isImeVisible) {
-//                                        // exclude bottom bar if ime is visible
-//                                        it.padding(
-//                                            PaddingValues(
-//                                                top = paddingValues.calculateTopPadding(),
-//                                                start = paddingValues.calculateStartPadding(
-//                                                    LocalLayoutDirection.current
-//                                                ),
-//                                                end = paddingValues.calculateEndPadding(
-//                                                    LocalLayoutDirection.current
-//                                                )
-//                                            )
-//                                        )
-//                                    } else {
-//                                        it.padding(paddingValues)
-//                                    }
-//                                }
-                    ) {
+                    Surface( modifier = Modifier.fillMaxSize() ) {
                         if (!hasLoadedPermissions) {
                             LoadingScreen()
                         } else if (!hasPermissions) {
@@ -207,19 +183,20 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             )
-                        } else if (!internetConnection) {
-                            NoInternetDialog(
-                                onConfirm = { finishAndRemoveTask() },
-                                onIgnore = {
-                                    internetConnection = true // assume connected (if spotify is down, can use other providers)
-                                }
-                            )
                         } else {
                             Navigator(
                                 navController = navController,
                                 selected = selected,
                                 allSongs = allSongs,
                                 viewModel = viewModel
+                            )
+                        }
+                        if (!internetConnection) {
+                            NoInternetDialog(
+                                onConfirm = { finishAndRemoveTask() },
+                                onIgnore = {
+                                    internetConnection = true // assume connected (if spotify is down, can use other providers)
+                                }
                             )
                         }
                 }

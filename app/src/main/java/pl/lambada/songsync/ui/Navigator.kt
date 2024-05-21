@@ -8,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import kotlinx.serialization.Serializable
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.domain.model.Song
@@ -28,8 +29,11 @@ fun Navigator(
     allSongs: List<Song>?,
     viewModel: MainViewModel
 ) {
-    NavHost(navController = navController, startDestination = Screens.Home.name) {
-        composable(Screens.Home.name) {
+    NavHost(
+        navController = navController,
+        startDestination = ScreenHome
+    ) {
+        composable<ScreenHome> {
             HomeScreen(
                 navController = navController,
                 selected = selected,
@@ -37,13 +41,13 @@ fun Navigator(
                 viewModel = viewModel,
             )
         }
-        composable(Screens.Search.name) {
+        composable<ScreenSearch> {
             SearchScreen(
                 viewModel = viewModel,
                 navController = navController,
             )
         }
-        composable(Screens.About.name) {
+        composable<ScreenAbout> {
             AboutScreen(
                 viewModel = viewModel,
                 navController = navController
@@ -52,11 +56,11 @@ fun Navigator(
     }
 }
 
-/**
- * Enum class for navigation.
- */
-enum class Screens(val stringResource: Int) {
-    Home(R.string.home),
-    Search(R.string.search),
-    About(R.string.about)
-}
+@Serializable
+object ScreenHome
+
+@Serializable
+object ScreenSearch
+
+@Serializable
+object ScreenAbout
