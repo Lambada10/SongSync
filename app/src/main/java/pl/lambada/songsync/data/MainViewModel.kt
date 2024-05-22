@@ -26,7 +26,6 @@ import java.net.UnknownHostException
  */
 class MainViewModel : ViewModel() {
     private var cachedSongs: List<Song>? = null
-    var nextSong: Song? = null // for fullscreen downloader dialog
 
     // Filter settings
     private var cachedFolders: MutableList<String>? = null
@@ -46,10 +45,10 @@ class MainViewModel : ViewModel() {
     var provider = Providers.SPOTIFY
 
     // LRCLib Track ID
-    var lrcLibID = 0
+    private var lrcLibID = 0
 
     // Netease Track ID
-    var neteaseID = 0
+    private var neteaseID = 0
     // TODO: Use values from SongInfo object returned by search instead of storing them here
 
     /**

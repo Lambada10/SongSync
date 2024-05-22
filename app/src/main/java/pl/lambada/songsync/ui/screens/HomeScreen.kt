@@ -9,7 +9,10 @@ import android.net.Uri
 import android.os.Build
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -139,13 +142,15 @@ import kotlin.math.roundToInt
  *
  * @param viewModel The [MainViewModel] instance.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun HomeScreen(
     selected: SnapshotStateList<String>,
     allSongs: List<Song>?,
     navController: NavHostController,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var isBatchDownload by remember { mutableStateOf(false) }
@@ -273,7 +278,7 @@ fun HomeScreen(
             }
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate(ScreenSearch) }) {
+            FloatingActionButton(onClick = { navController.navigate(ScreenSearch()) }) {
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = "Search lyrics"
@@ -292,6 +297,8 @@ fun HomeScreen(
                 paddingValues = paddingValues,
                 isBatchDownload = isBatchDownload,
                 onBatchDownload = { onBatchDownload -> isBatchDownload = onBatchDownload },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope
             )
         }
     }
@@ -314,7 +321,7 @@ fun LoadingScreen() {
 @Parcelize
 data class MyTextFieldValue(val text: String, val cursorStart: Int, val cursorEnd: Int) : Parcelable
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun HomeScreenLoaded(
     selected: SnapshotStateList<String>,
@@ -324,6 +331,8 @@ fun HomeScreenLoaded(
     paddingValues: PaddingValues,
     isBatchDownload: Boolean,
     onBatchDownload: (Boolean) -> Unit,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     var showingSearch by rememberSaveable { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(showingSearch) }
@@ -501,6 +510,7 @@ fun HomeScreenLoaded(
                     ) == true
                 ) {
                     SongItem(
+                        id = i.toString(),
                         selected = selected.contains(song.filePath),
                         quickSelect = selected.size > 0,
                         onSelectionChanged = { newValue ->
@@ -516,7 +526,8 @@ fun HomeScreenLoaded(
                         },
                         navController = navController,
                         song = song,
-                        viewModel = viewModel
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = animatedVisibilityScope,
                     )
                 }
             }
@@ -663,15 +674,17 @@ fun FiltersDialog(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 private fun SongItem(
+    id: String,
     selected: Boolean,
     quickSelect: Boolean,
     onSelectionChanged: (Boolean) -> Unit,
     navController: NavHostController,
     song: Song,
-    viewModel: MainViewModel
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current).data(data = song.imgUri).apply {
@@ -679,6 +692,8 @@ private fun SongItem(
             error(R.drawable.ic_song)
         }.build(), imageLoader = LocalContext.current.imageLoader
     )
+    val songName = song.title ?: stringResource(id = R.string.unknown)
+    val artists = song.artist ?: stringResource(id = R.string.unknown)
     val bgColor = if (selected) MaterialTheme.colorScheme.surfaceVariant
     else MaterialTheme.colorScheme.surface
     Row(
@@ -691,37 +706,58 @@ private fun SongItem(
                     if (quickSelect) {
                         onSelectionChanged(!selected)
                     } else {
-                        viewModel.nextSong = song
-                        navController.navigate(ScreenSearch)
+                        navController.navigate(
+                            ScreenSearch(
+                                id = id,
+                                songName = songName,
+                                artists = artists,
+                                coverUri = song.imgUri.toString(),
+                                filePath = song.filePath,
+                            )
+                        )
                     }
                 },
                 onLongClick = { onSelectionChanged(!selected) }
             )
             .padding(vertical = 12.dp, horizontal = 24.dp)
     ) {
-        Image(
-            painter = painter,
-            contentDescription = stringResource(id = R.string.album_cover),
-            modifier = Modifier
-                .fillMaxHeight()
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(20f))
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Column(
-            modifier = Modifier.fillMaxHeight(),
-            verticalArrangement = Arrangement.SpaceAround
-        ) {
-            MarqueeText(
-                text = song.title ?: stringResource(id = R.string.unknown),
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.contentColorFor(bgColor),
+        with(sharedTransitionScope) {
+            Image(
+                painter = painter,
+                contentDescription = stringResource(id = R.string.album_cover),
+                modifier = Modifier
+                    .sharedElement(
+                        state = rememberSharedContentState(key = "cover$id"),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                    .fillMaxHeight()
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(20f))
             )
-            MarqueeText(
-                text = song.artist ?: stringResource(id = R.string.unknown),
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.contentColorFor(bgColor)
-            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceAround
+            ) {
+                MarqueeText(
+                    text = songName,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.contentColorFor(bgColor),
+                    modifier = Modifier.sharedElement(
+                        state = rememberSharedContentState(key = "title$id"),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                )
+                MarqueeText(
+                    text = artists,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.contentColorFor(bgColor),
+                    modifier = Modifier.sharedElement(
+                        state = rememberSharedContentState(key = "artist$id"),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                )
+            }
         }
     }
 }

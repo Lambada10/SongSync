@@ -4,6 +4,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -60,7 +63,6 @@ import pl.lambada.songsync.R
 import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.NoTrackFoundException
-import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.components.CommonTextField
 import pl.lambada.songsync.ui.components.SongCard
@@ -74,18 +76,19 @@ import java.net.UnknownHostException
  *
  * @param viewModel the [MainViewModel] instance.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun SearchScreen(
+    id: String?,
+    songName: String?,
+    artists: String?,
+    coverUri: String?,
+    filePath: String?,
     viewModel: MainViewModel,
     navController: NavController,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
-
-    var nextSong: Song? by rememberSaveable { mutableStateOf(null) }
-    if (viewModel.nextSong != null) {
-        nextSong = viewModel.nextSong
-        viewModel.nextSong = null
-    }
 
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
@@ -97,21 +100,26 @@ fun SearchScreen(
         topBar = {
             MediumTopAppBar(
                 navigationIcon = {
-                                 IconButton(
-                                     onClick = {
-                                         navController.popBackStack(
-                                             navController.graph.startDestinationId,
-                                             false
-                                         )
-                                     }
-                                 ) {
-                                     Icon(
-                                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                         contentDescription = stringResource(R.string.back),
-                                     )
-                                 }
+                    IconButton(
+                        onClick = {
+                            navController.popBackStack(
+                                navController.graph.startDestinationId,
+                                false
+                            )
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                        )
+                    }
                 },
-                title = { Text(text = stringResource(id = R.string.search)) },
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.search),
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                },
                 scrollBehavior = scrollBehavior
             )
         }
@@ -121,7 +129,7 @@ fun SearchScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(paddingValues)
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -130,13 +138,13 @@ fun SearchScreen(
             // queryStatus: "Not submitted", "Pending", "Success", "Failed" - used to show different UI
             var queryStatus by rememberSaveable {
                 mutableStateOf(
-                    if (nextSong != null) QueryStatus.Pending else QueryStatus.NotSubmitted
+                    if (!id.isNullOrEmpty()) QueryStatus.Pending else QueryStatus.NotSubmitted
                 )
             }
 
             // querySong, queryArtist - used to store user input, offset - for search again
-            var querySong by rememberSaveable { mutableStateOf(nextSong?.title ?: "") }
-            var queryArtist by rememberSaveable { mutableStateOf(nextSong?.artist ?: "") }
+            var querySong by rememberSaveable { mutableStateOf(songName ?: "") }
+            var queryArtist by rememberSaveable { mutableStateOf(artists ?: "") }
             var offset by rememberSaveable { mutableIntStateOf(0) }
 
             // queryResult - used to store result of query, failReason - used to store error message if error occurs
@@ -150,7 +158,7 @@ fun SearchScreen(
             var failReason: Exception? by rememberSaveable { mutableStateOf(null) }
 
             Spacer(modifier = Modifier.height(16.dp))
-            if (nextSong != null) {
+            if (!id.isNullOrEmpty()) {
                 Row {
                     Icon(
                         imageVector = Icons.Filled.Downloading,
@@ -160,9 +168,12 @@ fun SearchScreen(
                     Text(stringResource(R.string.local_song))
                 }
                 SongCard(
-                    songName = nextSong?.title ?: stringResource(id = R.string.unknown),
-                    artists = nextSong?.artist ?: stringResource(id = R.string.unknown),
-                    coverUrl = nextSong?.imgUri?.toString()
+                    id = id,
+                    songName = songName!!,
+                    artists = artists!!,
+                    coverUrl = coverUri,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope,
                 )
             }
 
@@ -190,7 +201,8 @@ fun SearchScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = {
                         queryResult = SongInfo(
-                            songName = querySong, artistName = queryArtist
+                            songName = querySong,
+                            artistName = queryArtist
                         )
                         offset = 0
                         queryStatus = QueryStatus.Pending
@@ -234,10 +246,13 @@ fun SearchScreen(
                         Text(stringResource(R.string.cloud_song))
                     }
                     SongCard(
+                        id = "",
                         songName = result.songName ?: stringResource(id = R.string.unknown),
                         artists = result.artistName ?: stringResource(id = R.string.unknown),
                         coverUrl = result.albumCoverLink,
-                        modifier = Modifier.clickable { result.songLink?.let { uriHandler.openUri(it) } }
+                        modifier = Modifier.clickable { result.songLink?.let { uriHandler.openUri(it) } },
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = animatedVisibilityScope,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Row(
@@ -300,7 +315,7 @@ fun SearchScreen(
                             val lyrics = lyricsResult!!
 
                             val isLegacyVersion = Build.VERSION.SDK_INT < Build.VERSION_CODES.R
-                            val isInternalStorage = nextSong?.filePath?.contains("/storage/emulated/0/")
+                            val isInternalStorage = filePath?.contains("/storage/emulated/0/")
                                 ?: true // true because it's not a local song
 
                             Row(
@@ -314,7 +329,7 @@ fun SearchScreen(
                                     onClick = {
                                         val lrc =
                                             "[ti:${result.songName}]\n" + "[ar:${result.artistName}]\n" + "[by:$generatedUsingString]\n" + lyrics
-                                        val file = nextSong?.filePath?.toLrcFile() ?: File(
+                                        val file = filePath?.toLrcFile() ?: File(
                                             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                                             "SongSync/${result.songName} - ${result.artistName}.lrc"
                                         )
@@ -327,7 +342,7 @@ fun SearchScreen(
                                                     context.externalCacheDirs[1].absolutePath.indexOf("/Android/data")
                                                 )
                                             val path =
-                                                nextSong!!.filePath?.toLrcFile()?.absolutePath?.substringAfter(
+                                                filePath?.toLrcFile()?.absolutePath?.substringAfter(
                                                     sd
                                                 )?.split("/")?.dropLast(1)
                                             var sdCardFiles = DocumentFile.fromTreeUri(

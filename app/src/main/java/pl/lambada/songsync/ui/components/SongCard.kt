@@ -1,5 +1,8 @@
 package pl.lambada.songsync.ui.components
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,12 +28,16 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import pl.lambada.songsync.R
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SongCard(
-    modifier: Modifier = Modifier,
+    id: String,
     songName: String,
     artists: String,
     coverUrl: String?,
+    modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     OutlinedCard(
         shape = RoundedCornerShape(10.dp),
@@ -51,22 +58,43 @@ fun SongCard(
                         }.build(),
                     imageLoader = LocalContext.current.imageLoader
                 )
-                Image(
-                    painter = painter,
-                    contentDescription = stringResource(R.string.album_cover),
-                    modifier = Modifier
-                        .height(72.dp)
-                        .aspectRatio(1f),
-                )
-            }
-            Spacer(modifier = Modifier.width(2.dp))
-            Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.Top
-            ) {
-                MarqueeText(text = songName, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-                Spacer(modifier = Modifier.weight(1f))
-                MarqueeText(text = artists, fontSize = 14.sp)
+                with(sharedTransitionScope) {
+                    Image(
+                        painter = painter,
+                        contentDescription = stringResource(R.string.album_cover),
+                        modifier = Modifier
+                            .sharedElement(
+                                state = rememberSharedContentState(key = "cover$id"),
+                                animatedVisibilityScope = animatedVisibilityScope
+                            )
+                            .height(72.dp)
+                            .aspectRatio(1f)
+                    )
+                    Spacer(modifier = Modifier.width(2.dp))
+                    Column(
+                        modifier = Modifier.padding(12.dp),
+                        verticalArrangement = Arrangement.Top
+                    ) {
+                        MarqueeText(
+                            text = songName,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.sharedElement(
+                                state = rememberSharedContentState(key = "title$id"),
+                                animatedVisibilityScope = animatedVisibilityScope
+                            )
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        MarqueeText(
+                            text = artists,
+                            fontSize = 14.sp,
+                            modifier = Modifier.sharedElement(
+                                state = rememberSharedContentState(key = "artist$id"),
+                                animatedVisibilityScope = animatedVisibilityScope
+                            )
+                        )
+                    }
+                }
             }
         }
     }
