@@ -40,7 +40,6 @@
     <string name="check_your_connection">Mohon periksa koneksi internet dan coba lagi.</string>
     <string name="if_connected_spotify_down">Jika Anda sudah terkoneksi internet, Spotify mungkin sedang tidak aktif. Mohon coba lagi nanti.</string>
     <string name="home">Beranda</string>
-    <string name="browse">Cari</string>
     <string name="about">Tentang</string>
     <string name="song_name_no_args">Judul lagu</string>
     <string name="artist_name_no_args">Nama artis</string>
@@ -96,8 +95,8 @@
     <string name="pure_black_theme">Tema hitam pekat</string>
     <string name="restart_the_app">Mulai ulang aplikasi untuk menerapkan perubahan</string>
     <string name="sd_card">Kartu SD</string>
-    <string name="set_sd_card_path">Atur jalur direktori Kartu SD</string>
-    <string name="clear_sd_card_path">Hapus jalur direktori Kartu SD</string>
+    <string name="set_sd_card_path">Atur</string>
+    <string name="clear_sd_card_path">Hapus</string>
     <string name="sd_card_path_set_successfully">Berhasil mengatur jalur direktori Kartu SD!</string>
     <string name="no_sd_card_path_set">Tidak ada jalur direktori Kartu SD!</string>
     <string name="set_sd_path">Atur jalur direktori Kartu SD disini. Ini diperlukan untuk Android 10 kebawah.</string>

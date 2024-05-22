@@ -37,7 +37,6 @@
     <string name="you_need_internet_connection">你需要互联网连接来使用本应用。</string>
     <string name="check_your_connection">请检查你的互联网连接然后再试一次。</string>
     <string name="home">主页</string>
-    <string name="browse">浏览</string>
     <string name="about">关于</string>
     <string name="song_name_no_args">歌曲名称</string>
     <string name="artist_name_no_args">歌手名称</string>

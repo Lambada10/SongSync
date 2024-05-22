@@ -39,7 +39,6 @@
     <string name="you_need_internet_connection">Você precisa de conexão com a internet para usar este aplicativo.</string>
     <string name="check_your_connection">Por favor verifique sua conexão e tente novamente.</string>
     <string name="home">Tela inicial</string>
-    <string name="browse">Navegador</string>
     <string name="about">Sobre</string>
     <string name="song_name_no_args">Nome da música</string>
     <string name="artist_name_no_args">Nome do Artista</string>

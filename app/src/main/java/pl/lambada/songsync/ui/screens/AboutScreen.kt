@@ -24,9 +24,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -51,14 +54,16 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.domain.model.Release
-import pl.lambada.songsync.ui.components.AboutCard
+import pl.lambada.songsync.ui.components.AboutItem
 import pl.lambada.songsync.util.ext.getVersion
 
 /**
@@ -99,18 +104,25 @@ fun AboutScreen(
                         )
                     }
                 },
-                title = { Text(text = stringResource(id = R.string.about)) },
+                title = {
+                    Text(
+                        modifier = Modifier.padding(start = 8.dp),
+                        text = stringResource(id = R.string.about)
+                    )
+                },
                 scrollBehavior = scrollBehavior
             )
         }
     ) { paddingValues ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             contentPadding = paddingValues
         ) {
             item {
-                AboutCard(label = stringResource(R.string.provider)) {
+                AboutItem(
+                    label = stringResource(R.string.provider),
+                    modifier = Modifier.padding(horizontal = 22.dp, vertical = 16.dp)
+                ) {
                     val selected = rememberSaveable { mutableStateOf(viewModel.provider) }
                     Column {
                         Text(stringResource(R.string.provider_summary))
@@ -146,8 +158,11 @@ fun AboutScreen(
 
             item {
                 if (isSystemInDarkTheme()) {
-                    AboutCard(label = stringResource(R.string.theme)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                    AboutItem(label = stringResource(R.string.theme)) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 22.dp, vertical = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text(stringResource(R.string.pure_black_theme))
                             Spacer(modifier = Modifier.weight(1f))
                             val pureBlack = viewModel.pureBlack
@@ -170,17 +185,22 @@ fun AboutScreen(
                     var picker by remember { mutableStateOf(false) }
                     val sdCardPath = viewModel.sdCardPath
                     var sdPath by rememberSaveable { mutableStateOf(sdCardPath) }
-                    AboutCard(label = stringResource(R.string.sd_card)) {
+                    AboutItem(
+                        label = stringResource(R.string.sd_card),
+                        modifier = Modifier.padding(horizontal = 22.dp, vertical = 16.dp)
+                    ) {
                         Text(stringResource(R.string.set_sd_path))
                         if (sdPath == "") {
                             Text(
                                 text = stringResource(R.string.no_sd_card_path_set),
                                 color = MaterialTheme.colorScheme.error,
+                                fontSize = 12.sp
                             )
                         } else {
                             Text(
                                 text = stringResource(R.string.sd_card_path_set_successfully),
                                 color = MaterialTheme.colorScheme.tertiary,
+                                fontSize = 12.sp
                             )
                         }
                         Spacer(modifier = Modifier.height(8.dp))
@@ -196,15 +216,8 @@ fun AboutScreen(
                             ) {
                                 Text(stringResource(R.string.clear_sd_card_path))
                             }
-                        }
-                        Row {
-                            Spacer(modifier = Modifier.weight(1f))
-                            Button(
-                                modifier = Modifier.padding(top = 8.dp),
-                                onClick = {
-                                    picker = true
-                                }
-                            ) {
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Button(onClick = { picker = true }) {
                                 Text(stringResource(R.string.set_sd_card_path))
                             }
                         }
@@ -233,7 +246,10 @@ fun AboutScreen(
 
             item {
                 var update by rememberSaveable { mutableStateOf(false) }
-                AboutCard(stringResource(R.string.about_songsync)) {
+                AboutItem(
+                    label = stringResource(R.string.about_songsync),
+                    modifier = Modifier.padding(horizontal = 22.dp, vertical = 16.dp)
+                ) {
                     Text(stringResource(R.string.what_is_songsync))
                     Text(stringResource(R.string.extra_what_is_songsync))
                     Text("")
@@ -261,98 +277,92 @@ fun AboutScreen(
             }
 
             item {
-                AboutCard(stringResource(R.string.source_code)) {
+                AboutItem(
+                    stringResource(R.string.source_code),
+                    modifier = Modifier
+                        .clickable { uriHandler.openUri("https://github.com/Lambada10/SongSync") }
+                        .padding(horizontal = 22.dp, vertical = 16.dp)
+                ) {
                     Text(stringResource(R.string.we_are_open_source))
-                    Row {
-                        Spacer(modifier = Modifier.weight(1f))
-                        Button(
-                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                            onClick = {
-                                uriHandler.openUri("https://github.com/Lambada10/SongSync")
-                            }
-                        ) {
-                            Text(stringResource(id = R.string.view_on_github))
-                        }
-                    }
+                    Text(
+                        text = stringResource(id = R.string.view_on_github),
+                        color = MaterialTheme.colorScheme.outline,
+                        fontSize = 12.sp
+                    )
                 }
             }
 
             item {
-                AboutCard(stringResource(R.string.support)) {
-                    Text(stringResource(R.string.bugs_or_suggestions_contact_us))
-                    Row {
-                        Spacer(modifier = Modifier.weight(1f))
-                        Button(
-                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                            onClick = {
-                                uriHandler.openUri("https://t.me/LambadaOT")
-                            }
-                        ) {
-                            Text(stringResource(R.string.telegram_group))
-                        }
+                AboutItem(
+                    stringResource(R.string.support),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .clickable { uriHandler.openUri("https://t.me/LambadaOT") }
+                            .padding(horizontal = 22.dp, vertical = 16.dp)
+                    ) {
+                        Text(
+                            stringResource(R.string.bugs_or_suggestions_contact_us),
+                        )
+                        Text(
+                            text = stringResource(R.string.telegram_group),
+                            color = MaterialTheme.colorScheme.outline,
+                            fontSize = 12.sp
+                        )
                     }
-                    Text(stringResource(R.string.create_issue))
+                    Text(
+                        stringResource(R.string.create_issue),
+                        modifier = Modifier.padding(horizontal = 22.dp)
+                    )
                 }
             }
 
             item {
-                AboutCard(stringResource(R.string.contributors)) {
+                AboutItem(stringResource(R.string.contributors)) {
                     Contributor.values().forEach {
-                        val additionalInfo =
-                            stringResource(id = it.contributionLevel.stringResource)
-                        Text(text = "${it.devName} ($additionalInfo)")
-                        Row {
-                            Spacer(modifier = Modifier.weight(1f))
-                            if (it.github != null) {
-                                Button(
-                                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                                    onClick = {
-                                        uriHandler.openUri(it.github)
-                                    }
-                                ) {
-                                    Text(stringResource(R.string.github))
-                                }
-                            }
-                            if (it.telegram != null) {
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Button(
-                                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                                    onClick = {
-                                        uriHandler.openUri(it.telegram)
-                                    }
-                                ) {
-                                    Text(stringResource(R.string.telegram))
-                                }
-                            }
+                        val additionalInfo = stringResource(id = it.contributionLevel.stringResource)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { it.github?.let { it1 -> uriHandler.openUri(it1) } }
+                                .padding(horizontal = 22.dp, vertical = 16.dp)
+                        ) {
+                            Text(text = it.devName)
+                            Text(
+                                text = additionalInfo,
+                                color = MaterialTheme.colorScheme.outline,
+                                fontSize = 12.sp
+                            )
                         }
                     }
                 }
             }
-
             item {
-                AboutCard(stringResource(R.string.thanks_to)) {
+                AboutItem(label = stringResource(id = R.string.thanks_to)) {
                     val credits = mapOf(
                         stringResource(R.string.spotify_api) to "https://developer.spotify.com/documentation/web-api",
                         stringResource(R.string.spotifylyrics_api) to "https://github.com/akashrchandran/spotify-lyrics-api",
                         stringResource(R.string.syncedlyrics_py) to "https://github.com/0x7d4/syncedlyrics",
                         stringResource(R.string.statusbar_lyrics_ext) to "https://github.com/cjybyjk/StatusBarLyricExt"
                     )
-
                     credits.forEach { credit ->
-                        Text(text = credit.key)
-                        Row {
-                            Spacer(modifier = Modifier.weight(1f))
-                            Button(
-                                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                                onClick = {
-                                    uriHandler.openUri(credit.value)
-                                }
-                            ) {
-                                Text(stringResource(R.string.open_website))
-                            }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { uriHandler.openUri(credit.value) }
+                                .padding(22.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                                contentDescription = stringResource(id = R.string.open_website)
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(text = credit.key)
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
