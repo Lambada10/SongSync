@@ -78,7 +78,7 @@ import java.net.UnknownHostException
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
-fun SearchScreen(
+fun SharedTransitionScope.SearchScreen(
     id: String?,
     songName: String?,
     artists: String?,
@@ -96,7 +96,12 @@ fun SearchScreen(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .sharedBounds(
+                sharedContentState = rememberSharedContentState(key = if (id.isNullOrEmpty()) "fab" else ""),
+                animatedVisibilityScope = animatedVisibilityScope
+            )
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             MediumTopAppBar(
                 navigationIcon = {

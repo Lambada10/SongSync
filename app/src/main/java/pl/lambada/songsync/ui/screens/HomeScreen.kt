@@ -381,11 +381,19 @@ fun HomeScreen(
             }
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate(ScreenSearch()) }) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search lyrics"
-                )
+            with(sharedTransitionScope) {
+                FloatingActionButton(
+                    modifier = Modifier.sharedBounds(
+                        sharedContentState = rememberSharedContentState(key = "fab"),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    ),
+                    onClick = { navController.navigate(ScreenSearch()) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search lyrics"
+                    )
+                }
             }
         }
     ) { paddingValues ->
