@@ -51,6 +51,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Deselect
 import androidx.compose.material.icons.filled.FilterAlt
@@ -72,6 +73,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
@@ -206,7 +208,9 @@ fun HomeScreen(
                                 onClick = {
                                     selected.clear()
                                     ableToSelect?.map { it.filePath }?.forEach {
-                                        if (it != null) { selected.add(it) }
+                                        if (it != null) {
+                                            selected.add(it)
+                                        }
                                     }
                                 }
                             ) {
@@ -217,7 +221,8 @@ fun HomeScreen(
                             }
                             IconButton(
                                 onClick = {
-                                    val willBeSelected = ableToSelect?.map { it.filePath }?.toMutableList()
+                                    val willBeSelected =
+                                        ableToSelect?.map { it.filePath }?.toMutableList()
                                     for (song in selected) {
                                         willBeSelected?.remove(song)
                                     }
@@ -236,7 +241,6 @@ fun HomeScreen(
                                     )
                                 )
                             }
-                        } else {
                             var expanded by remember { mutableStateOf(false) }
                             IconButton(onClick = { expanded = !expanded }) {
                                 Icon(
@@ -249,19 +253,118 @@ fun HomeScreen(
                                 onDismissRequest = { expanded = false }
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text(text = stringResource(R.string.batch_download_lyrics)) },
+                                    text = {
+                                        Text(
+                                            text = stringResource(R.string.batch_download_lyrics),
+                                            modifier = Modifier.padding(horizontal = 6.dp),
+                                        )
+                                    },
+                                    onClick = {
+                                        isBatchDownload = true
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        } else {
+                            var expanded by remember { mutableStateOf(false) }
+                            var expandedProviders by remember { mutableStateOf(false) }
+                            IconButton(onClick = { expanded = !expanded }) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "More"
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            text = stringResource(R.string.provider),
+                                            modifier = Modifier.padding(horizontal = 6.dp),
+                                        )
+                                    },
+                                    trailingIcon = {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                                            contentDescription = "expand dropdown"
+                                        )
+                                    },
+                                    onClick = {
+                                        expanded = false
+                                        expandedProviders = true
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            text = stringResource(R.string.batch_download_lyrics),
+                                            modifier = Modifier.padding(horizontal = 6.dp),
+                                        )
+                                    },
                                     onClick = {
                                         isBatchDownload = true
                                         expanded = false
                                     }
                                 )
                                 DropdownMenuItem(
-                                    text = { Text(text = "About") },
+                                    text = {
+                                        Text(
+                                            text = stringResource(id = R.string.about),
+                                            modifier = Modifier.padding(horizontal = 6.dp),
+                                        )
+                                    },
                                     onClick = {
                                         navController.navigate(ScreenAbout)
                                         expanded = false
                                     }
                                 )
+                            }
+                            val selectedProvider = rememberSaveable { mutableStateOf(viewModel.provider) }
+                            val providers = Providers.values()
+                            val context = LocalContext.current
+                            val sharedPreferences = context.getSharedPreferences(
+                                "pl.lambada.songsync_preferences",
+                                Context.MODE_PRIVATE
+                            )
+                            DropdownMenu(
+                                expanded = expandedProviders,
+                                onDismissRequest = { expandedProviders = false }
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.provider),
+                                    modifier = Modifier.padding(start = 26.dp, top = 8.dp),
+                                    fontSize = 12.sp
+                                )
+                                providers.forEach {
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                RadioButton(
+                                                    selected = selectedProvider.value == it,
+                                                    onClick = {
+                                                        selectedProvider.value = it
+                                                        viewModel.provider = it
+                                                        sharedPreferences.edit()
+                                                            .putString("provider", it.displayName)
+                                                            .apply()
+                                                        expandedProviders = false
+                                                    }
+                                                )
+                                                Text(text = it.displayName, modifier = Modifier.padding(end = 16.dp))
+                                            }
+                                        },
+                                        onClick = {
+                                            selectedProvider.value = it
+                                            viewModel.provider = it
+                                            sharedPreferences.edit()
+                                                .putString("provider", it.displayName)
+                                                .apply()
+                                            expandedProviders = false
+                                        }
+                                    )
+                                }
                             }
                         }
                     },
@@ -726,9 +829,12 @@ private fun SongItem(
                 painter = painter,
                 contentDescription = stringResource(id = R.string.album_cover),
                 modifier = Modifier
-                    .sharedElement(
-                        state = rememberSharedContentState(key = "cover$id"),
-                        animatedVisibilityScope = animatedVisibilityScope
+                    .sharedBounds(
+                        sharedContentState = rememberSharedContentState(key = "cover$id"),
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        clipInOverlayDuringTransition = sharedTransitionScope.OverlayClip(
+                            RoundedCornerShape(20f)
+                        )
                     )
                     .fillMaxHeight()
                     .aspectRatio(1f)
@@ -743,8 +849,8 @@ private fun SongItem(
                     text = songName,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.contentColorFor(bgColor),
-                    modifier = Modifier.sharedElement(
-                        state = rememberSharedContentState(key = "title$id"),
+                    modifier = Modifier.sharedBounds(
+                        sharedContentState = rememberSharedContentState(key = "title$id"),
                         animatedVisibilityScope = animatedVisibilityScope
                     )
                 )
@@ -752,8 +858,8 @@ private fun SongItem(
                     text = artists,
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.contentColorFor(bgColor),
-                    modifier = Modifier.sharedElement(
-                        state = rememberSharedContentState(key = "artist$id"),
+                    modifier = Modifier.sharedBounds(
+                        sharedContentState = rememberSharedContentState(key = "artist$id"),
                         animatedVisibilityScope = animatedVisibilityScope
                     )
                 )

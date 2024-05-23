@@ -12,7 +12,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,21 +24,17 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,7 +49,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -118,44 +112,6 @@ fun AboutScreen(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = paddingValues
         ) {
-            item {
-                AboutItem(
-                    label = stringResource(R.string.provider),
-                    modifier = Modifier.padding(horizontal = 22.dp, vertical = 16.dp)
-                ) {
-                    val selected = rememberSaveable { mutableStateOf(viewModel.provider) }
-                    Column {
-                        Text(stringResource(R.string.provider_summary))
-                        val providers = Providers.values()
-                        providers.forEach {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(
-                                    selected = selected.value == it,
-                                    onClick = {
-                                        selected.value = it
-                                        viewModel.provider = it
-                                        sharedPreferences.edit()
-                                            .putString("provider", it.displayName)
-                                            .apply()
-                                    }
-                                )
-                                Text(
-                                    text = it.displayName,
-                                    modifier = Modifier.clickable {
-                                        selected.value = it
-                                        viewModel.provider = it
-                                        sharedPreferences.edit()
-                                            .putString("provider", it.displayName)
-                                            .apply()
-                                    }
-                                )
-
-                            }
-                        }
-                    }
-                }
-            }
-
             item {
                 if (isSystemInDarkTheme()) {
                     AboutItem(label = stringResource(R.string.theme)) {

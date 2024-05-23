@@ -18,6 +18,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.CombinedModifier
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -63,12 +64,28 @@ fun SongCard(
                         painter = painter,
                         contentDescription = stringResource(R.string.album_cover),
                         modifier = Modifier
-                            .sharedElement(
-                                state = rememberSharedContentState(key = "cover$id"),
-                                animatedVisibilityScope = animatedVisibilityScope
+                            .sharedBounds(
+                                sharedContentState = rememberSharedContentState(key = "cover$id"),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                clipInOverlayDuringTransition = sharedTransitionScope.OverlayClip(
+                                    RoundedCornerShape(
+                                        topStart = 30f,
+                                        bottomStart = 30f,
+                                        topEnd = 0f,
+                                        bottomEnd = 0f
+                                    )
+                                )
                             )
                             .height(72.dp)
                             .aspectRatio(1f)
+                            .clip(
+                                RoundedCornerShape(
+                                    topStart = 30f,
+                                    bottomStart = 30f,
+                                    topEnd = 0f,
+                                    bottomEnd = 0f
+                                )
+                            )
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Column(
@@ -79,8 +96,8 @@ fun SongCard(
                             text = songName,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.sharedElement(
-                                state = rememberSharedContentState(key = "title$id"),
+                            modifier = Modifier.sharedBounds(
+                                sharedContentState = rememberSharedContentState(key = "title$id"),
                                 animatedVisibilityScope = animatedVisibilityScope
                             )
                         )
@@ -88,8 +105,8 @@ fun SongCard(
                         MarqueeText(
                             text = artists,
                             fontSize = 14.sp,
-                            modifier = Modifier.sharedElement(
-                                state = rememberSharedContentState(key = "artist$id"),
+                            modifier = Modifier.sharedBounds(
+                                sharedContentState = rememberSharedContentState(key = "artist$id"),
                                 animatedVisibilityScope = animatedVisibilityScope
                             )
                         )
