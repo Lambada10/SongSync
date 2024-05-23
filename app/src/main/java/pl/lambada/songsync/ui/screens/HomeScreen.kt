@@ -490,7 +490,12 @@ fun HomeScreenLoaded(
                                 stiffness = Spring.StiffnessLow
                             )
                         )
-                        .padding(vertical = 5.dp, horizontal = 24.dp),
+                        .padding(
+                            top = 5.dp,
+                            bottom = 5.dp,
+                            start = 22.dp,
+                            end = 4.dp
+                        ),
                 ) {
                     val focusRequester = remember { FocusRequester() }
                     var willShowIme by remember { mutableStateOf(false) }
@@ -525,7 +530,6 @@ fun HomeScreenLoaded(
                             val focusManager = LocalFocusManager.current
                             TextField(value = query,
                                 onValueChange = { query = it },
-                                label = { Text(stringResource(id = R.string.search)) },
                                 leadingIcon = {
                                     Icon(Icons.Filled.Search,
                                         contentDescription = stringResource(id = R.string.search),
@@ -543,6 +547,7 @@ fun HomeScreenLoaded(
                                             showingSearch = false
                                         })
                                 },
+                                placeholder = { Text(stringResource(id = R.string.search)) },
                                 shape = ShapeDefaults.ExtraLarge,
                                 colors = TextFieldDefaults.colors(
                                     focusedLabelColor = MaterialTheme.colorScheme.onSurface,
@@ -551,7 +556,7 @@ fun HomeScreenLoaded(
                                     disabledIndicatorColor = Color.Transparent
                                 ),
                                 modifier = Modifier
-                                    .fillMaxWidth()
+                                    .padding(end = 18.dp)
                                     .focusRequester(focusRequester)
                                     .onFocusChanged {
                                         if (it.isFocused && !showingIme) {
