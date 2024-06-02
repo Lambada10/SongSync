@@ -1,5 +1,6 @@
 package pl.lambada.songsync.data.remote.lyrics_providers.others
 
+import android.util.Log
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
@@ -8,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import pl.lambada.songsync.data.EmptyQueryException
-import pl.lambada.songsync.data.NoTrackFoundException
+import pl.lambada.songsync.data.InternalErrorException
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.lyrics_providers.others.NeteaseLyricsResponse
 import pl.lambada.songsync.domain.model.lyrics_providers.others.NeteaseResponse
@@ -66,14 +67,14 @@ class NeteaseAPI {
         }
         val responseBody = response.bodyAsText(Charsets.UTF_8)
 
-        if (responseBody == "[]" || response.status.value !in 200..299)
+        if (responseBody == "[]" || response.status.value !in 200..299 || responseBody.contains("\"songCount\":0"))
             return null
 
         val neteaseResponse: NeteaseResponse
         try {
             neteaseResponse = json.decodeFromString<NeteaseResponse>(responseBody)
         } catch (e: kotlinx.serialization.MissingFieldException) {
-            throw NoTrackFoundException()
+            throw InternalErrorException(Log.getStackTraceString(e))
         }
 
         val artists = neteaseResponse.result.songs[0].artists.joinToString(", ") { it.name }
@@ -90,7 +91,7 @@ class NeteaseAPI {
      * @param id The ID of the song from search results.
      * @return The synced lyrics as a string.
      */
-    suspend fun getSyncedLyrics(id: Int): String? {
+    suspend fun getSyncedLyrics(id: Long): String? {
         val response = client.get(
             baseURL + "song/lyric"
         ) {

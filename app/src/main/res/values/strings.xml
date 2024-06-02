@@ -115,4 +115,7 @@
     <string name="provider">Lyrics provider</string>
     <string name="provider_summary">Please select lyrics provider below</string>
     <string name="ignore">Ignore</string>
+    <string name="internal_error">Internal error: %s</string>
+    <string name="disable_marquee">Disable Marquee Text</string>
+    <string name="disable_marquee_summary">Disable moving text animation in app</string>
 </resources>

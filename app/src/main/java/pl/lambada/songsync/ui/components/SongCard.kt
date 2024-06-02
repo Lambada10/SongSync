@@ -28,11 +28,13 @@ import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import pl.lambada.songsync.R
+import pl.lambada.songsync.data.MainViewModel
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SongCard(
     id: String,
+    animateText: Boolean,
     songName: String,
     artists: String,
     coverUrl: String?,
@@ -92,19 +94,21 @@ fun SongCard(
                         modifier = Modifier.padding(12.dp),
                         verticalArrangement = Arrangement.Top
                     ) {
-                        MarqueeText(
+                        AnimatedText(
                             text = songName,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold,
+                            animate = animatedText,
                             modifier = Modifier.sharedBounds(
                                 sharedContentState = rememberSharedContentState(key = "title$id"),
                                 animatedVisibilityScope = animatedVisibilityScope
                             )
                         )
                         Spacer(modifier = Modifier.weight(1f))
-                        MarqueeText(
+                        AnimatedText(
                             text = artists,
                             fontSize = 14.sp,
+                            animate = animatedText,
                             modifier = Modifier.sharedBounds(
                                 sharedContentState = rememberSharedContentState(key = "artist$id"),
                                 animatedVisibilityScope = animatedVisibilityScope

@@ -126,6 +126,7 @@ import kotlinx.parcelize.Parcelize
 import pl.lambada.songsync.MainActivity
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.EmptyQueryException
+import pl.lambada.songsync.data.InternalErrorException
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.domain.model.Song
@@ -134,6 +135,8 @@ import pl.lambada.songsync.ui.ScreenAbout
 import pl.lambada.songsync.ui.ScreenSearch
 import pl.lambada.songsync.ui.components.MarqueeText
 import pl.lambada.songsync.util.ext.BackPressHandler
+import pl.lambada.songsync.ui.Screens
+import pl.lambada.songsync.ui.components.AnimatedText
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
 import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.FileNotFoundException
@@ -858,7 +861,8 @@ private fun SongItem(
                 modifier = Modifier.fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceAround
             ) {
-                MarqueeText(
+                AnimatedText(
+                    animate = !viewModel.disableMarquee.value,
                     text = songName,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.contentColorFor(bgColor),
@@ -867,7 +871,8 @@ private fun SongItem(
                         animatedVisibilityScope = animatedVisibilityScope
                     )
                 )
-                MarqueeText(
+                AnimatedText(
+                    animate = !viewModel.disableMarquee.value,
                     text = artists,
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.contentColorFor(bgColor),
@@ -1010,8 +1015,9 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                 text = {
                     Column {
                         Text(text = stringResource(R.string.downloading_lyrics))
-                        MarqueeText(
-                            stringResource(
+                        AnimatedText(
+                            animate = !viewModel.disableMarquee.value,
+                            text = stringResource(
                                 R.string.song,
                                 songs.getOrNull((count) % total.coerceAtLeast(1))?.title
                                     ?: unknownString,
@@ -1077,7 +1083,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                                     continue
                                 }
 
-                                is NoTrackFoundException, is EmptyQueryException -> {
+                                is NoTrackFoundException, is EmptyQueryException, is InternalErrorException -> {
                                     // not increasing notFoundInARow because that is for rate limit
                                     failedCount++
                                 }
