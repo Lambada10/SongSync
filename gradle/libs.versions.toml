@@ -2,11 +2,7 @@
 accompanist-systemuicontroller = "0.31.3-beta"
 accompanist-permissions = "0.31.5-beta"
 agp = "8.4.0"
-androidx-junit = "1.1.5"
 coil-compose = "2.1.0"
-datastore-preferences = "1.1.1"
-espresso-core = "3.5.1"
-junit = "4.13.2"
 kotlin = "1.8.10"
 core-ktx = "1.13.1"
 material3 = "1.2.1"
@@ -15,20 +11,16 @@ kotlinx-serialization-json = "1.6.3"
 lifecycle-runtime-ktx = "2.7.0"
 activity-compose = "1.9.0"
 compose-bom = "2024.05.00"
-compose-animation = "1.7.0-beta01"
+compose-animation = "1.7.0-beta02"
 material-icons-extended = "1.6.7"
-navigation-compose = "2.8.0-alpha08"
-navigation-runtime-ktx = "2.8.0-alpha08"
+navigation-compose = "2.8.0-beta02"
+navigation-runtime-ktx = "2.8.0-beta02"
 preference = "1.2.1"
 ktor = "2.3.4"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist-systemuicontroller" }
-androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore-preferences" }
-androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso-core" }
-junit = { module = "junit:junit", version.ref = "junit" }
-androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil-compose" }
@@ -40,7 +32,6 @@ activity-compose = { group = "androidx.activity", name = "activity-compose", ver
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "compose-animation" }
 ui = { group = "androidx.compose.ui", name = "ui" }
-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
