@@ -133,9 +133,7 @@ import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.ScreenAbout
 import pl.lambada.songsync.ui.ScreenSearch
-import pl.lambada.songsync.ui.components.MarqueeText
 import pl.lambada.songsync.util.ext.BackPressHandler
-import pl.lambada.songsync.ui.Screens
 import pl.lambada.songsync.ui.components.AnimatedText
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
 import pl.lambada.songsync.util.ext.toLrcFile
@@ -325,7 +323,7 @@ fun HomeScreen(
                                 )
                             }
                             val selectedProvider = rememberSaveable { mutableStateOf(viewModel.provider) }
-                            val providers = Providers.values()
+                            val providers = Providers.entries.toTypedArray()
                             val context = LocalContext.current
                             val sharedPreferences = context.getSharedPreferences(
                                 "pl.lambada.songsync_preferences",
@@ -647,6 +645,7 @@ fun HomeScreenLoaded(
                         song = song,
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = animatedVisibilityScope,
+                        viewModel = viewModel,
                     )
                 }
             }
@@ -804,6 +803,7 @@ private fun SongItem(
     song: Song,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
+    viewModel: MainViewModel,
 ) {
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current).data(data = song.imgUri).apply {

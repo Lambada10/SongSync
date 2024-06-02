@@ -179,6 +179,7 @@ fun SharedTransitionScope.SearchScreen(
                     coverUrl = coverUri,
                     sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope,
+                    animateText = !viewModel.disableMarquee.value,
                 )
             }
 
@@ -258,6 +259,7 @@ fun SharedTransitionScope.SearchScreen(
                         modifier = Modifier.clickable { result.songLink?.let { uriHandler.openUri(it) } },
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = animatedVisibilityScope,
+                        animateText = !viewModel.disableMarquee.value,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Row(

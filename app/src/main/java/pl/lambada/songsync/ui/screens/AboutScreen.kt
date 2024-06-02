@@ -6,7 +6,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -276,7 +275,7 @@ fun AboutScreen(
 
             item {
                 AboutItem(stringResource(R.string.contributors)) {
-                    Contributor.values().forEach {
+                    Contributor.entries.forEach {
                         val additionalInfo = stringResource(id = it.contributionLevel.stringResource)
                         Column(
                             modifier = Modifier

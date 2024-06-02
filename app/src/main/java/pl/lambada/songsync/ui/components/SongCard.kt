@@ -28,7 +28,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import pl.lambada.songsync.R
-import pl.lambada.songsync.data.MainViewModel
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -98,7 +97,7 @@ fun SongCard(
                             text = songName,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold,
-                            animate = animatedText,
+                            animate = animateText,
                             modifier = Modifier.sharedBounds(
                                 sharedContentState = rememberSharedContentState(key = "title$id"),
                                 animatedVisibilityScope = animatedVisibilityScope
@@ -108,7 +107,7 @@ fun SongCard(
                         AnimatedText(
                             text = artists,
                             fontSize = 14.sp,
-                            animate = animatedText,
+                            animate = animateText,
                             modifier = Modifier.sharedBounds(
                                 sharedContentState = rememberSharedContentState(key = "artist$id"),
                                 animatedVisibilityScope = animatedVisibilityScope
