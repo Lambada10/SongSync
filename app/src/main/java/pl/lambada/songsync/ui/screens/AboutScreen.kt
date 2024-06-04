@@ -115,14 +115,20 @@ fun AboutScreen(
             item {
                 if (isSystemInDarkTheme()) {
                     AboutItem(label = stringResource(R.string.theme)) {
+                        val pureBlack = viewModel.pureBlack
+                        var selected by remember { mutableStateOf(pureBlack.value) }
                         Row(
-                            modifier = Modifier.padding(horizontal = 22.dp, vertical = 16.dp),
+                            modifier = Modifier
+                                .clickable {
+                                    viewModel.pureBlack.value = !selected
+                                    sharedPreferences.edit().putBoolean("pure_black", !selected).apply()
+                                    selected = !selected
+                                }
+                                .padding(horizontal = 22.dp, vertical = 16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(stringResource(R.string.pure_black_theme))
                             Spacer(modifier = Modifier.weight(1f))
-                            val pureBlack = viewModel.pureBlack
-                            var selected by remember { mutableStateOf(pureBlack.value) }
                             Switch(
                                 checked = selected,
                                 onCheckedChange = {
@@ -132,6 +138,34 @@ fun AboutScreen(
                                 }
                             )
                         }
+                    }
+                }
+            }
+
+            item {
+                AboutItem(label = stringResource(R.string.disable_marquee)) {
+                    val disableMarquee = viewModel.disableMarquee
+                    var selected by remember { mutableStateOf(disableMarquee.value) }
+                    Row(
+                        modifier = Modifier
+                            .clickable {
+                                viewModel.disableMarquee.value = !selected
+                                sharedPreferences.edit().putBoolean("marquee_disable", !selected).apply()
+                                selected = !selected
+                            }
+                            .padding(horizontal = 22.dp, vertical = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(stringResource(R.string.disable_marquee_summary))
+                        Spacer(modifier = Modifier.weight(1f))
+                        Switch(
+                            checked = selected,
+                            onCheckedChange = {
+                                viewModel.disableMarquee.value = it
+                                selected = it
+                                sharedPreferences.edit().putBoolean("marquee_disable", it).apply()
+                            }
+                        )
                     }
                 }
             }

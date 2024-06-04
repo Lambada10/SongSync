@@ -97,6 +97,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -687,28 +688,47 @@ fun FiltersDialog(
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(20f))
+                        .clickable {
+                            viewModel.hideLyrics = !hideLyrics
+                            sharedPreferences.edit().putBoolean("hide_lyrics", !hideLyrics).apply()
+                            hideLyrics = !hideLyrics
+                            onFilterChange()
+                        }
+                        .padding(8.dp)
+                    ,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row(modifier = Modifier.weight(0.8f)) {
                         Text(stringResource(R.string.no_lyrics_only))
                     }
-                    Switch(checked = hideLyrics, onCheckedChange = {
-                        hideLyrics = it
-                        viewModel.hideLyrics = it
-                        sharedPreferences.edit().putBoolean("hide_lyrics", it).apply()
-                        onFilterChange()
-                    })
+                    Switch(
+                        checked = hideLyrics,
+                        onCheckedChange = {
+                            hideLyrics = it
+                            viewModel.hideLyrics = it
+                            sharedPreferences.edit().putBoolean("hide_lyrics", it).apply()
+                            onFilterChange()
+                        }
+                    )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .clip(RoundedCornerShape(100))
+                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                        .clickable { showFolders = true }
+                        .padding(start = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Row(modifier = Modifier.weight(0.8f)) {
+                    Row(
+                        modifier = Modifier.weight(0.8f)
+                    ) {
                         Text(stringResource(R.string.ignore_folders))
                     }
-                    IconButton(onClick = {
-                        showFolders = true
-                    }) {
+                    IconButton(onClick = { showFolders = true }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                             contentDescription = null,
@@ -754,17 +774,11 @@ fun FiltersDialog(
                             }
 
                             Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Row(modifier = Modifier.weight(0.8f)) {
-                                    Text(folder)
-                                }
-                                Checkbox(checked = checked, onCheckedChange = { check ->
-                                    if (check) {
-                                        checked = true
+                                modifier = Modifier.clickable {
+                                    checked = !checked
+                                    if (checked) {
                                         viewModel.blacklistedFolders.add(folder)
                                     } else {
-                                        checked = false
                                         viewModel.blacklistedFolders.remove(folder)
                                     }
                                     sharedPreferences.edit().putString(
@@ -772,7 +786,28 @@ fun FiltersDialog(
                                         viewModel.blacklistedFolders.joinToString(",")
                                     ).apply()
                                     onFilterChange()
-                                })
+                                },
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Row(modifier = Modifier.weight(0.8f)) {
+                                    Text(folder)
+                                }
+                                Checkbox(
+                                    checked = checked,
+                                    onCheckedChange = { check ->
+                                        checked = check
+                                        if (check) {
+                                            viewModel.blacklistedFolders.add(folder)
+                                        } else {
+                                            viewModel.blacklistedFolders.remove(folder)
+                                        }
+                                        sharedPreferences.edit().putString(
+                                            "blacklist",
+                                            viewModel.blacklistedFolders.joinToString(",")
+                                        ).apply()
+                                        onFilterChange()
+                                    }
+                                )
                             }
                             Spacer(modifier = Modifier.height(16.dp))
                         }
