@@ -243,6 +243,7 @@ fun SharedTransitionScope.SearchScreen(
 
                 QueryStatus.Success -> {
                     val result = queryResult!!
+                    Spacer(modifier = Modifier.height(8.dp))
                     Row {
                         Icon(
                             imageVector = Icons.Filled.Cloud,
