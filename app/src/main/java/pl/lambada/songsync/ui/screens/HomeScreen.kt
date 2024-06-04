@@ -68,6 +68,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -79,6 +80,7 @@ import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
@@ -97,7 +99,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -683,8 +684,8 @@ fun FiltersDialog(
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = stringResource(R.string.filters),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(top = 6.dp, start = 6.dp)
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(
@@ -692,7 +693,10 @@ fun FiltersDialog(
                         .clip(RoundedCornerShape(20f))
                         .clickable {
                             viewModel.hideLyrics = !hideLyrics
-                            sharedPreferences.edit().putBoolean("hide_lyrics", !hideLyrics).apply()
+                            sharedPreferences
+                                .edit()
+                                .putBoolean("hide_lyrics", !hideLyrics)
+                                .apply()
                             hideLyrics = !hideLyrics
                             onFilterChange()
                         }
@@ -738,7 +742,9 @@ fun FiltersDialog(
                 Spacer(modifier = Modifier.height(16.dp))
                 Row {
                     Spacer(modifier = Modifier.weight(1f))
-                    Button(onClick = { onDismiss() }) {
+                    TextButton(
+                        onClick = { onDismiss() }
+                    ) {
                         Text(stringResource(R.string.close))
                     }
                 }
@@ -755,42 +761,46 @@ fun FiltersDialog(
                 shape = MaterialTheme.shapes.large,
                 tonalElevation = AlertDialogDefaults.TonalElevation
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column {
                     Text(
                         text = stringResource(R.string.ignore_folders),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(start = 22.dp, top = 22.dp, bottom = 16.dp)
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
+                    HorizontalDivider()
                     LazyColumn {
                         items(folders.size) {
                             val folder = folders[it]
                             var checked by remember {
-                                mutableStateOf(
-                                    viewModel.blacklistedFolders.contains(
-                                        folder
-                                    )
-                                )
+                                mutableStateOf(viewModel.blacklistedFolders.contains(folder))
                             }
 
                             Row(
-                                modifier = Modifier.clickable {
-                                    checked = !checked
-                                    if (checked) {
-                                        viewModel.blacklistedFolders.add(folder)
-                                    } else {
-                                        viewModel.blacklistedFolders.remove(folder)
+                                modifier = Modifier
+                                    .clickable {
+                                        checked = !checked
+                                        if (checked) {
+                                            viewModel.blacklistedFolders.add(folder)
+                                        } else {
+                                            viewModel.blacklistedFolders.remove(folder)
+                                        }
+                                        sharedPreferences
+                                            .edit()
+                                            .putString(
+                                                "blacklist",
+                                                viewModel.blacklistedFolders.joinToString(",")
+                                            )
+                                            .apply()
+                                        onFilterChange()
                                     }
-                                    sharedPreferences.edit().putString(
-                                        "blacklist",
-                                        viewModel.blacklistedFolders.joinToString(",")
-                                    ).apply()
-                                    onFilterChange()
-                                },
+                                    .padding(start = 16.dp, end = 8.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Row(modifier = Modifier.weight(0.8f)) {
-                                    Text(folder)
+                                    Text(
+                                        text = folder,
+                                        modifier = Modifier.padding(vertical = 16.dp)
+                                    )
                                 }
                                 Checkbox(
                                     checked = checked,
@@ -809,13 +819,14 @@ fun FiltersDialog(
                                     }
                                 )
                             }
-                            Spacer(modifier = Modifier.height(16.dp))
                         }
                         item {
-                            Row {
+                            HorizontalDivider()
+                            Row(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
                                 Spacer(modifier = Modifier.weight(1f))
-
-                                Button(onClick = { showFolders = false }) {
+                                TextButton(onClick = { showFolders = false }) {
                                     Text(stringResource(R.string.close))
                                 }
                             }
