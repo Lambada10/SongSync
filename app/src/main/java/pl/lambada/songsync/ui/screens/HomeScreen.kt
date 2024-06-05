@@ -54,10 +54,11 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Deselect
-import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SelectAll
+import androidx.compose.material.icons.outlined.FilterAlt
+import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
@@ -78,7 +79,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -137,6 +137,7 @@ import pl.lambada.songsync.ui.ScreenAbout
 import pl.lambada.songsync.ui.ScreenSearch
 import pl.lambada.songsync.util.ext.BackPressHandler
 import pl.lambada.songsync.ui.components.AnimatedText
+import pl.lambada.songsync.ui.components.SwitchItem
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
 import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.FileNotFoundException
@@ -194,13 +195,13 @@ fun HomeScreen(
                                 label = ""
                             ) { size ->
                                 Text(
-                                    modifier = Modifier.padding(start = 8.dp),
+                                    modifier = Modifier.padding(start = 6.dp),
                                     text = stringResource(id = R.string.selected_count, size)
                                 )
                             }
                         } else {
                             Text(
-                                modifier = Modifier.padding(start = 8.dp),
+                                modifier = Modifier.padding(start = 6.dp),
                                 text = stringResource(R.string.app_name)
                             )
                         }
@@ -337,13 +338,19 @@ fun HomeScreen(
                             ) {
                                 Text(
                                     text = stringResource(id = R.string.provider),
-                                    modifier = Modifier.padding(start = 26.dp, top = 8.dp),
+                                    modifier = Modifier.padding(start = 18.dp, top = 8.dp),
                                     fontSize = 12.sp
                                 )
                                 providers.forEach {
                                     DropdownMenuItem(
                                         text = {
                                             Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text(
+                                                    text = it.displayName,
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .padding(start = 6.dp)
+                                                )
                                                 RadioButton(
                                                     selected = selectedProvider.value == it,
                                                     onClick = {
@@ -355,7 +362,6 @@ fun HomeScreen(
                                                         expandedProviders = false
                                                     }
                                                 )
-                                                Text(text = it.displayName, modifier = Modifier.padding(end = 16.dp))
                                             }
                                         },
                                         onClick = {
@@ -542,13 +548,15 @@ fun HomeScreenLoaded(
                                         })
                                 },
                                 trailingIcon = {
-                                    Icon(Icons.Default.Clear,
+                                    Icon(
+                                        imageVector = Icons.Default.Clear,
                                         contentDescription = stringResource(id = R.string.clear),
                                         modifier = Modifier.clickable {
                                             query = TextFieldValue("")
                                             showSearch = false
                                             showingSearch = false
-                                        })
+                                        }
+                                    )
                                 },
                                 placeholder = { Text(stringResource(id = R.string.search)) },
                                 shape = ShapeDefaults.ExtraLarge,
@@ -584,11 +592,9 @@ fun HomeScreenLoaded(
                             ) {
                                 Text(text = "${displaySongs.size} songs")
                                 Spacer(modifier = Modifier.weight(1f))
-                                IconButton(onClick = {
-                                    showFilters = true
-                                }) {
+                                IconButton(onClick = { showFilters = true }) {
                                     Icon(
-                                        imageVector = Icons.Default.FilterAlt,
+                                        imageVector = Icons.Outlined.FilterAlt,
                                         contentDescription = stringResource(R.string.search),
                                     )
                                 }
@@ -681,55 +687,44 @@ fun FiltersDialog(
             shape = MaterialTheme.shapes.large,
             tonalElevation = AlertDialogDefaults.TonalElevation
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column {
                 Text(
                     text = stringResource(R.string.filters),
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(top = 6.dp, start = 6.dp)
+                    modifier = Modifier.padding(top = 24.dp, start = 24.dp, bottom = 16.dp)
                 )
-                Spacer(modifier = Modifier.height(24.dp))
-                Row(
+                SwitchItem(
+                    label = stringResource(R.string.no_lyrics_only),
+                    selected = hideLyrics,
                     modifier = Modifier
-                        .clip(RoundedCornerShape(20f))
-                        .clickable {
-                            viewModel.hideLyrics = !hideLyrics
-                            sharedPreferences
-                                .edit()
-                                .putBoolean("hide_lyrics", !hideLyrics)
-                                .apply()
-                            hideLyrics = !hideLyrics
-                            onFilterChange()
-                        }
-                        .padding(8.dp)
-                    ,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Row(modifier = Modifier.weight(0.8f)) {
-                        Text(stringResource(R.string.no_lyrics_only))
-                    }
-                    Switch(
-                        checked = hideLyrics,
-                        onCheckedChange = {
-                            hideLyrics = it
-                            viewModel.hideLyrics = it
-                            sharedPreferences.edit().putBoolean("hide_lyrics", it).apply()
-                            onFilterChange()
-                        }
+                        .padding(horizontal = 16.dp)
+                        .clip(RoundedCornerShape(20f)),
+                    innerPaddingValues = PaddingValues(
+                        top = 8.dp,
+                        start = 8.dp,
+                        end = 10.dp,
+                        bottom = 8.dp
                     )
+                ) {
+                    viewModel.hideLyrics = !hideLyrics
+                    sharedPreferences
+                        .edit()
+                        .putBoolean("hide_lyrics", !hideLyrics)
+                        .apply()
+                    hideLyrics = !hideLyrics
+                    onFilterChange()
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
+                        .padding(start = 24.dp, end = 26.dp)
                         .clip(RoundedCornerShape(100))
                         .background(MaterialTheme.colorScheme.secondaryContainer)
                         .clickable { showFolders = true }
-                        .padding(start = 12.dp),
+                        .padding(start = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Row(
-                        modifier = Modifier.weight(0.8f)
-                    ) {
+                    Row(modifier = Modifier.weight(1f)) {
                         Text(stringResource(R.string.ignore_folders))
                     }
                     IconButton(onClick = { showFolders = true }) {
@@ -739,8 +734,7 @@ fun FiltersDialog(
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-                Row {
+                Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                     Spacer(modifier = Modifier.weight(1f))
                     TextButton(
                         onClick = { onDismiss() }
@@ -793,15 +787,17 @@ fun FiltersDialog(
                                             .apply()
                                         onFilterChange()
                                     }
-                                    .padding(start = 16.dp, end = 8.dp),
+                                    .padding(start = 22.dp, end = 16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Row(modifier = Modifier.weight(0.8f)) {
-                                    Text(
-                                        text = folder,
-                                        modifier = Modifier.padding(vertical = 16.dp)
-                                    )
-                                }
+                                Icon(imageVector = Icons.Outlined.Folder, contentDescription = "Folder icon")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = folder.removePrefix("/storage/emulated/0/"),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(vertical = 16.dp)
+                                )
                                 Checkbox(
                                     checked = checked,
                                     onCheckedChange = { check ->
@@ -822,9 +818,7 @@ fun FiltersDialog(
                         }
                         item {
                             HorizontalDivider()
-                            Row(
-                                modifier = Modifier.padding(16.dp)
-                            ) {
+                            Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                                 Spacer(modifier = Modifier.weight(1f))
                                 TextButton(onClick = { showFolders = false }) {
                                     Text(stringResource(R.string.close))

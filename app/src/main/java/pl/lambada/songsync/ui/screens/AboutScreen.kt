@@ -33,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -58,6 +57,7 @@ import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.domain.model.Release
 import pl.lambada.songsync.ui.components.AboutItem
+import pl.lambada.songsync.ui.components.SwitchItem
 import pl.lambada.songsync.util.ext.getVersion
 
 /**
@@ -100,7 +100,7 @@ fun AboutScreen(
                 },
                 title = {
                     Text(
-                        modifier = Modifier.padding(start = 8.dp),
+                        modifier = Modifier.padding(start = 6.dp),
                         text = stringResource(id = R.string.about)
                     )
                 },
@@ -117,26 +117,16 @@ fun AboutScreen(
                     AboutItem(label = stringResource(R.string.theme)) {
                         val pureBlack = viewModel.pureBlack
                         var selected by remember { mutableStateOf(pureBlack.value) }
-                        Row(
-                            modifier = Modifier
-                                .clickable {
-                                    viewModel.pureBlack.value = !selected
-                                    sharedPreferences.edit().putBoolean("pure_black", !selected).apply()
-                                    selected = !selected
-                                }
-                                .padding(horizontal = 22.dp, vertical = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                        SwitchItem(
+                            label = stringResource(R.string.pure_black_theme),
+                            selected = selected
                         ) {
-                            Text(stringResource(R.string.pure_black_theme))
-                            Spacer(modifier = Modifier.weight(1f))
-                            Switch(
-                                checked = selected,
-                                onCheckedChange = {
-                                    viewModel.pureBlack.value = it
-                                    selected = it
-                                    sharedPreferences.edit().putBoolean("pure_black", it).apply()
-                                }
-                            )
+                            viewModel.pureBlack.value = !selected
+                            sharedPreferences
+                                .edit()
+                                .putBoolean("pure_black", !selected)
+                                .apply()
+                            selected = !selected
                         }
                     }
                 }
@@ -146,26 +136,16 @@ fun AboutScreen(
                 AboutItem(label = stringResource(R.string.disable_marquee)) {
                     val disableMarquee = viewModel.disableMarquee
                     var selected by remember { mutableStateOf(disableMarquee.value) }
-                    Row(
-                        modifier = Modifier
-                            .clickable {
-                                viewModel.disableMarquee.value = !selected
-                                sharedPreferences.edit().putBoolean("marquee_disable", !selected).apply()
-                                selected = !selected
-                            }
-                            .padding(horizontal = 22.dp, vertical = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    SwitchItem(
+                        label = stringResource(R.string.disable_marquee_summary),
+                        selected = selected
                     ) {
-                        Text(stringResource(R.string.disable_marquee_summary))
-                        Spacer(modifier = Modifier.weight(1f))
-                        Switch(
-                            checked = selected,
-                            onCheckedChange = {
-                                viewModel.disableMarquee.value = it
-                                selected = it
-                                sharedPreferences.edit().putBoolean("marquee_disable", it).apply()
-                            }
-                        )
+                        viewModel.disableMarquee.value = !selected
+                        sharedPreferences
+                            .edit()
+                            .putBoolean("marquee_disable", !selected)
+                            .apply()
+                        selected = !selected
                     }
                 }
             }

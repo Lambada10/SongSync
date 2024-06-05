@@ -122,7 +122,7 @@ fun SharedTransitionScope.SearchScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.search),
-                        modifier = Modifier.padding(start = 8.dp),
+                        modifier = Modifier.padding(start = 6.dp),
                     )
                 },
                 scrollBehavior = scrollBehavior
@@ -134,7 +134,7 @@ fun SharedTransitionScope.SearchScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 22.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -172,6 +172,7 @@ fun SharedTransitionScope.SearchScreen(
                     )
                     Text(stringResource(R.string.local_song))
                 }
+                Spacer(modifier = Modifier.height(6.dp))
                 SongCard(
                     id = id,
                     songName = songName!!,
@@ -191,20 +192,16 @@ fun SharedTransitionScope.SearchScreen(
                         onValueChange = { querySong = it.toString() },
                         label = stringResource(id = R.string.song_name_no_args),
                         imeAction = ImeAction.Next,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
+                        modifier = Modifier.fillMaxWidth()
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     CommonTextField(
                         value = queryArtist,
                         onValueChange = { queryArtist = it.toString() },
                         label = stringResource(R.string.artist_name_no_args),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
+                        modifier = Modifier.fillMaxWidth()
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = {
                         queryResult = SongInfo(
                             songName = querySong,
@@ -243,7 +240,7 @@ fun SharedTransitionScope.SearchScreen(
 
                 QueryStatus.Success -> {
                     val result = queryResult!!
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row {
                         Icon(
                             imageVector = Icons.Filled.Cloud,
@@ -252,6 +249,7 @@ fun SharedTransitionScope.SearchScreen(
                         )
                         Text(stringResource(R.string.cloud_song))
                     }
+                    Spacer(modifier = Modifier.height(6.dp))
                     SongCard(
                         id = "",
                         songName = result.songName ?: stringResource(id = R.string.unknown),
@@ -262,11 +260,9 @@ fun SharedTransitionScope.SearchScreen(
                         animatedVisibilityScope = animatedVisibilityScope,
                         animateText = !viewModel.disableMarquee.value,
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -278,13 +274,13 @@ fun SharedTransitionScope.SearchScreen(
                                     songName = querySong, artistName = queryArtist
                                 )
                                 queryStatus = QueryStatus.Pending
-                            }) {
+                            }
+                        ) {
                             Text(text = stringResource(id = R.string.try_again))
                         }
                         OutlinedButton(
-                            onClick = {
-                                queryStatus = QueryStatus.NotSubmitted
-                            }) {
+                            onClick = { queryStatus = QueryStatus.NotSubmitted }
+                        ) {
                             Text(text = stringResource(id = R.string.edit))
                         }
                     }
@@ -326,10 +322,9 @@ fun SharedTransitionScope.SearchScreen(
                             val isInternalStorage = filePath?.contains("/storage/emulated/0/")
                                 ?: true // true because it's not a local song
 
+                            Spacer(modifier = Modifier.height(8.dp))
                             Row(
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -411,11 +406,9 @@ fun SharedTransitionScope.SearchScreen(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(6.dp))
                             OutlinedCard(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
+                                modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(10.dp)
                             ) {
                                 SelectionContainer {

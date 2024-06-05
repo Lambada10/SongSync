@@ -44,9 +44,7 @@ fun SharedTransitionScope.SongCard(
     OutlinedCard(
         shape = RoundedCornerShape(10.dp),
         modifier = CombinedModifier(
-            outer = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
+            outer = Modifier.fillMaxWidth(),
             inner = modifier
         )
     ) {
