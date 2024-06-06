@@ -12,14 +12,13 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -36,7 +35,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -52,26 +54,33 @@ import pl.lambada.songsync.ui.components.dialogs.NoInternetDialog
 import pl.lambada.songsync.ui.screens.LoadingScreen
 import pl.lambada.songsync.ui.screens.Providers
 import pl.lambada.songsync.ui.theme.SongSyncTheme
+import pl.lambada.songsync.util.dataStore
+import pl.lambada.songsync.util.get
 import java.io.File
 
 /**
  * The main activity of the SongSync app.
  */
 class MainActivity : ComponentActivity() {
-
+    val viewModel: MainViewModel by viewModels()
     /**
      * Called when the activity is starting.
      *
      * @param savedInstanceState The saved instance state.
      */
     @SuppressLint("SuspiciousIndentation")
-    @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { view, insets ->
+            view.setPadding(0, 0, 0, 0)
+            insets
+        }
+        val dataStore = this.dataStore
         setContent {
             val context = LocalContext.current
             val scope = rememberCoroutineScope()
-            val viewModel: MainViewModel by viewModels()
             val navController = rememberNavController()
             var hasLoadedPermissions by remember { mutableStateOf(false) }
             var hasPermissions by remember { mutableStateOf(false) }
@@ -79,34 +88,28 @@ class MainActivity : ComponentActivity() {
             var themeDefined by remember { mutableStateOf(false) }
 
             LaunchedEffect(Unit) {
-                // Load user-defined settings
-                val sharedPreferences = context.getSharedPreferences(
-                    "pl.lambada.songsync_preferences",
-                    Context.MODE_PRIVATE
-                )
-
-                val disableMarquee = sharedPreferences.getBoolean("marquee_disable", false)
+                val disableMarquee = dataStore.get(booleanPreferencesKey("marquee_disable"), false)
                 viewModel.disableMarquee.value = disableMarquee
 
-                val pureBlack = sharedPreferences.getBoolean("pure_black", false)
+                val pureBlack = dataStore.get(booleanPreferencesKey("pure_black"), false)
                 viewModel.pureBlack.value = pureBlack
                 themeDefined = true
 
-                val sdCardPath = sharedPreferences.getString("sd_card_path", null)
+                val sdCardPath = dataStore.get(stringPreferencesKey("sd_card_path"), null)
                 if (sdCardPath != null) {
                     viewModel.sdCardPath = sdCardPath
                 }
 
-                val blacklist = sharedPreferences.getString("blacklist", null)
+                val blacklist = dataStore.get(stringPreferencesKey("blacklist"), null)
                 if (blacklist != null) {
                     viewModel.blacklistedFolders = blacklist.split(",").toMutableList()
                 }
-                val hideLyrics = sharedPreferences.getBoolean("hide_lyrics", false)
+
+                val hideLyrics = dataStore.get(booleanPreferencesKey("hide_lyrics"), false)
                 viewModel.hideLyrics = hideLyrics
 
-                val provider =
-                    sharedPreferences.getString("provider", Providers.SPOTIFY.displayName)
-                viewModel.provider = Providers.values().find { it.displayName == provider }!!
+                val provider = dataStore.get(stringPreferencesKey("provider"), Providers.SPOTIFY.displayName)
+                viewModel.provider = Providers.entries.find { it.displayName == provider }!!
 
                 // Get token upon app start
                 launch(Dispatchers.IO) {
@@ -125,20 +128,7 @@ class MainActivity : ComponentActivity() {
                     songSyncDir.mkdir()
                 }
 
-                // Register notification channel
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val notificationManager =
-                        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-                    val channelId = getString(R.string.batch_download_lyrics)
-                    val channelName = getString(R.string.batch_download_lyrics)
-                    val channelDescription = getString(R.string.batch_download_lyrics)
-                    val importance = NotificationManager.IMPORTANCE_LOW
-                    val channel = NotificationChannel(channelId, channelName, importance)
-                    channel.description = channelDescription
-
-                    notificationManager.createNotificationChannel(channel)
-                }
+                createNotificationChannel()
             }
 
             if (themeDefined)
@@ -213,6 +203,22 @@ class MainActivity : ComponentActivity() {
         notificationManager.cancel(2) // "Done" notification
         super.onResume()
     }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            val channelId = getString(R.string.batch_download_lyrics)
+            val channelName = getString(R.string.batch_download_lyrics)
+            val channelDescription = getString(R.string.batch_download_lyrics)
+            val importance = NotificationManager.IMPORTANCE_LOW
+            val channel = NotificationChannel(channelId, channelName, importance)
+            channel.description = channelDescription
+
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -220,8 +226,7 @@ class MainActivity : ComponentActivity() {
 fun RequestPermissions(onGranted: () -> Unit, context: Context, onDone: () -> Unit) {
     var storageManager: ActivityResultLauncher<Intent>? = null
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        storageManager =
-            rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        storageManager = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 if (Environment.isExternalStorageManager()) {
                     onGranted()
                 }

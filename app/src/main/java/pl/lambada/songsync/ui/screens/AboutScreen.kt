@@ -40,6 +40,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,6 +51,9 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -58,6 +62,7 @@ import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.domain.model.Release
 import pl.lambada.songsync.ui.components.AboutItem
 import pl.lambada.songsync.ui.components.SwitchItem
+import pl.lambada.songsync.util.dataStore
 import pl.lambada.songsync.util.ext.getVersion
 
 /**
@@ -72,11 +77,9 @@ fun AboutScreen(
     val uriHandler = LocalUriHandler.current
     val version = LocalContext.current.getVersion()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
-    val sharedPreferences = context.getSharedPreferences(
-        "pl.lambada.songsync_preferences",
-        Context.MODE_PRIVATE
-    )
+    val dataStore = context.dataStore
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
@@ -122,10 +125,11 @@ fun AboutScreen(
                             selected = selected
                         ) {
                             viewModel.pureBlack.value = !selected
-                            sharedPreferences
-                                .edit()
-                                .putBoolean("pure_black", !selected)
-                                .apply()
+                            scope.launch {
+                                dataStore.edit {
+                                    it[booleanPreferencesKey("pure_black")] = !selected
+                                }
+                            }
                             selected = !selected
                         }
                     }
@@ -141,10 +145,11 @@ fun AboutScreen(
                         selected = selected
                     ) {
                         viewModel.disableMarquee.value = !selected
-                        sharedPreferences
-                            .edit()
-                            .putBoolean("marquee_disable", !selected)
-                            .apply()
+                        scope.launch {
+                            dataStore.edit {
+                                it[booleanPreferencesKey("marquee_disable")] = !selected
+                            }
+                        }
                         selected = !selected
                     }
                 }
@@ -181,7 +186,11 @@ fun AboutScreen(
                                 onClick = {
                                     sdPath = ""
                                     viewModel.sdCardPath = ""
-                                    sharedPreferences.edit().remove("sd_card_path").apply()
+                                    scope.launch(Dispatchers.IO) {
+                                        dataStore.edit {
+                                            it.remove(booleanPreferencesKey("sd_card_path"))
+                                        }
+                                    }
                                 }
                             ) {
                                 Text(stringResource(R.string.clear_sd_card_path))
@@ -201,9 +210,11 @@ fun AboutScreen(
                                     }
                                     sdPath = it.toString()
                                     viewModel.sdCardPath = it.toString()
-                                    sharedPreferences.edit()
-                                        .putString("sd_card_path", it.toString())
-                                        .apply()
+                                    scope.launch {
+                                        dataStore.edit {
+                                            it[stringPreferencesKey("sd_card_path")] = it.toString()
+                                        }
+                                    }
                                     picker = false
                                 }
                             LaunchedEffect(Unit) {

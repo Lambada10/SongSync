@@ -80,8 +80,6 @@ dependencies {
     implementation(libs.ui)
     implementation(libs.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
-    debugImplementation(libs.ui.tooling)
-    debugImplementation(libs.ui.tooling.preview)
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.navigation.compose)
@@ -93,4 +91,7 @@ dependencies {
     implementation(libs.androidx.preference)
     implementation(libs.ktor.core)
     implementation(libs.ktor.cio)
+    implementation(libs.datastore.preferences)
+    debugImplementation(libs.ui.tooling)
+    debugImplementation(libs.ui.tooling.preview)
 }
