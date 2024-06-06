@@ -54,7 +54,6 @@
     <string name="check_your_connection">Please check your connection and try again.</string>
     <string name="if_connected_spotify_down">If you are connected, Spotify might be down. Please try again later.</string>
     <string name="home">Home</string>
-    <string name="browse">Browse</string>
     <string name="about">About</string>
     <string name="song_name_no_args">Song name</string>
     <string name="artist_name_no_args">Artist name</string>
@@ -106,8 +105,8 @@
     <string name="set_sd_path">Set the path to your SD card here. This is required for Android 10 and below.</string>
     <string name="no_sd_card_path_set">No SD card path set!</string>
     <string name="sd_card_path_set_successfully">SD card path set successfully!</string>
-    <string name="clear_sd_card_path">Clear SD Card path</string>
-    <string name="set_sd_card_path">Set SD Card path</string>
+    <string name="clear_sd_card_path">Clear</string>
+    <string name="set_sd_card_path">Set</string>
     <string name="set_sd_path_warn">You are using an older version of Android. Make sure that you have set the SD card path in the settings. If you have not, please cancel this dialog and set it.</string>
     <string name="thanks_to">Thanks to</string>
     <string name="syncedlyrics_py">Syncedlyrics (for Netease headers and LrcLib)</string>

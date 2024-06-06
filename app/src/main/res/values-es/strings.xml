@@ -55,7 +55,6 @@
     <string name="check_your_connection">Por favor, verifica tu conexión e inténtalo de nuevo.</string>
     <string name="if_connected_spotify_down">Si estás conectado, Spotify podría estar caído. Por favor, inténtalo de nuevo más tarde.</string>
     <string name="home">Inicio</string>
-    <string name="browse">Explorar</string>
     <string name="about">Acerca de</string>
     <string name="song_name_no_args">Nombre de la canción</string>
     <string name="artist_name_no_args">Nombre del artista</string>
@@ -103,7 +102,7 @@
     <string name="set_sd_path">Establece aquí la ruta de tu tarjeta SD. Esto es necesario para Android 10 y versiones anteriores.</string>
     <string name="no_sd_card_path_set">¡No se ha establecido la ruta de la tarjeta SD!</string>
     <string name="sd_card_path_set_successfully">¡Ruta de la tarjeta SD establecida con éxito!</string>
-    <string name="clear_sd_card_path">Borrar ruta de la tarjeta SD</string>
-    <string name="set_sd_card_path">Establecer ruta de la tarjeta SD</string>
+    <string name="clear_sd_card_path">Borrar</string>
+    <string name="set_sd_card_path">Establecer</string>
     <string name="set_sd_path_warn">Estás usando una versión anterior de Android. Asegúrate de haber establecido la ruta de la tarjeta SD en la configuración. Si no lo has hecho, por favor cancela este diálogo y hazlo.</string>
 </resources>

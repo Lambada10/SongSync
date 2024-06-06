@@ -1,5 +1,8 @@
 package pl.lambada.songsync.ui.components
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +18,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.CombinedModifier
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,22 +28,23 @@ import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import pl.lambada.songsync.R
-import pl.lambada.songsync.data.MainViewModel
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SongCard(
+fun SharedTransitionScope.SongCard(
+    id: String,
     animateText: Boolean,
-    modifier: Modifier = Modifier,
     songName: String,
     artists: String,
     coverUrl: String?,
+    modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     OutlinedCard(
         shape = RoundedCornerShape(10.dp),
         modifier = CombinedModifier(
-            outer = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
+            outer = Modifier.fillMaxWidth(),
             inner = modifier
         )
     ) {
@@ -57,8 +62,28 @@ fun SongCard(
                     painter = painter,
                     contentDescription = stringResource(R.string.album_cover),
                     modifier = Modifier
+                        .sharedBounds(
+                            sharedContentState = rememberSharedContentState(key = "cover$id"),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            clipInOverlayDuringTransition = sharedTransitionScope.OverlayClip(
+                                RoundedCornerShape(
+                                    topStart = 30f,
+                                    bottomStart = 30f,
+                                    topEnd = 0f,
+                                    bottomEnd = 0f
+                                )
+                            )
+                        )
                         .height(72.dp)
-                        .aspectRatio(1f),
+                        .aspectRatio(1f)
+                        .clip(
+                            RoundedCornerShape(
+                                topStart = 30f,
+                                bottomStart = 30f,
+                                topEnd = 0f,
+                                bottomEnd = 0f
+                            )
+                        )
                 )
             }
             Spacer(modifier = Modifier.width(2.dp))
@@ -66,9 +91,26 @@ fun SongCard(
                 modifier = Modifier.padding(12.dp),
                 verticalArrangement = Arrangement.Top
             ) {
-                AnimatedText(animate = animateText, text = songName, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                AnimatedText(
+                    text = songName,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    animate = animateText,
+                    modifier = Modifier.sharedBounds(
+                        sharedContentState = rememberSharedContentState(key = "title$id"),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                )
                 Spacer(modifier = Modifier.weight(1f))
-                AnimatedText(animate = animateText, text = artists, fontSize = 14.sp)
+                AnimatedText(
+                    text = artists,
+                    fontSize = 14.sp,
+                    animate = animateText,
+                    modifier = Modifier.sharedBounds(
+                        sharedContentState = rememberSharedContentState(key = "artist$id"),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                )
             }
         }
     }

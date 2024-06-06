@@ -27,7 +27,6 @@ import java.net.UnknownHostException
  */
 class MainViewModel : ViewModel() {
     private var cachedSongs: List<Song>? = null
-    var nextSong: Song? = null // for fullscreen downloader dialog
 
     // Filter settings
     private var cachedFolders: MutableList<String>? = null

@@ -41,7 +41,6 @@
     <string name="you_need_internet_connection">تحتاج إلى اتصال بالإنترنت لاستخدام هذا التطبيق.</string>
     <string name="if_connected_spotify_down">إذا كنت متصلا ، فقد يكون Spotify معطلا. يرجى إعادة المحاولة لاحقا.</string>
     <string name="home">الرئيسية</string>
-    <string name="browse">تصفح</string>
     <string name="about">حول</string>
     <string name="song_name_no_args">اسم الاغنية</string>
     <string name="artist_name_no_args">اسم الفنان</string>
@@ -84,11 +83,11 @@
     <string name="set_sd_path">اضبط المسار إلى بطاقة SD الخاصة بك هنا. هذا مطلوب لنظام التشغيل Android 10 والإصدارات الأقدم.</string>
     <string name="no_sd_card_path_set">لم يتم تعيين مسار بطاقة SD!</string>
     <string name="sd_card_path_set_successfully">تم تعيين مسار بطاقة SD بنجاح!</string>
-    <string name="clear_sd_card_path">مسح مسار بطاقة SD</string>
+    <string name="clear_sd_card_path">مسح</string>
     <string name="pure_black_theme">نسق أسود نقي</string>
     <string name="restart_the_app">أعد تشغيل التطبيق لتصبح التغييرات سارية المفعول</string>
     <string name="sd_card">بطاقة SD</string>
-    <string name="set_sd_card_path">تعيين مسار بطاقة SD</string>
+    <string name="set_sd_card_path">تعيين</string>
     <string name="set_sd_path_warn">أنت تستخدم إصدارا قديما من Android. تأكد من تعيين مسار بطاقة SD في الإعدادات. إذا لم تقم بذلك ، فيرجى إلغاء مربع الحوار هذا وتعيينه.</string>
     <string name="batch_download_lyrics">دفعة تحميل كلمات الأغاني</string>
     <string name="try_again">إعادة المحاولة</string>

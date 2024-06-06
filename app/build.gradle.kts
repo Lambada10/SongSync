@@ -85,6 +85,7 @@ dependencies {
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.compose.animation)
     implementation(libs.coil.compose)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.kotlinx.serialization.json)
