@@ -44,6 +44,11 @@ fun <T> DataStore<Preferences>.get(key: Preferences.Key<T>, defaultValue: T?): T
         data.first()[key] ?: defaultValue
     }
 
+fun <T> DataStore<Preferences>.set(key: Preferences.Key<T>, value: T) =
+    runBlocking(Dispatchers.IO) {
+        edit { it[key] = value }
+    }
+
 fun <T> preference(
     context: Context,
     key: Preferences.Key<T>,
