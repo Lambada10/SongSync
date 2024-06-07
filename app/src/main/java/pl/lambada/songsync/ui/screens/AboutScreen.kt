@@ -64,6 +64,7 @@ import pl.lambada.songsync.ui.components.AboutItem
 import pl.lambada.songsync.ui.components.SwitchItem
 import pl.lambada.songsync.util.dataStore
 import pl.lambada.songsync.util.ext.getVersion
+import pl.lambada.songsync.util.set
 
 /**
  * Composable function for AboutScreen component.
@@ -77,7 +78,6 @@ fun AboutScreen(
     val uriHandler = LocalUriHandler.current
     val version = LocalContext.current.getVersion()
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
 
     val dataStore = context.dataStore
 
@@ -125,12 +125,8 @@ fun AboutScreen(
                             selected = selected
                         ) {
                             viewModel.pureBlack.value = !selected
-                            scope.launch {
-                                dataStore.edit {
-                                    it[booleanPreferencesKey("pure_black")] = !selected
-                                }
-                            }
                             selected = !selected
+                            dataStore.set(key = booleanPreferencesKey("pure_black"), value = selected)
                         }
                     }
                 }
@@ -145,12 +141,8 @@ fun AboutScreen(
                         selected = selected
                     ) {
                         viewModel.disableMarquee.value = !selected
-                        scope.launch {
-                            dataStore.edit {
-                                it[booleanPreferencesKey("marquee_disable")] = !selected
-                            }
-                        }
                         selected = !selected
+                        dataStore.set(key = booleanPreferencesKey("marquee_disable"), value = selected)
                     }
                 }
             }
@@ -186,11 +178,10 @@ fun AboutScreen(
                                 onClick = {
                                     sdPath = ""
                                     viewModel.sdCardPath = ""
-                                    scope.launch(Dispatchers.IO) {
-                                        dataStore.edit {
-                                            it.remove(booleanPreferencesKey("sd_card_path"))
-                                        }
-                                    }
+                                    dataStore.set(
+                                        key = stringPreferencesKey("sd_card_path"),
+                                        value = sdPath
+                                    )
                                 }
                             ) {
                                 Text(stringResource(R.string.clear_sd_card_path))
@@ -210,11 +201,10 @@ fun AboutScreen(
                                     }
                                     sdPath = it.toString()
                                     viewModel.sdCardPath = it.toString()
-                                    scope.launch {
-                                        dataStore.edit {
-                                            it[stringPreferencesKey("sd_card_path")] = it.toString()
-                                        }
-                                    }
+                                    dataStore.set(
+                                        key = stringPreferencesKey("sd_card_path"),
+                                        value = sdPath
+                                    )
                                     picker = false
                                 }
                             LaunchedEffect(Unit) {
