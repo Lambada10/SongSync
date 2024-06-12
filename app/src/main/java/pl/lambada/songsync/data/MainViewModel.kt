@@ -98,10 +98,10 @@ class MainViewModel : ViewModel() {
      * @param songLink The link to the song.
      * @return The synced lyrics as a string.
      */
-    suspend fun getSyncedLyrics(songLink: String): String? {
+    suspend fun getSyncedLyrics(songLink: String, version: String): String? {
         return try {
             when (this.provider) {
-                Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink)
+                Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink, version)
                 Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(this.lrcLibID)
                 Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID)
             }
