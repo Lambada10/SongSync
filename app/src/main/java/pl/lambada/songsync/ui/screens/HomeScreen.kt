@@ -138,6 +138,7 @@ import pl.lambada.songsync.ui.ScreenSearch
 import pl.lambada.songsync.util.ext.BackPressHandler
 import pl.lambada.songsync.ui.components.AnimatedText
 import pl.lambada.songsync.ui.components.SwitchItem
+import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
 import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.FileNotFoundException
@@ -1135,7 +1136,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                         if (queryResult != null) {
                             val lyricsResult: String
                             try {
-                                lyricsResult = viewModel.getSyncedLyrics(queryResult.songLink ?: "")!!
+                                lyricsResult = viewModel.getSyncedLyrics(queryResult.songLink ?: "", context.getVersion())!!
                             } catch (e: Exception) {
                                 when (e) {
                                     is NullPointerException, is FileNotFoundException -> {

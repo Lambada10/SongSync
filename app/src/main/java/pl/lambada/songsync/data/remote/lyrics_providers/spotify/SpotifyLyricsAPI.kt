@@ -1,6 +1,8 @@
 package pl.lambada.songsync.data.remote.lyrics_providers.spotify
 
+import android.os.Build
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
 import pl.lambada.songsync.domain.model.lyrics_providers.spotify.SyncedLinesResponse
 import pl.lambada.songsync.util.networking.Ktor.client
@@ -14,8 +16,10 @@ class SpotifyLyricsAPI {
      * @param songLink The link to the song.
      * @return The synced lyrics as a string.
      */
-    suspend fun getSyncedLyrics(songLink: String): String? {
-        val response = client.get("$baseURL?url=$songLink&format=lrc")
+    suspend fun getSyncedLyrics(songLink: String, version: String = ""): String? {
+        val response = client.get("$baseURL?url=$songLink&format=lrc") {
+            header("User-Agent", "SongSync v${version}, ${Build.FINGERPRINT}")
+        }
         val responseBody = response.bodyAsText(Charsets.UTF_8)
 
         if (response.status.value !in 200..299)

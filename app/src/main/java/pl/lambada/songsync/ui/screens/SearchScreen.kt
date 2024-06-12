@@ -66,6 +66,7 @@ import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.components.CommonTextField
 import pl.lambada.songsync.ui.components.SongCard
+import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.File
 import java.io.FileNotFoundException
@@ -292,7 +293,7 @@ fun SharedTransitionScope.SearchScreen(
                         launch(Dispatchers.IO) {
                             try {
                                 if (lyricSuccess == LyricsStatus.NotSubmitted) {
-                                    lyricsResult = viewModel.getSyncedLyrics(result.songLink ?: "")
+                                    lyricsResult = viewModel.getSyncedLyrics(result.songLink ?: "", context.getVersion())
                                     if (lyricsResult == null)
                                         throw NullPointerException("lyricsResult is null")
                                     else
