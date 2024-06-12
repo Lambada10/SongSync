@@ -5,11 +5,6 @@ plugins {
     alias(libs.plugins.parcelize)
 }
 
-val releaseStoreFile = project.properties["RELEASE_STORE_FILE"] as String?
-val releaseStorePassword = project.properties["RELEASE_STORE_PASSWORD"] as String?
-val releaseKeyAlias = project.properties["RELEASE_KEY_ALIAS"] as String?
-val releaseKeyPassword = project.properties["RELEASE_KEY_PASSWORD"] as String?
-
 android {
     namespace = "pl.lambada.songsync"
     compileSdk = 34
@@ -32,11 +27,11 @@ android {
     }
     signingConfigs {
         create("release") {
-            if (project.hasProperty("RELEASE_KEY_ALIAS")) {
-                storeFile = file(releaseStoreFile!!)
-                storePassword = releaseStorePassword
-                keyAlias = releaseKeyAlias
-                keyPassword = releaseKeyPassword
+            if (System.getenv("RELEASE_STORE_FILE") != null) {
+                storeFile = file(System.getenv("RELEASE_STORE_FILE"))
+                storePassword = System.getenv("RELEASE_STORE_PASSWORD")
+                keyAlias = System.getenv("RELEASE_KEY_ALIAS")
+                keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
             }
         }
     }
@@ -47,7 +42,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            if (project.hasProperty("RELEASE_KEY_ALIAS")) {
+            if (System.getenv("RELEASE_STORE_FILE") != null) {
                 signingConfig = signingConfigs["release"]
             }
         }
