@@ -34,14 +34,10 @@ jobs:
                   echo "RELEASE_STORE_FILE=$(realpath release.keystore)" >> $GITHUB_ENV
 
             - name: Build release APK
-              run: ./gradlew bundleRelease
-
-            - name: Find release APK
-              run: |
-                  $APK_PATH=$(find . -name "*.apk")
+              run: ./gradlew assembleRelea
 
             - name: Upload release APK
               uses: actions/upload-artifact@v2
               with:
                   name: app-release
-                  path: $APK_PATH
+                  path: ./app/build/outputs/apk/release/app-release.apk
