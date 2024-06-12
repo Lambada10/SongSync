@@ -39,7 +39,6 @@
     <string name="you_need_internet_connection">このアプリはインターネット接続が必要です。</string>
     <string name="check_your_connection">接続を確認して、もう一度お試しください。</string>
     <string name="home">ホーム</string>
-    <string name="browse">参照</string>
     <string name="about">アプリについて</string>
     <string name="song_name_no_args">曲名</string>
     <string name="lyrics_copied_to_clipboard">歌詞をクリップボードにコピーしました</string>

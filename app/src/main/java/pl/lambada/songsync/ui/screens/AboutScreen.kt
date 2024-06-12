@@ -6,14 +6,12 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,311 +21,329 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Switch
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.domain.model.Release
-import pl.lambada.songsync.ui.components.AboutCard
+import pl.lambada.songsync.ui.components.AboutItem
+import pl.lambada.songsync.ui.components.SwitchItem
+import pl.lambada.songsync.util.dataStore
 import pl.lambada.songsync.util.ext.getVersion
 
 /**
  * Composable function for AboutScreen component.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutScreen(viewModel: MainViewModel) {
+fun AboutScreen(
+    viewModel: MainViewModel,
+    navController: NavController
+) {
     val uriHandler = LocalUriHandler.current
     val version = LocalContext.current.getVersion()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
-    val sharedPreferences = context.getSharedPreferences(
-        "pl.lambada.songsync_preferences",
-        Context.MODE_PRIVATE
-    )
+    val dataStore = context.dataStore
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth(),
-        contentPadding = PaddingValues(top = 8.dp, start = 8.dp, end = 8.dp)
-    ) {
-        item {
-            AboutCard(label = stringResource(R.string.provider)) {
-                val selected = rememberSaveable { mutableStateOf(viewModel.provider) }
-                Column {
-                    Text(stringResource(R.string.provider_summary))
-                    val providers = Providers.values()
-                    providers.forEach {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(
-                                selected = selected.value == it,
-                                onClick = {
-                                    selected.value = it
-                                    viewModel.provider = it
-                                    sharedPreferences.edit().putString("provider", it.displayName)
-                                        .apply()
-                                }
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            MediumTopAppBar(
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.popBackStack(
+                                navController.graph.startDestinationId,
+                                false
                             )
-                            Text(
-                                text = it.displayName,
-                                modifier = Modifier.clickable {
-                                    selected.value = it
-                                    viewModel.provider = it
-                                    sharedPreferences.edit().putString("provider", it.displayName)
-                                        .apply()
-                                }
-                            )
-
                         }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                        )
                     }
-                }
-            }
+                },
+                title = {
+                    Text(
+                        modifier = Modifier.padding(start = 6.dp),
+                        text = stringResource(id = R.string.about)
+                    )
+                },
+                scrollBehavior = scrollBehavior
+            )
         }
-
-        item {
-            if (isSystemInDarkTheme()) {
-                AboutCard(label = stringResource(R.string.theme)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.pure_black_theme))
-                        Spacer(modifier = Modifier.weight(1f))
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = paddingValues
+        ) {
+            item {
+                if (isSystemInDarkTheme()) {
+                    AboutItem(label = stringResource(R.string.theme)) {
                         val pureBlack = viewModel.pureBlack
                         var selected by remember { mutableStateOf(pureBlack.value) }
-                        Switch(
-                            checked = selected,
-                            onCheckedChange = {
-                                viewModel.pureBlack.value = it
-                                selected = it
-                                sharedPreferences.edit().putBoolean("pure_black", it).apply()
+                        SwitchItem(
+                            label = stringResource(R.string.pure_black_theme),
+                            selected = selected
+                        ) {
+                            viewModel.pureBlack.value = !selected
+                            scope.launch {
+                                dataStore.edit {
+                                    it[booleanPreferencesKey("pure_black")] = !selected
+                                }
                             }
-                        )
+                            selected = !selected
+                        }
                     }
                 }
             }
-        }
 
-        item {
-            AboutCard(label = stringResource(R.string.disable_marquee)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.disable_marquee_summary))
-                    Spacer(modifier = Modifier.weight(1f))
+            item {
+                AboutItem(label = stringResource(R.string.disable_marquee)) {
                     val disableMarquee = viewModel.disableMarquee
                     var selected by remember { mutableStateOf(disableMarquee.value) }
-                    Switch(
-                        checked = selected,
-                        onCheckedChange = {
-                            viewModel.disableMarquee.value = it
-                            selected = it
-                            sharedPreferences.edit().putBoolean("marquee_disable", it).apply()
+                    SwitchItem(
+                        label = stringResource(R.string.disable_marquee_summary),
+                        selected = selected
+                    ) {
+                        viewModel.disableMarquee.value = !selected
+                        scope.launch {
+                            dataStore.edit {
+                                it[booleanPreferencesKey("marquee_disable")] = !selected
+                            }
                         }
-                    )
+                        selected = !selected
+                    }
                 }
             }
-        }
 
-        item {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-                var picker by remember { mutableStateOf(false) }
-                val sdCardPath = viewModel.sdCardPath
-                var sdPath by rememberSaveable { mutableStateOf(sdCardPath) }
-                AboutCard(label = stringResource(R.string.sd_card)) {
-                    Text(stringResource(R.string.set_sd_path))
-                    if (sdPath == "") {
-                        Text(
-                            text = stringResource(R.string.no_sd_card_path_set),
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    } else {
-                        Text(
-                            text = stringResource(R.string.sd_card_path_set_successfully),
-                            color = MaterialTheme.colorScheme.tertiary,
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
+            item {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                    var picker by remember { mutableStateOf(false) }
+                    val sdCardPath = viewModel.sdCardPath
+                    var sdPath by rememberSaveable { mutableStateOf(sdCardPath) }
+                    AboutItem(
+                        label = stringResource(R.string.sd_card),
+                        modifier = Modifier.padding(horizontal = 22.dp, vertical = 16.dp)
+                    ) {
+                        Text(stringResource(R.string.set_sd_path))
+                        if (sdPath == "") {
+                            Text(
+                                text = stringResource(R.string.no_sd_card_path_set),
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 12.sp
+                            )
+                        } else {
+                            Text(
+                                text = stringResource(R.string.sd_card_path_set_successfully),
+                                color = MaterialTheme.colorScheme.tertiary,
+                                fontSize = 12.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                    Row {
-                        Spacer(modifier = Modifier.weight(1f))
-                        OutlinedButton(
-                            onClick = {
-                                sdPath = ""
-                                viewModel.sdCardPath = ""
-                                sharedPreferences.edit().remove("sd_card_path").apply()
+                        Row {
+                            Spacer(modifier = Modifier.weight(1f))
+                            OutlinedButton(
+                                onClick = {
+                                    sdPath = ""
+                                    viewModel.sdCardPath = ""
+                                    scope.launch(Dispatchers.IO) {
+                                        dataStore.edit {
+                                            it.remove(booleanPreferencesKey("sd_card_path"))
+                                        }
+                                    }
+                                }
+                            ) {
+                                Text(stringResource(R.string.clear_sd_card_path))
                             }
-                        ) {
-                            Text(stringResource(R.string.clear_sd_card_path))
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Button(onClick = { picker = true }) {
+                                Text(stringResource(R.string.set_sd_card_path))
+                            }
+                        }
+
+                        if (picker) {
+                            val sdCardPicker =
+                                rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) {
+                                    if (it == null) {
+                                        picker = false
+                                        return@rememberLauncherForActivityResult
+                                    }
+                                    sdPath = it.toString()
+                                    viewModel.sdCardPath = it.toString()
+                                    scope.launch {
+                                        dataStore.edit {
+                                            it[stringPreferencesKey("sd_card_path")] = it.toString()
+                                        }
+                                    }
+                                    picker = false
+                                }
+                            LaunchedEffect(Unit) {
+                                sdCardPicker.launch(Uri.parse(Environment.getExternalStorageDirectory().absolutePath))
+                            }
                         }
                     }
+                }
+            }
+
+            item {
+                var update by rememberSaveable { mutableStateOf(false) }
+                AboutItem(
+                    label = stringResource(R.string.about_songsync),
+                    modifier = Modifier.padding(horizontal = 22.dp, vertical = 16.dp)
+                ) {
+                    Text(stringResource(R.string.what_is_songsync))
+                    Text(stringResource(R.string.extra_what_is_songsync))
+                    Text("")
+                    Text(stringResource(R.string.app_version, version))
                     Row {
                         Spacer(modifier = Modifier.weight(1f))
                         Button(
                             modifier = Modifier.padding(top = 8.dp),
-                            onClick = {
-                                picker = true
-                            }
+                            onClick = { update = true }
                         ) {
-                            Text(stringResource(R.string.set_sd_card_path))
-                        }
-                    }
-
-                    if (picker) {
-                        val sdCardPicker =
-                            rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) {
-                                if (it == null) {
-                                    picker = false
-                                    return@rememberLauncherForActivityResult
-                                }
-                                sdPath = it.toString()
-                                viewModel.sdCardPath = it.toString()
-                                sharedPreferences.edit().putString("sd_card_path", it.toString())
-                                    .apply()
-                                picker = false
-                            }
-                        LaunchedEffect(Unit) {
-                            sdCardPicker.launch(Uri.parse(Environment.getExternalStorageDirectory().absolutePath))
+                            Text(stringResource(R.string.check_for_updates))
                         }
                     }
                 }
-            }
-        }
 
-        item {
-            var update by rememberSaveable { mutableStateOf(false) }
-            AboutCard(stringResource(R.string.about_songsync)) {
-                Text(stringResource(R.string.what_is_songsync))
-                Text(stringResource(R.string.extra_what_is_songsync))
-                Text("")
-                Text(stringResource(R.string.app_version, version))
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button(
-                        modifier = Modifier.padding(top = 8.dp),
-                        onClick = { update = true }
+                if (update) {
+                    CheckForUpdates(
+                        onDismiss = { update = false },
+                        onDownload = { uriHandler.openUri(it) },
+                        context = LocalContext.current,
+                        viewModel = viewModel,
+                        version = version
+                    )
+                }
+            }
+
+            item {
+                AboutItem(
+                    stringResource(R.string.source_code),
+                    modifier = Modifier
+                        .clickable { uriHandler.openUri("https://github.com/Lambada10/SongSync") }
+                        .padding(horizontal = 22.dp, vertical = 16.dp)
+                ) {
+                    Text(stringResource(R.string.we_are_open_source))
+                    Text(
+                        text = stringResource(id = R.string.view_on_github),
+                        color = MaterialTheme.colorScheme.outline,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+
+            item {
+                AboutItem(
+                    stringResource(R.string.support),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .clickable { uriHandler.openUri("https://t.me/LambadaOT") }
+                            .padding(horizontal = 22.dp, vertical = 16.dp)
                     ) {
-                        Text(stringResource(R.string.check_for_updates))
+                        Text(
+                            stringResource(R.string.bugs_or_suggestions_contact_us),
+                        )
+                        Text(
+                            text = stringResource(R.string.telegram_group),
+                            color = MaterialTheme.colorScheme.outline,
+                            fontSize = 12.sp
+                        )
                     }
+                    Text(
+                        stringResource(R.string.create_issue),
+                        modifier = Modifier.padding(horizontal = 22.dp)
+                    )
                 }
             }
 
-            if (update) {
-                CheckForUpdates(
-                    onDismiss = { update = false },
-                    onDownload = { uriHandler.openUri(it) },
-                    context = LocalContext.current,
-                    viewModel = viewModel,
-                    version = version
-                )
-            }
-        }
-
-        item {
-            AboutCard(stringResource(R.string.source_code)) {
-                Text(stringResource(R.string.we_are_open_source))
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button(
-                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                        onClick = {
-                            uriHandler.openUri("https://github.com/Lambada10/SongSync")
-                        }
-                    ) {
-                        Text(stringResource(id = R.string.view_on_github))
-                    }
-                }
-            }
-        }
-
-        item {
-            AboutCard(stringResource(R.string.support)) {
-                Text(stringResource(R.string.bugs_or_suggestions_contact_us))
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button(
-                        modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                        onClick = {
-                            uriHandler.openUri("https://t.me/LambadaOT")
-                        }
-                    ) {
-                        Text(stringResource(R.string.telegram_group))
-                    }
-                }
-                Text(stringResource(R.string.create_issue))
-            }
-        }
-
-        item {
-            AboutCard(stringResource(R.string.contributors)) {
-                Contributor.values().forEach {
-                    val additionalInfo = stringResource(id = it.contributionLevel.stringResource)
-                    Text(text = "${it.devName} ($additionalInfo)")
-                    Row {
-                        Spacer(modifier = Modifier.weight(1f))
-                        if (it.github != null) {
-                            Button(
-                                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                                onClick = {
-                                    uriHandler.openUri(it.github)
-                                }
-                            ) {
-                                Text(stringResource(R.string.github))
-                            }
-                        }
-                        if (it.telegram != null) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Button(
-                                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                                onClick = {
-                                    uriHandler.openUri(it.telegram)
-                                }
-                            ) {
-                                Text(stringResource(R.string.telegram))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        item {
-            AboutCard(stringResource(R.string.thanks_to)) {
-                val credits = mapOf(
-                    stringResource(R.string.spotify_api) to "https://developer.spotify.com/documentation/web-api",
-                    stringResource(R.string.spotifylyrics_api) to "https://github.com/akashrchandran/spotify-lyrics-api",
-                    stringResource(R.string.syncedlyrics_py) to "https://github.com/0x7d4/syncedlyrics",
-                    stringResource(R.string.statusbar_lyrics_ext) to "https://github.com/cjybyjk/StatusBarLyricExt"
-                )
-
-                credits.forEach { credit ->
-                    Text(text = credit.key)
-                    Row {
-                        Spacer(modifier = Modifier.weight(1f))
-                        Button(
-                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                            onClick = {
-                                uriHandler.openUri(credit.value)
-                            }
+            item {
+                AboutItem(stringResource(R.string.contributors)) {
+                    Contributor.entries.forEach {
+                        val additionalInfo = stringResource(id = it.contributionLevel.stringResource)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { it.github?.let { it1 -> uriHandler.openUri(it1) } }
+                                .padding(horizontal = 22.dp, vertical = 16.dp)
                         ) {
-                            Text(stringResource(R.string.open_website))
+                            Text(text = it.devName)
+                            Text(
+                                text = additionalInfo,
+                                color = MaterialTheme.colorScheme.outline,
+                                fontSize = 12.sp
+                            )
                         }
                     }
                 }
+            }
+            item {
+                AboutItem(label = stringResource(id = R.string.thanks_to)) {
+                    val credits = mapOf(
+                        stringResource(R.string.spotify_api) to "https://developer.spotify.com/documentation/web-api",
+                        stringResource(R.string.spotifylyrics_api) to "https://github.com/akashrchandran/spotify-lyrics-api",
+                        stringResource(R.string.syncedlyrics_py) to "https://github.com/0x7d4/syncedlyrics",
+                        stringResource(R.string.statusbar_lyrics_ext) to "https://github.com/cjybyjk/StatusBarLyricExt"
+                    )
+                    credits.forEach { credit ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { uriHandler.openUri(credit.value) }
+                                .padding(22.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                                contentDescription = stringResource(id = R.string.open_website)
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(text = credit.key)
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

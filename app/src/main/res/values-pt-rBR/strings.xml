@@ -37,7 +37,6 @@
     <string name="check_your_connection">Por favor, verifique sua conexão e tente novamente.</string>
     <string name="if_connected_spotify_down">Se você estiver conectado, o Spotify pode estar indisponível. Por favor, tente novamente mais tarde.</string>
     <string name="home">Tela inicial</string>
-    <string name="browse">Pesquisar</string>
     <string name="about">Sobre</string>
     <string name="song_name_no_args">Nome da Música</string>
     <string name="artist_name_no_args">Nome do Artista</string>
@@ -104,6 +103,6 @@
     <string name="sd_card">Cartão SD</string>
     <string name="set_sd_path">Defina o caminho para o seu cartão SD aqui. Isso é necessário para o Android 10 e versões inferiores.</string>
     <string name="no_sd_card_path_set">Nenhum caminho de cartão SD definido!</string>
-    <string name="clear_sd_card_path">Limpar o caminho do cartão SD</string>
-    <string name="set_sd_card_path">Definir o caminho do cartão SD</string>
+    <string name="clear_sd_card_path">Limpar</string>
+    <string name="set_sd_card_path">Definir</string>
 </resources>

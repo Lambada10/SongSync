@@ -49,7 +49,6 @@
     <string name="check_your_connection">Bitte überprüfe deine Verbindung und versuch es noch einmal.</string>
     <string name="if_connected_spotify_down">Falls du verbunden bist, kann es sein, das Spotify nicht verfügbar ist. Bitte versuche es später noch einmal.</string>
     <string name="home">Start</string>
-    <string name="browse">Suchen</string>
     <string name="about">Über</string>
     <string name="song_name_no_args">Song-Name</string>
     <string name="artist_name_no_args">Künstler-Name</string>
@@ -100,8 +99,8 @@
     <string name="sd_card">SD-Karte</string>
     <string name="no_sd_card_path_set">Kein SD-Karten-Pfad gesetzt!</string>
     <string name="sd_card_path_set_successfully">SD-Karten-Pfad erfolgreich gesetzt!</string>
-    <string name="clear_sd_card_path">SD-Karten-Pfad zurücksetzen</string>
-    <string name="set_sd_card_path">SD-Karten-Pfad setzen</string>
+    <string name="clear_sd_card_path">Zurücksetzen</string>
+    <string name="set_sd_card_path">Setzen</string>
     <string name="pure_black_theme">Pures Schwarz-Design</string>
     <string name="set_sd_path">Hier kann der SD-Karten-Pfad gesetzt werden, was für Android 10 und ältere Versionen notwendig ist.</string>
     <string name="set_sd_path_warn">Du nutzt eine ältere Version von Android. Bitte stelle sicher, dass du den korrekten SD-Karten-Pfad in den Einstellungen gesetzt hast. Falls nicht, bitte tue dies jetzt.</string>

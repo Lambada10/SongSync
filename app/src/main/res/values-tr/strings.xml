@@ -54,7 +54,6 @@
     <string name="check_your_connection">Lütfen bağlantınızı kontrol edin ve tekrar deneyin.</string>
     <string name="if_connected_spotify_down">Bağlandıysanız Spotify kapalı olabilir. Lütfen daha sonra tekrar deneyin.</string>
     <string name="home">Anasayfa</string>
-    <string name="browse">Gözat</string>
     <string name="about">Hakkında</string>
     <string name="song_name_no_args">Şarkı adı</string>
     <string name="artist_name_no_args">Sanatçı adı</string>
