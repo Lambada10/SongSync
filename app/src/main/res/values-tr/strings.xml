@@ -31,14 +31,14 @@
     <string name="spotifylyrics_api" translatable="false">SpotifyLyrics API</string>
     <string name="about_songsync">SongSync Hakkında</string>
     <string name="how_we_get_lyrics">SongSync, şarkı sözlerini almak için SpotifyLyrics API kullanır. SpotifyLyrics API hakkında daha fazla bilgiyi GitHub sayfalarında bulabilirsiniz.</string>
-    <string name="view_on_github">GitHub'da görüntüle</string>
-    <string name="we_are_open_source">SongSync açık kaynaklı bir projedir. Kaynak kodunu GitHub'da bulabilirsiniz.</string>
+    <string name="view_on_github">GitHub\'da görüntüle</string>
+    <string name="we_are_open_source">SongSync açık kaynaklı bir projedir. Kaynak kodunu GitHub\'da bulabilirsiniz.</string>
     <string name="contributors">Katkıda Bulunanlar</string>
     <string name="github" translatable="false">GitHub</string>
     <string name="telegram" translatable="false">Telegram</string>
     <string name="bugs_or_suggestions_contact_us">Bir hata mı buldunuz? Bir öneriniz mi var? Katkıda bulunmak mı istiyorsunuz? Telegram grubumdan bana ulaşabilirsiniz.</string>
     <string name="telegram_group">Telegram grubu</string>
-    <string name="create_issue">Ayrıca GitHub'da bir sorun oluşturabilirsiniz (yukarıdaki bağlantı).</string>
+    <string name="create_issue">Ayrıca GitHub\'da bir sorun oluşturabilirsiniz (yukarıdaki bağlantı).</string>
     <string name="spotify_api" translatable="false">Spotify API</string>
     <string name="source_code">Kaynak kodu</string>
     <string name="support">Destek</string>
@@ -95,7 +95,7 @@
     <string name="way_to_get_token">Spotify belirteci almak için yol</string>
     <string name="cant_be_empty">Alanlar boş olamaz</string>
     <string name="default_keys">Varsayılan API kimlik bilgileri</string>
-    <string name="web_player_keys">Web Çalar API'si</string>
+    <string name="web_player_keys">Web Çalar API\'si</string>
     <string name="custom_keys">Özel API kimlik bilgileri</string>
     <string name="change_api_strategy">Ayarlar bölümünde Spotify ağına bağlanmak için alternatif yolları da deneyebilirsiniz.</string>
     <string name="theme">Tema</string>
