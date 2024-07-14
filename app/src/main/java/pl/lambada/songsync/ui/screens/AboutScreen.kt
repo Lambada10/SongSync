@@ -442,8 +442,12 @@ enum class Contributor(
         github = "https://github.com/nift4", telegram = "https://t.me/nift4"
     ),
     BOBBYESP(
-        "BobbyESP", ContributionLevel.CONTRIBUTOR,
+        "BobbyESP", ContributionLevel.DEVELOPER,
         github = "https://github.com/BobbyESP"
+    ),
+    PXEEMO(
+        "Pxeemo", ContributionLevel.CONTRIBUTOR,
+        github = "https://github.com/pxeemo"
     ),
     AKANETAN(
         "AkaneTan", ContributionLevel.CONTRIBUTOR,
