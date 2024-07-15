@@ -178,9 +178,11 @@ fun HomeScreen(
             }
             var ableToSelect by remember { mutableStateOf<List<Song>?>(null) }
 
+            val searched = viewModel.searchResults.collectAsState()
             val filtered = viewModel.cachedFilteredSongs.collectAsState()
 
             ableToSelect = when {
+                searched.value.isNotEmpty() -> searched.value
                 filtered.value.isNotEmpty() -> filtered.value
                 else -> allSongs
             }
