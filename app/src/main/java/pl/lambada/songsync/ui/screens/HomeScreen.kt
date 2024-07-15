@@ -87,6 +87,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -171,7 +172,12 @@ fun HomeScreen(
             }
             var ableToSelect by remember { mutableStateOf<List<Song>?>(null) }
 
-            ableToSelect = viewModel.cachedFilteredSongs ?: allSongs
+            val filtered = viewModel.cachedFilteredSongs.collectAsState()
+
+            ableToSelect = when {
+                filtered.value.isNotEmpty() -> filtered.value
+                else -> allSongs
+            }
 
             BackPressHandler(enabled = selected.size > 0, onBackPressed = { selected.clear() })
             Crossfade(
@@ -468,13 +474,18 @@ fun HomeScreenLoaded(
             restore = { TextFieldValue(it.text, TextRange(it.cursorStart, it.cursorEnd)) })
     ) { mutableStateOf(TextFieldValue()) }
     var showFilters by rememberSaveable { mutableStateOf(false) }
-    var filtered by remember { mutableStateOf<List<Song>?>(null) }
+    val filtered = viewModel.cachedFilteredSongs.collectAsState()
+    val searched = viewModel.searchResults.collectAsState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val displaySongs = filtered ?: songs
+    val displaySongs = when {
+        query.text.isNotEmpty() -> searched.value
+        filtered.value.isNotEmpty() -> filtered.value
+        else -> songs
+    }
 
     LaunchedEffect(Unit) {
-        filtered = viewModel.filterSongs()
+        viewModel.filterSongs()
     }
 
     Column {
@@ -539,7 +550,10 @@ fun HomeScreenLoaded(
                             }
                             val focusManager = LocalFocusManager.current
                             TextField(value = query,
-                                onValueChange = { query = it },
+                                onValueChange = {
+                                    query = it
+                                    viewModel.updateSearchResults(it.text.lowercaseWithLocale())
+                                },
                                 leadingIcon = {
                                     Icon(Icons.Filled.Search,
                                         contentDescription = stringResource(id = R.string.search),
@@ -554,6 +568,7 @@ fun HomeScreenLoaded(
                                         contentDescription = stringResource(id = R.string.clear),
                                         modifier = Modifier.clickable {
                                             query = TextFieldValue("")
+                                            viewModel.updateSearchResults("")
                                             showSearch = false
                                             showingSearch = false
                                         }
@@ -607,7 +622,7 @@ fun HomeScreenLoaded(
                                         onDismiss = { showFilters = false },
                                         onFilterChange = {
                                             scope.launch(Dispatchers.Default) {
-                                                filtered = viewModel.filterSongs()
+                                                viewModel.filterSongs()
                                             }
                                         },
                                     )
@@ -627,36 +642,28 @@ fun HomeScreenLoaded(
 
             items(displaySongs.size) { i ->
                 val song = displaySongs[i]
-                val songTitleLowercase = song.title?.lowercaseWithLocale()
-                val songArtistLowercase = song.artist?.lowercaseWithLocale()
-                val queryLowercase = query.text.lowercaseWithLocale()
 
-                if (songTitleLowercase?.contains(queryLowercase) == true || songArtistLowercase?.contains(
-                        queryLowercase
-                    ) == true
-                ) {
-                    SongItem(
-                        id = i.toString(),
-                        selected = selected.contains(song.filePath),
-                        quickSelect = selected.size > 0,
-                        onSelectionChanged = { newValue ->
-                            if (newValue) {
-                                song.filePath?.let { selected.add(it) }
-                                showSearch = false
-                                showingSearch = false
-                            } else {
-                                selected.remove(song.filePath)
-                                if (selected.size == 0 && query.text.isNotEmpty()) showingSearch =
-                                    true // show again but don't focus
-                            }
-                        },
-                        navController = navController,
-                        song = song,
-                        sharedTransitionScope = sharedTransitionScope,
-                        animatedVisibilityScope = animatedVisibilityScope,
-                        viewModel = viewModel,
-                    )
-                }
+                SongItem(
+                    id = i.toString(),
+                    selected = selected.contains(song.filePath),
+                    quickSelect = selected.size > 0,
+                    onSelectionChanged = { newValue ->
+                        if (newValue) {
+                            song.filePath?.let { selected.add(it) }
+                            showSearch = false
+                            showingSearch = false
+                        } else {
+                            selected.remove(song.filePath)
+                            if (selected.size == 0 && query.text.isNotEmpty()) showingSearch =
+                                true // show again but don't focus
+                        }
+                    },
+                    navController = navController,
+                    song = song,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    viewModel = viewModel,
+                )
             }
 
             item { Spacer(modifier = Modifier.height(4.dp)) }

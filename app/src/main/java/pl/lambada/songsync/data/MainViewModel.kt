@@ -8,6 +8,11 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import pl.lambada.songsync.data.remote.github.GithubAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.LRCLibAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.NeteaseAPI
@@ -33,7 +38,14 @@ class MainViewModel : ViewModel() {
     var blacklistedFolders = mutableListOf<String>()
     var hideLyrics = false
     private var hideFolders = blacklistedFolders.isNotEmpty()
-    var cachedFilteredSongs: List<Song>? = null
+
+    // filtered folders/lyrics songs
+    private var _cachedFilteredSongs: MutableStateFlow<List<Song>> = MutableStateFlow(emptyList())
+    val cachedFilteredSongs = _cachedFilteredSongs.asStateFlow()
+
+    // searching
+    private var _searchResults: MutableStateFlow<List<Song>> = MutableStateFlow(emptyList())
+    val searchResults = _searchResults.asStateFlow()
 
     // Spotify API token
     private val spotifyAPI = SpotifyAPI()
@@ -188,6 +200,31 @@ class MainViewModel : ViewModel() {
     }
 
     /**
+     * Updates song search (filter) results based on the query.
+     * @param query The search query.
+     */
+    fun updateSearchResults(query: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (query.isEmpty()) {
+                _searchResults.value = emptyList()
+                return@launch
+            }
+
+            val data: List<Song> = when {
+                cachedFilteredSongs.value.isNotEmpty() -> cachedFilteredSongs.value
+                cachedSongs != null -> cachedSongs!!
+                else -> { return@launch }
+            }
+
+            val results = data.filter {
+                it.title?.contains(query, ignoreCase = true) == true ||
+                it.artist?.contains(query, ignoreCase = true) == true
+            }
+
+            _searchResults.value = results
+        }
+    }
+    /**
      * Loads all songs' folders
      * @param context The application context.
      * @return A list of folders.
@@ -212,11 +249,12 @@ class MainViewModel : ViewModel() {
      * Filter songs based on user's preferences.
      * @return A list of songs depending on the user's preferences. If no preferences are set, null is returned, so app will use all songs.
      */
-    fun filterSongs(): List<Song>? {
+    fun filterSongs() {
         hideFolders = blacklistedFolders.isNotEmpty()
-        return when {
+
+        when {
             hideLyrics && hideFolders -> {
-                cachedSongs!!
+                _cachedFilteredSongs?.value = cachedSongs!!
                     .filter {
                         it.filePath.toLrcFile()?.exists() != true && !blacklistedFolders.contains(
                             it.filePath!!.substring(
@@ -224,17 +262,13 @@ class MainViewModel : ViewModel() {
                             )
                         )
                     }
-                    .also { cachedFilteredSongs = it }
             }
-
             hideLyrics -> {
-                cachedSongs!!
+                _cachedFilteredSongs?.value = cachedSongs!!
                     .filter { it.filePath.toLrcFile()?.exists() != true }
-                    .also { cachedFilteredSongs = it }
             }
-
             hideFolders -> {
-                cachedSongs!!.filter {
+                _cachedFilteredSongs?.value = cachedSongs!!.filter {
                     !blacklistedFolders.contains(
                         it.filePath!!.substring(
                             0,
@@ -243,11 +277,8 @@ class MainViewModel : ViewModel() {
                     )
                 }
             }
-
             else -> {
-                null.also {
-                    cachedFilteredSongs = null
-                }
+                _cachedFilteredSongs?.value = emptyList()
             }
         }
     }
