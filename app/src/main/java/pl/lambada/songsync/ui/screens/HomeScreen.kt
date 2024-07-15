@@ -117,6 +117,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getString
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.documentfile.provider.DocumentFile
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -139,9 +143,11 @@ import pl.lambada.songsync.ui.ScreenSearch
 import pl.lambada.songsync.util.ext.BackPressHandler
 import pl.lambada.songsync.ui.components.AnimatedText
 import pl.lambada.songsync.ui.components.SwitchItem
+import pl.lambada.songsync.util.dataStore
 import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
 import pl.lambada.songsync.util.ext.toLrcFile
+import pl.lambada.songsync.util.set
 import java.io.FileNotFoundException
 import kotlin.math.roundToInt
 
@@ -335,10 +341,7 @@ fun HomeScreen(
                             val selectedProvider = rememberSaveable { mutableStateOf(viewModel.provider) }
                             val providers = Providers.entries.toTypedArray()
                             val context = LocalContext.current
-                            val sharedPreferences = context.getSharedPreferences(
-                                "pl.lambada.songsync_preferences",
-                                Context.MODE_PRIVATE
-                            )
+                            val dataStore = context.dataStore
                             DropdownMenu(
                                 expanded = expandedProviders,
                                 onDismissRequest = { expandedProviders = false }
@@ -363,9 +366,10 @@ fun HomeScreen(
                                                     onClick = {
                                                         selectedProvider.value = it
                                                         viewModel.provider = it
-                                                        sharedPreferences.edit()
-                                                            .putString("provider", it.displayName)
-                                                            .apply()
+                                                        dataStore.set(
+                                                            stringPreferencesKey("provider"),
+                                                            it.displayName
+                                                        )
                                                         expandedProviders = false
                                                     }
                                                 )
@@ -374,9 +378,10 @@ fun HomeScreen(
                                         onClick = {
                                             selectedProvider.value = it
                                             viewModel.provider = it
-                                            sharedPreferences.edit()
-                                                .putString("provider", it.displayName)
-                                                .apply()
+                                            dataStore.set(
+                                                stringPreferencesKey("provider"),
+                                                it.displayName
+                                            )
                                             expandedProviders = false
                                         }
                                     )
@@ -683,9 +688,7 @@ fun FiltersDialog(
     val folders = viewModel.getSongFolders(context)
     var showFolders by rememberSaveable { mutableStateOf(false) }
 
-    val sharedPreferences = LocalContext.current.getSharedPreferences(
-        "pl.lambada.songsync_preferences", Context.MODE_PRIVATE
-    )
+    val dataStore = context.dataStore
 
     BasicAlertDialog(onDismissRequest = { onDismiss() }) {
         Surface(
@@ -715,10 +718,10 @@ fun FiltersDialog(
                     )
                 ) {
                     viewModel.hideLyrics = !hideLyrics
-                    sharedPreferences
-                        .edit()
-                        .putBoolean("hide_lyrics", !hideLyrics)
-                        .apply()
+                    dataStore.set(
+                        booleanPreferencesKey("hide_lyrics"),
+                        !hideLyrics
+                    )
                     hideLyrics = !hideLyrics
                     onFilterChange()
                 }
@@ -786,13 +789,10 @@ fun FiltersDialog(
                                         } else {
                                             viewModel.blacklistedFolders.remove(folder)
                                         }
-                                        sharedPreferences
-                                            .edit()
-                                            .putString(
-                                                "blacklist",
-                                                viewModel.blacklistedFolders.joinToString(",")
-                                            )
-                                            .apply()
+                                        dataStore.set(
+                                            stringPreferencesKey("blacklist"),
+                                            viewModel.blacklistedFolders.joinToString(",")
+                                        )
                                         onFilterChange()
                                     }
                                     .padding(start = 22.dp, end = 16.dp),
@@ -815,10 +815,10 @@ fun FiltersDialog(
                                         } else {
                                             viewModel.blacklistedFolders.remove(folder)
                                         }
-                                        sharedPreferences.edit().putString(
-                                            "blacklist",
+                                        dataStore.set(
+                                            stringPreferencesKey("blacklist"),
                                             viewModel.blacklistedFolders.joinToString(",")
-                                        ).apply()
+                                        )
                                         onFilterChange()
                                     }
                                 )
