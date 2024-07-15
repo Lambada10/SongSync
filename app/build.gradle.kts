@@ -14,8 +14,8 @@ android {
         minSdk = 21
         //noinspection OldTargetApi
         targetSdk = 34
-        versionCode = 303
-        versionName = "3.0.3"
+        versionCode = 400
+        versionName = "4.0.0"
 
         resourceConfigurations += arrayOf(
             "ar", "de", "en", "es", "in", "ja", "pt", "pt-rBR", "ro", "vi", "zh-rCN", "tr"
