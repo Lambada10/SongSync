@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.data.remote.github.GithubAPI
+import pl.lambada.songsync.data.remote.lyrics_providers.others.AppleAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.LRCLibAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.NeteaseAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyAPI
@@ -63,6 +64,9 @@ class MainViewModel : ViewModel() {
 
     // Netease Track ID
     private var neteaseID = 0L
+
+    // Apple Track ID
+    private var appleID = 0L
     // TODO: Use values from SongInfo object returned by search instead of storing them here
 
     /**
@@ -93,6 +97,10 @@ class MainViewModel : ViewModel() {
                 Providers.NETEASE -> NeteaseAPI().getSongInfo(query, offset).also {
                     this.neteaseID = it?.neteaseID ?: 0
                 } ?: throw NoTrackFoundException()
+
+                Providers.APPLE -> AppleAPI().getSongInfo(query).also {
+                    this.appleID = it?.appleID ?: 0
+                } ?: throw NoTrackFoundException()
             }
         } catch (e: InternalErrorException) {
             throw e
@@ -116,6 +124,7 @@ class MainViewModel : ViewModel() {
                 Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink, version)
                 Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(this.lrcLibID)
                 Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID)
+                Providers.APPLE -> AppleAPI().getSyncedLyrics(this.appleID)
             }
         } catch (e: Exception) {
             null
