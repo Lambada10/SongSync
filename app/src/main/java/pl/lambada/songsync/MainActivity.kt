@@ -114,6 +114,9 @@ class MainActivity : ComponentActivity() {
                 val provider = dataStore.get(stringPreferencesKey("provider"), Providers.SPOTIFY.displayName)
                 viewModel.provider = Providers.entries.find { it.displayName == provider }!!
 
+                val embedLyrics = dataStore.get(booleanPreferencesKey("embed_lyrics"), false)
+                viewModel.embedLyricsInFile = embedLyrics
+
                 // Get token upon app start
                 launch(Dispatchers.IO) {
                     try {

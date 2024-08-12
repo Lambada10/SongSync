@@ -293,7 +293,10 @@ fun SharedTransitionScope.SearchScreen(
                         launch(Dispatchers.IO) {
                             try {
                                 if (lyricSuccess == LyricsStatus.NotSubmitted) {
-                                    lyricsResult = viewModel.getSyncedLyrics(result.songLink ?: "", context.getVersion())
+                                    lyricsResult = viewModel.getSyncedLyrics(
+                                        result.songLink ?: "",
+                                        context.getVersion()
+                                    )
                                     if (lyricsResult == null)
                                         throw NullPointerException("lyricsResult is null")
                                     else
@@ -334,16 +337,24 @@ fun SharedTransitionScope.SearchScreen(
                                         val lrc =
                                             "[ti:${result.songName}]\n" + "[ar:${result.artistName}]\n" + "[by:$generatedUsingString]\n" + lyrics
                                         val file = filePath?.toLrcFile() ?: File(
-                                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                                            Environment.getExternalStoragePublicDirectory(
+                                                Environment.DIRECTORY_DOWNLOADS
+                                            ),
                                             "SongSync/${result.songName} - ${result.artistName}.lrc"
                                         )
                                         if (!isLegacyVersion || isInternalStorage) {
-                                            file.writeText(lrc)
+                                            if (viewModel.embedLyricsInFile) viewModel.embedLyricsInFile(
+                                                context, filePath
+                                                    ?: throw IllegalArgumentException("File path must not be null"),
+                                                lyrics = lrc
+                                            ) else file.writeText(lrc)
                                         } else {
                                             val sd =
                                                 context.externalCacheDirs[1].absolutePath.substring(
                                                     0,
-                                                    context.externalCacheDirs[1].absolutePath.indexOf("/Android/data")
+                                                    context.externalCacheDirs[1].absolutePath.indexOf(
+                                                        "/Android/data"
+                                                    )
                                                 )
                                             val path =
                                                 filePath?.toLrcFile()?.absolutePath?.substringAfter(
@@ -370,7 +381,8 @@ fun SharedTransitionScope.SearchScreen(
                                                 "text/lrc",
                                                 file.name
                                             )?.let {
-                                                val outputStream = context.contentResolver.openOutputStream(it.uri)
+                                                val outputStream =
+                                                    context.contentResolver.openOutputStream(it.uri)
                                                 outputStream?.write(lrc.toByteArray())
                                                 outputStream?.close()
                                             }
@@ -389,7 +401,8 @@ fun SharedTransitionScope.SearchScreen(
                                     Text(text = stringResource(R.string.save_lrc_file))
                                 }
                                 val clipboardManager = LocalClipboardManager.current
-                                val copiedString = stringResource(R.string.lyrics_copied_to_clipboard)
+                                val copiedString =
+                                    stringResource(R.string.lyrics_copied_to_clipboard)
                                 OutlinedButton(
                                     onClick = {
                                         clipboardManager.setText(AnnotatedString(lyrics))
