@@ -62,8 +62,9 @@ class MainViewModel : ViewModel() {
     // LRCLib Track ID
     private var lrcLibID = 0
 
-    // Netease Track ID
+    // Netease Track ID and stuff
     private var neteaseID = 0L
+    var includeTranslation = false
 
     // Apple Track ID
     private var appleID = 0L
@@ -123,7 +124,7 @@ class MainViewModel : ViewModel() {
             when (this.provider) {
                 Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink, version)
                 Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(this.lrcLibID)
-                Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID)
+                Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID, includeTranslation)
                 Providers.APPLE -> AppleAPI().getSyncedLyrics(this.appleID)
             }
         } catch (e: Exception) {

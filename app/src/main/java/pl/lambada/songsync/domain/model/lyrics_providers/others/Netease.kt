@@ -29,6 +29,7 @@ data class NeteaseArtist(
 @Serializable
 data class NeteaseLyricsResponse(
     val lrc: NeteaseLyrics,
+    val tlyric: NeteaseLyrics?,
     val code: Int
 )
 

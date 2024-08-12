@@ -148,6 +148,21 @@ fun AboutScreen(
             }
 
             item {
+                AboutItem(label = stringResource(id = R.string.include_translation)) {
+                    val includeTranslation = viewModel.includeTranslation
+                    var selected by remember { mutableStateOf(includeTranslation) }
+                    SwitchItem(
+                        label = stringResource(id = R.string.include_translation_summary),
+                        selected = selected
+                    ) {
+                        viewModel.includeTranslation = !selected
+                        selected = !selected
+                        dataStore.set(key = booleanPreferencesKey("include_translation"), value = selected)
+                    }
+                }
+            }
+
+            item {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                     var picker by remember { mutableStateOf(false) }
                     val sdCardPath = viewModel.sdCardPath

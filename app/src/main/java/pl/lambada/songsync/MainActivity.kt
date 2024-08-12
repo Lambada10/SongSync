@@ -100,6 +100,9 @@ class MainActivity : ComponentActivity() {
                     viewModel.sdCardPath = sdCardPath
                 }
 
+                val includeTranslation = dataStore.get(booleanPreferencesKey("include_translation"), false)
+                viewModel.includeTranslation = includeTranslation
+
                 val blacklist = dataStore.get(stringPreferencesKey("blacklist"), null)
                 if (blacklist != null) {
                     viewModel.blacklistedFolders = blacklist.split(",").toMutableList()

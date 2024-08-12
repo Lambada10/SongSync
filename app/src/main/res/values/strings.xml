@@ -118,4 +118,6 @@
     <string name="internal_error">Internal error: %s</string>
     <string name="disable_marquee">Disable Marquee Text</string>
     <string name="disable_marquee_summary">Disable moving text animation in app</string>
+    <string name="include_translation">Include translation</string>
+    <string name="include_translation_summary">Include translated lyrics when getting song lyrics from Netease provider</string>
 </resources>
