@@ -35,6 +35,7 @@ jobs:
                   path: ./app/build/outputs/apk/debug/app-debug.apk
 
     build-release:
+        if: github.event_name == 'push'
         name: Build signed release APK
         runs-on: ubuntu-latest
 
