@@ -344,9 +344,15 @@ class MainViewModel : ViewModel() {
             val fd = getFileDescriptorFromPath(context, filePath, mode = "w")
                 ?: throw IllegalStateException("File descriptor is null")
 
+            val fileDescriptor = fd.dup().detachFd()
+
+            val metadata = TagLib.getMetadata(fileDescriptor, false) ?: throw IllegalStateException(
+                "Metadata is null"
+            )
+
             fd.dup().detachFd().let {
                 TagLib.savePropertyMap(
-                    it, propertyMap = PropertyMap().apply {
+                    it, propertyMap = metadata.propertyMap.apply {
                         put("LYRICS", arrayOf(lyrics))
                     }
                 )
