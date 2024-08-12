@@ -71,7 +71,10 @@ class AppleAPI {
                     syncedLyrics.append("[${line.timestamp.toLrcTimestamp()}]")
 
                     for (syllable in line.text) {
-                        syncedLyrics.append("<${syllable.timestamp!!.toLrcTimestamp()}>${syllable.text} ")
+                        syncedLyrics.append("<${syllable.timestamp!!.toLrcTimestamp()}>${syllable.text}")
+                        if (!syllable.part) {
+                            syncedLyrics.append(" ")
+                        }
                     }
 
                     syncedLyrics.append("<${line.endtime.toLrcTimestamp()}>\n")

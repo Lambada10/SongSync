@@ -33,5 +33,6 @@ data class AppleLyrics(
 @Serializable
 data class AppleLyricsLineDetails(
     val text: String,
+    val part: Boolean,
     val timestamp: Int?
 )
