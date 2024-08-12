@@ -45,13 +45,9 @@ class NeteaseAPI {
      */
     @OptIn(ExperimentalSerializationApi::class)
     suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo? {
-        val search = withContext(Dispatchers.IO) {
-            URLEncoder.encode(
-                "${query.songName} ${query.artistName}",
-                Charsets.UTF_8.toString()
-            )
-        }
-        if (search == "+")
+        val search = "${query.songName} ${query.artistName}"
+
+        if (search == " ")
             throw EmptyQueryException()
 
         val response = client.get(
