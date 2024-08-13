@@ -343,11 +343,7 @@ fun SharedTransitionScope.SearchScreen(
                                             "SongSync/${result.songName} - ${result.artistName}.lrc"
                                         )
                                         if (!isLegacyVersion || isInternalStorage) {
-                                            if (viewModel.embedLyricsInFile) viewModel.embedLyricsInFile(
-                                                context, filePath
-                                                    ?: throw IllegalArgumentException("File path must not be null"),
-                                                lyrics = lrc
-                                            ) else file.writeText(lrc)
+                                            file.writeText(lrc)
                                         } else {
                                             val sd =
                                                 context.externalCacheDirs[1].absolutePath.substring(
@@ -400,24 +396,56 @@ fun SharedTransitionScope.SearchScreen(
                                 ) {
                                     Text(text = stringResource(R.string.save_lrc_file))
                                 }
-                                val clipboardManager = LocalClipboardManager.current
-                                val copiedString =
-                                    stringResource(R.string.lyrics_copied_to_clipboard)
-                                OutlinedButton(
+                                Button(
                                     onClick = {
-                                        clipboardManager.setText(AnnotatedString(lyrics))
-                                        Toast.makeText(
-                                            context,
-                                            copiedString,
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
+                                        val lrc =
+                                            "[ti:${result.songName}]\n" + "[ar:${result.artistName}]\n" + "[by:$generatedUsingString]\n" + lyrics
+
+                                        val embeddedToFile = kotlin.runCatching {
+                                            viewModel.embedLyricsInFile(
+                                                context,
+                                                filePath ?: throw NullPointerException("filePath is null"),
+                                                lrc
+                                            )
+                                        }
+
+                                        if(embeddedToFile.isFailure) {
+                                            Toast.makeText(
+                                                context,
+                                                embeddedToFile.exceptionOrNull()?.message ?: context.getString(R.string.error),
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                            return@Button
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                context.getString(R.string.embedded_lyrics_in_file),
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                    },
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.ContentCopy,
-                                        contentDescription = stringResource(R.string.copy_lyrics_to_clipboard)
-                                    )
+                                    Text(text = stringResource(R.string.embed_lyrics_in_file))
                                 }
+                            }
+
+                            val clipboardManager = LocalClipboardManager.current
+                            val copiedString =
+                                stringResource(R.string.lyrics_copied_to_clipboard)
+                            OutlinedButton(
+                                onClick = {
+                                    clipboardManager.setText(AnnotatedString(lyrics))
+                                    Toast.makeText(
+                                        context,
+                                        copiedString,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ContentCopy,
+                                    contentDescription = stringResource(R.string.copy_lyrics_to_clipboard)
+                                )
                             }
 
                             Spacer(modifier = Modifier.height(6.dp))

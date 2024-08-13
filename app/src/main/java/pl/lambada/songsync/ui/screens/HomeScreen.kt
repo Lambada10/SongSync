@@ -1224,23 +1224,20 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                                             }
                                         }
                                     }
-                                    if (viewModel.embedLyricsInFile) {
-                                        viewModel.embedLyricsInFile(context, song.filePath, lrc)
-                                    } else {
-                                        sdCardFiles?.listFiles()?.forEach {
-                                            if (it.name == file.name) {
-                                                it.delete()
-                                                return@forEach
-                                            }
+                                    //In here we won't try to embed lyrics in file because if it failed before, it will fail again
+                                    sdCardFiles?.listFiles()?.forEach {
+                                        if (it.name == file.name) {
+                                            it.delete()
+                                            return@forEach
                                         }
-                                        sdCardFiles?.createFile(
-                                            "text/lrc", file.name
-                                        )?.let {
-                                            val outputStream =
-                                                context.contentResolver.openOutputStream(it.uri)
-                                            outputStream?.write(lrc.toByteArray())
-                                            outputStream?.close()
-                                        }
+                                    }
+                                    sdCardFiles?.createFile(
+                                        "text/lrc", file.name
+                                    )?.let {
+                                        val outputStream =
+                                            context.contentResolver.openOutputStream(it.uri)
+                                        outputStream?.write(lrc.toByteArray())
+                                        outputStream?.close()
                                     }
                                 } else {
                                     throw e
