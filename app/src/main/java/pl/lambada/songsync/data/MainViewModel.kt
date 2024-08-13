@@ -15,7 +15,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kyant.taglib.PropertyMap
 import com.kyant.taglib.TagLib
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -134,7 +133,11 @@ class MainViewModel : ViewModel() {
             when (this.provider) {
                 Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink, version)
                 Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(this.lrcLibID)
-                Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID, includeTranslation)
+                Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(
+                    this.neteaseID,
+                    includeTranslation
+                )
+
                 Providers.APPLE -> AppleAPI().getSyncedLyrics(this.appleID)
             }
         } catch (e: Exception) {
@@ -264,17 +267,20 @@ class MainViewModel : ViewModel() {
             val data: List<Song> = when {
                 cachedFilteredSongs.value.isNotEmpty() -> cachedFilteredSongs.value
                 cachedSongs != null -> cachedSongs!!
-                else -> { return@launch }
+                else -> {
+                    return@launch
+                }
             }
 
             val results = data.filter {
                 it.title?.contains(query, ignoreCase = true) == true ||
-                it.artist?.contains(query, ignoreCase = true) == true
+                        it.artist?.contains(query, ignoreCase = true) == true
             }
 
             _searchResults.value = results
         }
     }
+
     /**
      * Loads all songs' folders
      * @param context The application context.
@@ -314,10 +320,12 @@ class MainViewModel : ViewModel() {
                         )
                     }
             }
+
             hideLyrics -> {
                 _cachedFilteredSongs?.value = cachedSongs!!
                     .filter { it.filePath.toLrcFile()?.exists() != true }
             }
+
             hideFolders -> {
                 _cachedFilteredSongs?.value = cachedSongs!!.filter {
                     !blacklistedFolders.contains(
@@ -328,6 +336,7 @@ class MainViewModel : ViewModel() {
                     )
                 }
             }
+
             else -> {
                 _cachedFilteredSongs?.value = emptyList()
             }

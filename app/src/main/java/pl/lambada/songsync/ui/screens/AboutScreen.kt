@@ -40,7 +40,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,7 +51,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
@@ -126,7 +124,10 @@ fun AboutScreen(
                         ) {
                             viewModel.pureBlack.value = !selected
                             selected = !selected
-                            dataStore.set(key = booleanPreferencesKey("pure_black"), value = selected)
+                            dataStore.set(
+                                key = booleanPreferencesKey("pure_black"),
+                                value = selected
+                            )
                         }
                     }
                 }
@@ -142,7 +143,10 @@ fun AboutScreen(
                     ) {
                         viewModel.disableMarquee.value = !selected
                         selected = !selected
-                        dataStore.set(key = booleanPreferencesKey("marquee_disable"), value = selected)
+                        dataStore.set(
+                            key = booleanPreferencesKey("marquee_disable"),
+                            value = selected
+                        )
                     }
                 }
             }
@@ -157,7 +161,10 @@ fun AboutScreen(
                     ) {
                         viewModel.includeTranslation = !selected
                         selected = !selected
-                        dataStore.set(key = booleanPreferencesKey("include_translation"), value = selected)
+                        dataStore.set(
+                            key = booleanPreferencesKey("include_translation"),
+                            value = selected
+                        )
                     }
                 }
             }
@@ -306,7 +313,8 @@ fun AboutScreen(
             item {
                 AboutItem(stringResource(R.string.contributors)) {
                     Contributor.entries.forEach {
-                        val additionalInfo = stringResource(id = it.contributionLevel.stringResource)
+                        val additionalInfo =
+                            stringResource(id = it.contributionLevel.stringResource)
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()

@@ -63,6 +63,7 @@ import java.io.File
  */
 class MainActivity : ComponentActivity() {
     val viewModel: MainViewModel by viewModels()
+
     /**
      * Called when the activity is starting.
      *
@@ -100,7 +101,8 @@ class MainActivity : ComponentActivity() {
                     viewModel.sdCardPath = sdCardPath
                 }
 
-                val includeTranslation = dataStore.get(booleanPreferencesKey("include_translation"), false)
+                val includeTranslation =
+                    dataStore.get(booleanPreferencesKey("include_translation"), false)
                 viewModel.includeTranslation = includeTranslation
 
                 val blacklist = dataStore.get(stringPreferencesKey("blacklist"), null)
@@ -111,7 +113,8 @@ class MainActivity : ComponentActivity() {
                 val hideLyrics = dataStore.get(booleanPreferencesKey("hide_lyrics"), false)
                 viewModel.hideLyrics = hideLyrics
 
-                val provider = dataStore.get(stringPreferencesKey("provider"), Providers.SPOTIFY.displayName)
+                val provider =
+                    dataStore.get(stringPreferencesKey("provider"), Providers.SPOTIFY.displayName)
                 viewModel.provider = Providers.entries.find { it.displayName == provider }!!
 
                 val embedLyrics = dataStore.get(booleanPreferencesKey("embed_lyrics"), false)
@@ -160,7 +163,7 @@ class MainActivity : ComponentActivity() {
                         }
                     )
 
-                    Surface( modifier = Modifier.fillMaxSize() ) {
+                    Surface(modifier = Modifier.fillMaxSize()) {
                         if (!hasLoadedPermissions) {
                             LoadingScreen()
                         } else if (!hasPermissions) {
@@ -194,14 +197,15 @@ class MainActivity : ComponentActivity() {
                             NoInternetDialog(
                                 onConfirm = { finishAndRemoveTask() },
                                 onIgnore = {
-                                    internetConnection = true // assume connected (if spotify is down, can use other providers)
+                                    internetConnection =
+                                        true // assume connected (if spotify is down, can use other providers)
                                 }
                             )
                         }
+                    }
                 }
         }
     }
-}
 
     override fun onResume() {
         val notificationManager =
@@ -232,7 +236,8 @@ class MainActivity : ComponentActivity() {
 fun RequestPermissions(onGranted: () -> Unit, context: Context, onDone: () -> Unit) {
     var storageManager: ActivityResultLauncher<Intent>? = null
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        storageManager = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        storageManager =
+            rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 if (Environment.isExternalStorageManager()) {
                     onGranted()
                 }

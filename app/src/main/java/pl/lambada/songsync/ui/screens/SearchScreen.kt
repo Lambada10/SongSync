@@ -404,15 +404,17 @@ fun SharedTransitionScope.SearchScreen(
                                         val embeddedToFile = kotlin.runCatching {
                                             viewModel.embedLyricsInFile(
                                                 context,
-                                                filePath ?: throw NullPointerException("filePath is null"),
+                                                filePath
+                                                    ?: throw NullPointerException("filePath is null"),
                                                 lrc
                                             )
                                         }
 
-                                        if(embeddedToFile.isFailure) {
+                                        if (embeddedToFile.isFailure) {
                                             Toast.makeText(
                                                 context,
-                                                embeddedToFile.exceptionOrNull()?.message ?: context.getString(R.string.error),
+                                                embeddedToFile.exceptionOrNull()?.message
+                                                    ?: context.getString(R.string.error),
                                                 Toast.LENGTH_LONG
                                             ).show()
                                             return@Button

@@ -12,8 +12,8 @@ import kotlinx.serialization.Serializable
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.ui.screens.AboutScreen
-import pl.lambada.songsync.ui.screens.SearchScreen
 import pl.lambada.songsync.ui.screens.HomeScreen
+import pl.lambada.songsync.ui.screens.SearchScreen
 
 /**
  * Composable function for handling navigation within the app.
