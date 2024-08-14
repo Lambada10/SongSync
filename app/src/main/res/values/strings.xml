@@ -121,5 +121,6 @@
     <string name="include_translation">Include translation</string>
     <string name="include_translation_summary">Include translated lyrics when getting song lyrics from Netease provider</string>
     <string name="embed_lyrics_in_file">Embed lyrics to file</string>
-    <string name="embedded_lyrics_in_file">Lyrics has been embeded to the song file</string>
+    <string name="embedded_lyrics_in_file">Lyrics has been embedded to the song file</string>
+    <string name="embed_non_local_song_error">You tried to embed the lyrics to a non-local file. Aborting operation.</string>
 </resources>

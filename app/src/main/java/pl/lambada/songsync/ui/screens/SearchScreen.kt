@@ -401,24 +401,29 @@ fun SharedTransitionScope.SearchScreen(
                                         val lrc =
                                             "[ti:${result.songName}]\n" + "[ar:${result.artistName}]\n" + "[by:$generatedUsingString]\n" + lyrics
 
-                                        val embeddedToFile = kotlin.runCatching {
+                                        kotlin.runCatching {
                                             viewModel.embedLyricsInFile(
                                                 context,
                                                 filePath
                                                     ?: throw NullPointerException("filePath is null"),
                                                 lrc
                                             )
-                                        }
-
-                                        if (embeddedToFile.isFailure) {
+                                        }.onFailure { exception ->
+                                            val errorMessage = when(exception) {
+                                                is NullPointerException -> {
+                                                    context.getString(R.string.embed_non_local_song_error)
+                                                }
+                                                else -> {
+                                                    exception.message
+                                                        ?: context.getString(R.string.error)
+                                                }
+                                            }
                                             Toast.makeText(
                                                 context,
-                                                embeddedToFile.exceptionOrNull()?.message
-                                                    ?: context.getString(R.string.error),
+                                                errorMessage,
                                                 Toast.LENGTH_LONG
                                             ).show()
-                                            return@Button
-                                        } else {
+                                        }.onSuccess {
                                             Toast.makeText(
                                                 context,
                                                 context.getString(R.string.embedded_lyrics_in_file),
