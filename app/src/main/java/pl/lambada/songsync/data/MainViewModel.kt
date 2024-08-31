@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -351,8 +352,16 @@ class MainViewModel : ViewModel() {
         hideLyrics = newHideLyrics
     }
 
-    fun onToggleFolderBlacklist(folder: String, blacklisted: Boolean) {
-
+    fun onToggleFolderBlacklist(dataStore: DataStore<Preferences>, folder: String, blacklisted: Boolean) {
+        if (blacklisted) {
+            blacklistedFolders.add(folder)
+        } else {
+            blacklistedFolders.remove(folder)
+        }
+        dataStore.set(
+            stringPreferencesKey("blacklist"),
+            blacklistedFolders.joinToString(",")
+        )
     }
 }
 

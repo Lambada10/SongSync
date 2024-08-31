@@ -256,7 +256,9 @@ fun HomeScreenLoaded(
                             onDismiss = { showFilters = false },
                             onFilterChange = { viewModel.filterSongs() },
                             onHideLyricsChange = { viewModel.onHideLyricsChange(dataStore, it) },
-                            onToggleFolderBlacklist = viewModel::onToggleFolderBlacklist
+                            onToggleFolderBlacklist = { folder, blacklisted ->
+                                viewModel.onToggleFolderBlacklist(dataStore, folder, blacklisted)
+                            }
                         )
                     }
                 }
