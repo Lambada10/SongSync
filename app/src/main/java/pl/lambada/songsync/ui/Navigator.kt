@@ -3,17 +3,15 @@ package pl.lambada.songsync.ui
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import pl.lambada.songsync.data.MainViewModel
-import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.ui.screens.AboutScreen
 import pl.lambada.songsync.ui.screens.SearchScreen
-import pl.lambada.songsync.ui.screens.HomeScreen
+import pl.lambada.songsync.ui.screens.home.HomeScreen
 
 /**
  * Composable function for handling navigation within the app.

@@ -268,7 +268,7 @@ fun SharedTransitionScope.SearchScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         OutlinedButton(
-                            enabled = viewModel.provider != Providers.LRCLIB && viewModel.provider != Providers.APPLE,
+                            enabled = viewModel.selectedProvider != Providers.LRCLIB && viewModel.selectedProvider != Providers.APPLE,
                             onClick = {
                                 offset += 1
                                 queryResult = SongInfo(

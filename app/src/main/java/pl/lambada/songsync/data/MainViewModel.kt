@@ -6,13 +6,17 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.data.remote.github.GithubAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.AppleAPI
@@ -35,7 +39,10 @@ import java.net.UnknownHostException
 class MainViewModel : ViewModel() {
     private var cachedSongs: List<Song>? = null
     val selected = mutableStateListOf<String>()
-    val allSongs = mutableStateListOf<Song>()
+    var allSongs by mutableStateOf<List<Song>?>(null)
+
+    var ableToSelect by mutableStateOf<List<Song>?>(null)
+
 
     // Filter settings
     private var cachedFolders: MutableList<String>? = null
@@ -60,7 +67,7 @@ class MainViewModel : ViewModel() {
     var sdCardPath = ""
 
     // selected provider
-    var provider = Providers.SPOTIFY
+    var selectedProvider by mutableStateOf(Providers.SPOTIFY)
 
     // LRCLib Track ID
     private var lrcLibID = 0
@@ -72,6 +79,10 @@ class MainViewModel : ViewModel() {
     // Apple Track ID
     private var appleID = 0L
     // TODO: Use values from SongInfo object returned by search instead of storing them here
+
+    init {
+        viewModelScope.launch { updateAbleToSelect() }
+    }
 
     /**
      * Refreshes the access token by sending a request to the Spotify API.
@@ -92,7 +103,7 @@ class MainViewModel : ViewModel() {
     )
     suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
         return try {
-            when (this.provider) {
+            when (this.selectedProvider) {
                 Providers.SPOTIFY -> spotifyAPI.getSongInfo(query, offset)
                 Providers.LRCLIB -> LRCLibAPI().getSongInfo(query).also {
                     this.lrcLibID = it?.lrcLibID ?: 0
@@ -124,7 +135,7 @@ class MainViewModel : ViewModel() {
      */
     suspend fun getSyncedLyrics(songLink: String, version: String): String? {
         return try {
-            when (this.provider) {
+            when (this.selectedProvider) {
                 Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink, version)
                 Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(this.lrcLibID)
                 Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID, includeTranslation)
@@ -154,10 +165,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun updateAllSongs(context: Context) = viewModelScope.launch(Dispatchers.IO) {
-        val newSongsList = getAllSongs(context)
-        // do not clear the list until the songs are actually loaded
-        allSongs.clear()
-        allSongs.addAll(newSongsList)
+        allSongs = getAllSongs(context)
     }
 
     /**
@@ -301,6 +309,35 @@ class MainViewModel : ViewModel() {
                 _cachedFilteredSongs?.value = emptyList()
             }
         }
+    }
+
+    private suspend fun updateAbleToSelect() = coroutineScope {
+        searchResults.combine(cachedFilteredSongs) { searched, filtered ->
+            ableToSelect = when {
+                searched.isNotEmpty() -> searched
+                filtered.isNotEmpty() -> filtered
+                else -> allSongs
+            }
+        }
+    }
+
+    fun invertSongSelection() {
+        val willBeSelected = ableToSelect?.map { it.filePath }?.toMutableList()
+
+        for (song in selected) { willBeSelected?.remove(song) }
+
+        selected.clear()
+        if (willBeSelected != null) {
+            for (song in willBeSelected) {
+                song?.let { selected.add(it) }
+            }
+        }
+    }
+
+    fun selectAllSongs() {
+        ableToSelect
+            ?.mapNotNull { it.filePath }
+            ?.forEach(selected::add)
     }
 }
 

@@ -25,12 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -48,11 +44,10 @@ import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.data.MainViewModel
-import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.ui.Navigator
 import pl.lambada.songsync.ui.components.dialogs.NoInternetDialog
-import pl.lambada.songsync.ui.screens.LoadingScreen
 import pl.lambada.songsync.ui.screens.Providers
+import pl.lambada.songsync.ui.screens.home.LoadingScreen
 import pl.lambada.songsync.ui.theme.SongSyncTheme
 import pl.lambada.songsync.util.dataStore
 import pl.lambada.songsync.util.get
@@ -111,7 +106,7 @@ class MainActivity : ComponentActivity() {
                 viewModel.hideLyrics = hideLyrics
 
                 val provider = dataStore.get(stringPreferencesKey("provider"), Providers.SPOTIFY.displayName)
-                viewModel.provider = Providers.entries.find { it.displayName == provider }!!
+                viewModel.selectedProvider = Providers.entries.find { it.displayName == provider }!!
 
                 // Get token upon app start
                 launch(Dispatchers.IO) {
