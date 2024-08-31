@@ -5,17 +5,14 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
-import pl.lambada.songsync.data.EmptyQueryException
-import pl.lambada.songsync.data.InternalErrorException
+import pl.lambada.songsync.EmptyQueryException
+import pl.lambada.songsync.InternalErrorException
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.lyrics_providers.others.NeteaseLyricsResponse
 import pl.lambada.songsync.domain.model.lyrics_providers.others.NeteaseResponse
 import pl.lambada.songsync.util.networking.Ktor.client
 import pl.lambada.songsync.util.networking.Ktor.json
-import java.net.URLEncoder
 
 class NeteaseAPI {
     private val baseURL = "http://music.163.com/api/"

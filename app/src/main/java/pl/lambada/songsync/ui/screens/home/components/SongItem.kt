@@ -32,10 +32,10 @@ import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import pl.lambada.songsync.R
-import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.ui.ScreenSearch
 import pl.lambada.songsync.ui.components.AnimatedText
+import pl.lambada.songsync.ui.screens.home.HomeViewModel
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class)
@@ -49,7 +49,7 @@ fun SongItem(
     song: Song,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    viewModel: MainViewModel,
+    viewModel: HomeViewModel,
 ) {
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current).data(data = song.imgUri).apply {

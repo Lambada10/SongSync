@@ -1,4 +1,4 @@
-package pl.lambada.songsync.ui.screens
+package pl.lambada.songsync.ui.screens.search
 
 import android.net.Uri
 import android.os.Build
@@ -56,16 +56,18 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import pl.lambada.songsync.EmptyQueryException
+import pl.lambada.songsync.MainViewModel
+import pl.lambada.songsync.NoTrackFoundException
 import pl.lambada.songsync.R
-import pl.lambada.songsync.data.EmptyQueryException
-import pl.lambada.songsync.data.MainViewModel
-import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.components.CommonTextField
 import pl.lambada.songsync.ui.components.SongCard
+import pl.lambada.songsync.ui.screens.Providers
 import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.File
@@ -85,7 +87,7 @@ fun SharedTransitionScope.SearchScreen(
     artists: String?,
     coverUri: String?,
     filePath: String?,
-    viewModel: MainViewModel,
+    viewModel: SearchViewModel = viewModel(),
     navController: NavController,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,

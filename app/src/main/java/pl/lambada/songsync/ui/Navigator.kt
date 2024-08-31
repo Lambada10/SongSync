@@ -8,10 +8,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import pl.lambada.songsync.data.MainViewModel
+import pl.lambada.songsync.MainViewModel
 import pl.lambada.songsync.ui.screens.AboutScreen
-import pl.lambada.songsync.ui.screens.SearchScreen
 import pl.lambada.songsync.ui.screens.home.HomeScreen
+import pl.lambada.songsync.ui.screens.search.SearchScreen
 
 /**
  * Composable function for handling navigation within the app.
@@ -33,7 +33,6 @@ fun Navigator(
             composable<ScreenHome> {
                 HomeScreen(
                     navController = navController,
-                    viewModel = viewModel,
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
                 )
@@ -46,7 +45,6 @@ fun Navigator(
                     artists = args.artists,
                     coverUri = args.coverUri,
                     filePath = args.filePath,
-                    viewModel = viewModel,
                     navController = navController,
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,

@@ -29,14 +29,14 @@ import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import pl.lambada.songsync.EmptyQueryException
+import pl.lambada.songsync.InternalErrorException
 import pl.lambada.songsync.MainActivity
+import pl.lambada.songsync.NoTrackFoundException
 import pl.lambada.songsync.R
-import pl.lambada.songsync.data.EmptyQueryException
-import pl.lambada.songsync.data.InternalErrorException
-import pl.lambada.songsync.data.MainViewModel
-import pl.lambada.songsync.data.NoTrackFoundException
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.components.AnimatedText
+import pl.lambada.songsync.ui.screens.home.HomeViewModel
 import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.FileNotFoundException
@@ -44,7 +44,7 @@ import kotlin.math.roundToInt
 
 @SuppressLint("StringFormatMatches")
 @Composable
-fun BatchDownloadLyrics(viewModel: MainViewModel, onDone: () -> Unit) {
+fun BatchDownloadLyrics(viewModel: HomeViewModel, onDone: () -> Unit) {
     val unknownString = stringResource(id = R.string.unknown)
     val generatedUsingString = stringResource(id = R.string.generated_using)
     val songs = viewModel.songsToBatchDownload

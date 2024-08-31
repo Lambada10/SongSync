@@ -4,7 +4,7 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import pl.lambada.songsync.data.EmptyQueryException
+import pl.lambada.songsync.EmptyQueryException
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.lyrics_providers.others.LRCLibResponse
 import pl.lambada.songsync.util.networking.Ktor.client

@@ -1,4 +1,4 @@
-package pl.lambada.songsync.data
+package pl.lambada.songsync.ui.screens.home
 
 import android.content.ContentUris
 import android.content.Context
@@ -26,17 +26,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import pl.lambada.songsync.data.remote.github.GithubAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.AppleAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.LRCLibAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.NeteaseAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyLyricsAPI
-import pl.lambada.songsync.domain.model.Release
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.screens.Providers
-import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.util.ext.toLrcFile
 import pl.lambada.songsync.util.set
 import java.io.FileNotFoundException
@@ -45,7 +42,7 @@ import java.net.UnknownHostException
 /**
  * ViewModel class for the main functionality of the app.
  */
-class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
+class HomeViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
     private var cachedSongs: List<Song>? = null
     val selected = mutableStateListOf<String>()
     var allSongs by mutableStateOf<List<Song>?>(null)
@@ -70,7 +67,6 @@ class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
     private val spotifyAPI = SpotifyAPI()
 
     // other settings
-    var pureBlack: MutableState<Boolean> = mutableStateOf(false)
     var disableMarquee: MutableState<Boolean> = mutableStateOf(false)
     var sdCardPath = ""
 
@@ -130,13 +126,6 @@ class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
     }
 
     /**
-     * Refreshes the access token by sending a request to the Spotify API.
-     */
-    suspend fun refreshToken() {
-        spotifyAPI.refreshToken()
-    }
-
-    /**
      * Gets song information from the Spotify API.
      * @param query The SongInfo object with songName and artistName fields filled.
      * @param offset (optional) The offset used for trying to find a better match or searching again.
@@ -189,24 +178,6 @@ class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
         } catch (e: Exception) {
             null
         }
-    }
-
-    /**
-     * Gets latest GitHub release information.
-     * @return The latest release version.
-     */
-    suspend fun getLatestRelease(): Release {
-        return GithubAPI.getLatestRelease()
-    }
-
-    /**
-     * Checks if the latest release is newer than the current version.
-     */
-    suspend fun isNewerRelease(context: Context): Boolean {
-        val currentVersion = context.getVersion().replace(".", "").toInt()
-        val latestVersion = getLatestRelease().tagName.replace(".", "").replace("v", "").toInt()
-
-        return latestVersion > currentVersion
     }
 
     fun updateAllSongs(context: Context) = viewModelScope.launch(Dispatchers.IO) {

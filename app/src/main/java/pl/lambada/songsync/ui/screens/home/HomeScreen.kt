@@ -34,8 +34,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import pl.lambada.songsync.data.MainViewModel
+import pl.lambada.songsync.MainViewModel
 import pl.lambada.songsync.ui.ScreenAbout
 import pl.lambada.songsync.ui.ScreenSearch
 import pl.lambada.songsync.ui.screens.home.components.BatchDownloadLyrics
@@ -58,7 +59,7 @@ import pl.lambada.songsync.util.ext.lowercaseWithLocale
 @Composable
 fun HomeScreen(
     navController: NavHostController,
-    viewModel: MainViewModel,
+    viewModel: HomeViewModel = viewModel(),
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
@@ -152,7 +153,7 @@ fun LoadingScreen() {
 fun HomeScreenLoaded(
     selected: SnapshotStateList<String>,
     navController: NavHostController,
-    viewModel: MainViewModel,
+    viewModel: HomeViewModel,
     paddingValues: PaddingValues,
     isBatchDownload: Boolean,
     onBatchDownloadState: (isBatchDownload: Boolean) -> Unit,

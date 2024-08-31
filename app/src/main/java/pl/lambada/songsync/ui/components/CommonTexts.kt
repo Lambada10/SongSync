@@ -40,7 +40,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import pl.lambada.songsync.data.MainViewModel
 
 @Composable
 fun AnimatedText(
