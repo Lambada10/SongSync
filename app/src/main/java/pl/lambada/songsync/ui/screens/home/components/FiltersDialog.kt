@@ -1,6 +1,5 @@
 package pl.lambada.songsync.ui.screens.home.components
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -39,27 +38,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import pl.lambada.songsync.R
-import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.ui.components.SwitchItem
-import pl.lambada.songsync.util.dataStore
-import pl.lambada.songsync.util.set
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FiltersDialog(
-    viewModel: MainViewModel,
-    context: Context,
+    hideLyrics: Boolean,
+    folders: List<String>,
+    blacklistedFolders: List<String>,
     onDismiss: () -> Unit,
-    onFilterChange: () -> Unit
+    onFilterChange: () -> Unit,
+    onHideLyricsChange: (Boolean) -> Unit,
+    onToggleFolderBlacklist: (String, Boolean) -> Unit
 ) {
-    var hideLyrics by remember { mutableStateOf(viewModel.hideLyrics) }
-    val folders = viewModel.getSongFolders(context)
     var showFolders by rememberSaveable { mutableStateOf(false) }
-
-    val dataStore = context.dataStore
 
     BasicAlertDialog(onDismissRequest = { onDismiss() }) {
         Surface(
@@ -88,12 +81,7 @@ fun FiltersDialog(
                         bottom = 8.dp
                     )
                 ) {
-                    viewModel.hideLyrics = !hideLyrics
-                    dataStore.set(
-                        booleanPreferencesKey("hide_lyrics"),
-                        !hideLyrics
-                    )
-                    hideLyrics = !hideLyrics
+                    onHideLyricsChange(!hideLyrics)
                     onFilterChange()
                 }
                 Spacer(modifier = Modifier.height(16.dp))
@@ -145,25 +133,17 @@ fun FiltersDialog(
                     )
                     HorizontalDivider()
                     LazyColumn {
-                        items(folders.size) {
-                            val folder = folders[it]
+                        items(folders.size) { index ->
+                            val folder = folders[index]
                             var checked by remember {
-                                mutableStateOf(viewModel.blacklistedFolders.contains(folder))
+                                mutableStateOf(blacklistedFolders.contains(folder))
                             }
 
                             Row(
                                 modifier = Modifier
                                     .clickable {
                                         checked = !checked
-                                        if (checked) {
-                                            viewModel.blacklistedFolders.add(folder)
-                                        } else {
-                                            viewModel.blacklistedFolders.remove(folder)
-                                        }
-                                        dataStore.set(
-                                            stringPreferencesKey("blacklist"),
-                                            viewModel.blacklistedFolders.joinToString(",")
-                                        )
+                                        onToggleFolderBlacklist(folder, checked)
                                         onFilterChange()
                                     }
                                     .padding(start = 22.dp, end = 16.dp),
@@ -181,15 +161,7 @@ fun FiltersDialog(
                                     checked = checked,
                                     onCheckedChange = { check ->
                                         checked = check
-                                        if (check) {
-                                            viewModel.blacklistedFolders.add(folder)
-                                        } else {
-                                            viewModel.blacklistedFolders.remove(folder)
-                                        }
-                                        dataStore.set(
-                                            stringPreferencesKey("blacklist"),
-                                            viewModel.blacklistedFolders.joinToString(",")
-                                        )
+                                        onToggleFolderBlacklist(folder, check)
                                         onFilterChange()
                                     }
                                 )

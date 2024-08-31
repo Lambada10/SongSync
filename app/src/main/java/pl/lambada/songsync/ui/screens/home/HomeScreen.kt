@@ -76,8 +76,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.MainViewModel
@@ -88,6 +86,7 @@ import pl.lambada.songsync.ui.screens.home.components.BatchDownloadLyrics
 import pl.lambada.songsync.ui.screens.home.components.FiltersDialog
 import pl.lambada.songsync.ui.screens.home.components.HomeAppBar
 import pl.lambada.songsync.ui.screens.home.components.SongItem
+import pl.lambada.songsync.util.dataStore
 import pl.lambada.songsync.util.ext.BackPressHandler
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
 
@@ -226,6 +225,8 @@ fun HomeScreenLoaded(
         else -> songs
     }
 
+    val dataStore = context.dataStore
+
     LaunchedEffect(Unit) {
         viewModel.filterSongs()
     }
@@ -237,6 +238,7 @@ fun HomeScreenLoaded(
                 viewModel = viewModel,
                 onDone = { onBatchDownload(false) })
         }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -293,18 +295,22 @@ fun HomeScreenLoaded(
                                 willShowIme = false
                             }
                             val focusManager = LocalFocusManager.current
-                            TextField(value = query,
+
+                            TextField(
+                                value = query,
                                 onValueChange = {
                                     query = it
                                     viewModel.updateSearchResults(it.text.lowercaseWithLocale())
                                 },
                                 leadingIcon = {
-                                    Icon(Icons.Filled.Search,
+                                    Icon(
+                                        Icons.Filled.Search,
                                         contentDescription = stringResource(id = R.string.search),
                                         modifier = Modifier.clickable {
                                             showSearch = false
                                             showingSearch = false
-                                        })
+                                        }
+                                    )
                                 },
                                 trailingIcon = {
                                     Icon(
@@ -330,9 +336,7 @@ fun HomeScreenLoaded(
                                     .padding(end = 18.dp)
                                     .focusRequester(focusRequester)
                                     .onFocusChanged {
-                                        if (it.isFocused && !showingIme) {
-                                            willShowIme = true
-                                        }
+                                        if (it.isFocused && !showingIme) willShowIme = true
                                     }
                                     .onGloballyPositioned {
                                         if (showSearch && !showingIme) {
@@ -341,9 +345,9 @@ fun HomeScreenLoaded(
                                         }
                                     },
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                                keyboardActions = KeyboardActions(onSearch = {
-                                    focusManager.clearFocus()
-                                })
+                                keyboardActions = KeyboardActions(
+                                    onSearch = { focusManager.clearFocus() }
+                                )
                             )
                         } else {
                             Row(
@@ -361,14 +365,13 @@ fun HomeScreenLoaded(
 
                                 if (showFilters) {
                                     FiltersDialog(
-                                        viewModel = viewModel,
-                                        context = context,
-                                        onDismiss = { showFilters = false },
-                                        onFilterChange = {
-                                            scope.launch(Dispatchers.Default) {
-                                                viewModel.filterSongs()
-                                            }
-                                        },
+                                        hideLyrics = viewModel.hideLyrics,
+                                        folders = viewModel.getSongFolders(context),
+                                        blacklistedFolders = viewModel.blacklistedFolders,
+                                        onDismiss = { showFilters = false  },
+                                        onFilterChange = { viewModel.filterSongs() },
+                                        onHideLyricsChange = { viewModel.onHideLyricsChange(dataStore, it) },
+                                        onToggleFolderBlacklist = viewModel::onToggleFolderBlacklist
                                     )
                                 }
 

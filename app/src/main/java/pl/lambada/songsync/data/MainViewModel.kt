@@ -10,6 +10,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +33,7 @@ import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.screens.Providers
 import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.util.ext.toLrcFile
+import pl.lambada.songsync.util.set
 import java.io.FileNotFoundException
 import java.net.UnknownHostException
 
@@ -41,13 +45,12 @@ class MainViewModel : ViewModel() {
     val selected = mutableStateListOf<String>()
     var allSongs by mutableStateOf<List<Song>?>(null)
 
-    var ableToSelect by mutableStateOf<List<Song>?>(null)
-
+    private var ableToSelect by mutableStateOf<List<Song>?>(null)
 
     // Filter settings
     private var cachedFolders: MutableList<String>? = null
     var blacklistedFolders = mutableListOf<String>()
-    var hideLyrics = false
+    var hideLyrics by mutableStateOf(false)
     private var hideFolders = blacklistedFolders.isNotEmpty()
 
     // filtered folders/lyrics songs
@@ -277,7 +280,7 @@ class MainViewModel : ViewModel() {
      * Filter songs based on user's preferences.
      * @return A list of songs depending on the user's preferences. If no preferences are set, null is returned, so app will use all songs.
      */
-    fun filterSongs() {
+    fun filterSongs() = viewModelScope.launch {
         hideFolders = blacklistedFolders.isNotEmpty()
 
         when {
@@ -338,6 +341,18 @@ class MainViewModel : ViewModel() {
         ableToSelect
             ?.mapNotNull { it.filePath }
             ?.forEach(selected::add)
+    }
+
+    fun onHideLyricsChange(dataStore: DataStore<Preferences>, newHideLyrics: Boolean) {
+        dataStore.set(
+            booleanPreferencesKey("hide_lyrics"),
+            newHideLyrics
+        )
+        hideLyrics = newHideLyrics
+    }
+
+    fun onToggleFolderBlacklist(folder: String, blacklisted: Boolean) {
+
     }
 }
 
