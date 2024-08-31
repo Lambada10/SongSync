@@ -7,9 +7,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -55,7 +52,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -118,7 +114,9 @@ fun HomeScreen(
                 cachedSize = viewModel.selected.size
             }
 
-            BackPressHandler(enabled = viewModel.selected.size > 0, onBackPressed = { viewModel.selected.clear() })
+            BackPressHandler(
+                enabled = viewModel.selected.size > 0,
+                onBackPressed = { viewModel.selected.clear() })
             Crossfade(
                 targetState = viewModel.selected.size > 0,
                 label = ""
@@ -154,20 +152,21 @@ fun HomeScreen(
             }
         }
     ) { paddingValues ->
-        if (viewModel.allSongs == null) {
-            LoadingScreen()
-        } else {
-            HomeScreenLoaded(
-                navController = navController,
-                viewModel = viewModel,
-                selected = viewModel.selected,
-                songs = viewModel.allSongs!!,
-                paddingValues = paddingValues,
-                isBatchDownload = isBatchDownload,
-                onBatchDownload = { onBatchDownload -> isBatchDownload = onBatchDownload },
-                sharedTransitionScope = sharedTransitionScope,
-                animatedVisibilityScope = animatedVisibilityScope
-            )
+        AnimatedContent(viewModel.allSongs) { songsList ->
+            if (songsList == null)
+                LoadingScreen()
+            else
+                HomeScreenLoaded(
+                    navController = navController,
+                    viewModel = viewModel,
+                    selected = viewModel.selected,
+                    songs = songsList,
+                    paddingValues = paddingValues,
+                    isBatchDownload = isBatchDownload,
+                    onBatchDownload = { onBatchDownload -> isBatchDownload = onBatchDownload },
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
         }
     }
 }
@@ -189,7 +188,7 @@ fun LoadingScreen() {
 @Parcelize
 data class MyTextFieldValue(val text: String, val cursorStart: Int, val cursorEnd: Int) : Parcelable
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun HomeScreenLoaded(
     selected: SnapshotStateList<String>,
@@ -217,7 +216,6 @@ fun HomeScreenLoaded(
     var showFilters by rememberSaveable { mutableStateOf(false) }
     val filtered = viewModel.cachedFilteredSongs.collectAsState()
     val searched = viewModel.searchResults.collectAsState()
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val displaySongs = when {
         query.text.isNotEmpty() -> searched.value
@@ -234,7 +232,11 @@ fun HomeScreenLoaded(
     Column {
         if (isBatchDownload) {
             BatchDownloadLyrics(
-                songs = if (selected.isEmpty()) displaySongs else songs.filter { selected.contains(it.filePath) }.toList(),
+                songs = if (selected.isEmpty()) displaySongs else songs.filter {
+                    selected.contains(
+                        it.filePath
+                    )
+                }.toList(),
                 viewModel = viewModel,
                 onDone = { onBatchDownload(false) })
         }
@@ -248,141 +250,51 @@ fun HomeScreenLoaded(
         ) {
             item {
                 Column(
-                    modifier = Modifier
-                        .animateContentSize(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioLowBouncy,
-                                stiffness = Spring.StiffnessLow
-                            )
-                        )
-                        .padding(
-                            top = 5.dp,
-                            bottom = 5.dp,
-                            start = 22.dp,
-                            end = 4.dp
-                        ),
+                    modifier = Modifier.padding(
+                        top = 5.dp,
+                        bottom = 5.dp,
+                        start = 22.dp,
+                        end = 4.dp
+                    ),
                 ) {
-                    val focusRequester = remember { FocusRequester() }
-                    var willShowIme by remember { mutableStateOf(false) }
-
-                    @OptIn(ExperimentalLayoutApi::class)
-                    val showingIme = WindowInsets.isImeVisible
-                    if (!showingSearch && showSearch) {
-                        showingSearch = true
-                    }
-                    if (!showSearch && !willShowIme && showingSearch && !WindowInsets.isImeVisible && query.text.isEmpty()) {
-                        // If search already is no longer "to be shown" but "currently showing", query is
-                        // empty and user hides soft-keyboard, we close search bar
-                        showingSearch = false
-                    }
-                    AnimatedContent(
-                        targetState = showingSearch, transitionSpec = {
-                            if (targetState) {
-                                (slideInVertically { height -> height } + fadeIn()).togetherWith(
-                                    slideOutVertically { height -> -height } + fadeOut())
-                            } else {
-                                (slideInVertically { height -> -height } + fadeIn()).togetherWith(
-                                    slideOutVertically { height -> height } + fadeOut())
-                            }.using(
-                                SizeTransform()
+                    HomeSearchThing(
+                        showingSearch = showingSearch,
+                        searchBar = {
+                            HomeSearchBar(
+                                query = query,
+                                onQueryChange = { newQuery ->
+                                    query = newQuery
+                                    viewModel.updateSearchResults(newQuery.text.lowercaseWithLocale())
+                                    showingSearch = true
+                                },
+                                showSearch = showSearch,
+                                onShowSearchChange = { showSearch = it },
+                                showingSearch = showingSearch,
+                                onShowingSearchChange = { showingSearch = it }
                             )
-                        }, label = "", modifier = Modifier
-                            .fillMaxWidth()
-                            .height(55.dp)
-                    ) { showing ->
-                        if (showing) {
-                            if (willShowIme && WindowInsets.isImeVisible) {
-                                willShowIme = false
-                            }
-                            val focusManager = LocalFocusManager.current
-
-                            TextField(
-                                value = query,
-                                onValueChange = {
-                                    query = it
-                                    viewModel.updateSearchResults(it.text.lowercaseWithLocale())
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Filled.Search,
-                                        contentDescription = stringResource(id = R.string.search),
-                                        modifier = Modifier.clickable {
-                                            showSearch = false
-                                            showingSearch = false
-                                        }
-                                    )
-                                },
-                                trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Clear,
-                                        contentDescription = stringResource(id = R.string.clear),
-                                        modifier = Modifier.clickable {
-                                            query = TextFieldValue("")
-                                            viewModel.updateSearchResults("")
-                                            showSearch = false
-                                            showingSearch = false
-                                        }
-                                    )
-                                },
-                                placeholder = { Text(stringResource(id = R.string.search)) },
-                                shape = ShapeDefaults.ExtraLarge,
-                                colors = TextFieldDefaults.colors(
-                                    focusedLabelColor = MaterialTheme.colorScheme.onSurface,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent,
-                                    disabledIndicatorColor = Color.Transparent
-                                ),
-                                modifier = Modifier
-                                    .padding(end = 18.dp)
-                                    .focusRequester(focusRequester)
-                                    .onFocusChanged {
-                                        if (it.isFocused && !showingIme) willShowIme = true
-                                    }
-                                    .onGloballyPositioned {
-                                        if (showSearch && !showingIme) {
-                                            focusRequester.requestFocus()
-                                            showSearch = false
-                                        }
-                                    },
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                                keyboardActions = KeyboardActions(
-                                    onSearch = { focusManager.clearFocus() }
-                                )
+                        },
+                        filterBar = {
+                            FilterAndSongCount(
+                                displaySongsCount = displaySongs.size,
+                                onFilterClick = { showFilters = true },
+                                onSearchClick = {
+                                    showSearch = true
+                                    showingSearch = true
+                                }
                             )
-                        } else {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Text(text = "${displaySongs.size} songs")
-                                Spacer(modifier = Modifier.weight(1f))
-                                IconButton(onClick = { showFilters = true }) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.FilterAlt,
-                                        contentDescription = stringResource(R.string.search),
-                                    )
-                                }
-
-                                if (showFilters) {
-                                    FiltersDialog(
-                                        hideLyrics = viewModel.hideLyrics,
-                                        folders = viewModel.getSongFolders(context),
-                                        blacklistedFolders = viewModel.blacklistedFolders,
-                                        onDismiss = { showFilters = false  },
-                                        onFilterChange = { viewModel.filterSongs() },
-                                        onHideLyricsChange = { viewModel.onHideLyricsChange(dataStore, it) },
-                                        onToggleFolderBlacklist = viewModel::onToggleFolderBlacklist
-                                    )
-                                }
-
-                                IconButton(onClick = { showSearch = true }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Search,
-                                        contentDescription = stringResource(R.string.search),
-                                    )
-                                }
-                            }
                         }
+                    )
+
+                    if (showFilters) {
+                        FiltersDialog(
+                            hideLyrics = viewModel.hideLyrics,
+                            folders = viewModel.getSongFolders(context),
+                            blacklistedFolders = viewModel.blacklistedFolders,
+                            onDismiss = { showFilters = false },
+                            onFilterChange = { viewModel.filterSongs() },
+                            onHideLyricsChange = { viewModel.onHideLyricsChange(dataStore, it) },
+                            onToggleFolderBlacklist = viewModel::onToggleFolderBlacklist
+                        )
                     }
                 }
             }
@@ -414,6 +326,143 @@ fun HomeScreenLoaded(
             }
 
             item { Spacer(modifier = Modifier.height(4.dp)) }
+        }
+    }
+}
+
+@Composable
+fun HomeSearchThing(
+    showingSearch: Boolean,
+    searchBar: @Composable () -> Unit,
+    filterBar: @Composable () -> Unit
+) {
+    AnimatedContent(
+        targetState = showingSearch,
+        transitionSpec = {
+            if (targetState) {
+                (slideInVertically { height -> height } + fadeIn()).togetherWith(
+                    slideOutVertically { height -> -height } + fadeOut()
+                )
+            } else {
+                (slideInVertically { height -> -height } + fadeIn()).togetherWith(
+                    slideOutVertically { height -> height } + fadeOut()
+                )
+            }.using(
+                SizeTransform()
+            )
+        },
+        label = "",
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(55.dp)
+    ) { showing ->
+        if (showing) searchBar() else filterBar()
+    }
+}
+
+@Composable
+fun HomeSearchBar(
+    query: TextFieldValue,
+    onQueryChange: (TextFieldValue) -> Unit,
+    showSearch: Boolean,
+    onShowSearchChange: (Boolean) -> Unit,
+    showingSearch: Boolean,
+    onShowingSearchChange: (Boolean) -> Unit,
+) {
+    val focusRequester = remember { FocusRequester() }
+    var willShowIme by remember { mutableStateOf(false) }
+
+    @OptIn(ExperimentalLayoutApi::class)
+    val showingIme = WindowInsets.isImeVisible
+
+    if (!showingSearch && showSearch) {
+        onShowingSearchChange(true)
+    }
+
+    if (!showSearch && !willShowIme && showingSearch && !showingIme && query.text.isEmpty()) {
+        onShowingSearchChange(false)
+    }
+
+    if (willShowIme && showingIme) {
+        willShowIme = false
+    }
+    val focusManager = LocalFocusManager.current
+
+    TextField(
+        value = query,
+        onValueChange = onQueryChange,
+        leadingIcon = {
+            Icon(
+                Icons.Filled.Search,
+                contentDescription = stringResource(id = R.string.search),
+                modifier = Modifier.clickable {
+                    onShowSearchChange(false)
+                    onShowingSearchChange(false)
+                }
+            )
+        },
+        trailingIcon = {
+            Icon(
+                imageVector = Icons.Default.Clear,
+                contentDescription = stringResource(id = R.string.clear),
+                modifier = Modifier.clickable {
+                    onQueryChange(TextFieldValue(""))
+                    onShowSearchChange(false)
+                    onShowingSearchChange(false)
+                }
+            )
+        },
+        placeholder = { Text(stringResource(id = R.string.search)) },
+        shape = ShapeDefaults.ExtraLarge,
+        colors = TextFieldDefaults.colors(
+            focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent
+        ),
+        modifier = Modifier
+            .padding(end = 18.dp)
+            .focusRequester(focusRequester)
+            .onFocusChanged {
+                if (it.isFocused && !showingIme) willShowIme = true
+            }
+            .onGloballyPositioned {
+                if (showSearch && !showingIme) {
+                    focusRequester.requestFocus()
+                    onShowSearchChange(false)
+                }
+            },
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(
+            onSearch = { focusManager.clearFocus() }
+        )
+    )
+}
+
+@Composable
+fun FilterAndSongCount(
+    displaySongsCount: Int,
+    onFilterClick: () -> Unit,
+    onSearchClick: () -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(text = "$displaySongsCount songs")
+        Spacer(modifier = Modifier.weight(1f))
+        IconButton(onClick = onFilterClick) {
+            Icon(
+                imageVector = Icons.Outlined.FilterAlt,
+                contentDescription = stringResource(R.string.search),
+            )
+        }
+
+        IconButton(onClick = onSearchClick) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = stringResource(R.string.search),
+            )
         }
     }
 }
