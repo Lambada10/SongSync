@@ -30,14 +30,13 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import pl.lambada.songsync.R
 
 @Composable
 fun HomeSearchBar(
-    query: TextFieldValue,
-    onQueryChange: (TextFieldValue) -> Unit,
+    query: String,
+    onQueryChange: (String) -> Unit,
     showSearch: Boolean,
     onShowSearchChange: (Boolean) -> Unit,
     showingSearch: Boolean,
@@ -53,7 +52,7 @@ fun HomeSearchBar(
         onShowingSearchChange(true)
     }
 
-    if (!showSearch && !willShowIme && showingSearch && !showingIme && query.text.isEmpty()) {
+    if (!showSearch && !willShowIme && showingSearch && !showingIme && query.isEmpty()) {
         onShowingSearchChange(false)
     }
 
@@ -63,7 +62,7 @@ fun HomeSearchBar(
     val focusManager = LocalFocusManager.current
 
     TextField(
-        value = query,
+        query,
         onValueChange = onQueryChange,
         leadingIcon = {
             Icon(
@@ -80,7 +79,7 @@ fun HomeSearchBar(
                 imageVector = Icons.Default.Clear,
                 contentDescription = stringResource(id = R.string.clear),
                 modifier = Modifier.clickable {
-                    onQueryChange(TextFieldValue(""))
+                    onQueryChange("")
                     onShowSearchChange(false)
                     onShowingSearchChange(false)
                 }

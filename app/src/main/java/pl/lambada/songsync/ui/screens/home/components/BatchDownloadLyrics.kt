@@ -35,7 +35,6 @@ import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.data.InternalErrorException
 import pl.lambada.songsync.data.MainViewModel
 import pl.lambada.songsync.data.NoTrackFoundException
-import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.components.AnimatedText
 import pl.lambada.songsync.util.ext.getVersion
@@ -45,9 +44,10 @@ import kotlin.math.roundToInt
 
 @SuppressLint("StringFormatMatches")
 @Composable
-fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () -> Unit) {
+fun BatchDownloadLyrics(viewModel: MainViewModel, onDone: () -> Unit) {
     val unknownString = stringResource(id = R.string.unknown)
     val generatedUsingString = stringResource(id = R.string.generated_using)
+    val songs = viewModel.songsToBatchDownload
 
     var uiState by rememberSaveable { mutableStateOf(UiState.Warning) }
     var failedCount by rememberSaveable { mutableIntStateOf(0) }

@@ -10,17 +10,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import pl.lambada.songsync.data.remote.github.GithubAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.AppleAPI
@@ -41,10 +45,12 @@ import java.net.UnknownHostException
 /**
  * ViewModel class for the main functionality of the app.
  */
-class MainViewModel : ViewModel() {
+class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
     private var cachedSongs: List<Song>? = null
     val selected = mutableStateListOf<String>()
     var allSongs by mutableStateOf<List<Song>?>(null)
+
+    var searchQuery by mutableStateOf("")
 
     private var ableToSelect by mutableStateOf<List<Song>?>(null)
 
@@ -55,12 +61,10 @@ class MainViewModel : ViewModel() {
     private var hideFolders = blacklistedFolders.isNotEmpty()
 
     // filtered folders/lyrics songs
-    private var _cachedFilteredSongs: MutableStateFlow<List<Song>> = MutableStateFlow(emptyList())
-    val cachedFilteredSongs = _cachedFilteredSongs.asStateFlow()
+    private var _cachedFilteredSongs = MutableStateFlow<List<Song>>(emptyList())
 
     // searching
-    private var _searchResults: MutableStateFlow<List<Song>> = MutableStateFlow(emptyList())
-    val searchResults = _searchResults.asStateFlow()
+    private var _searchResults = MutableStateFlow<List<Song>>(emptyList())
 
     // Spotify API token
     private val spotifyAPI = SpotifyAPI()
@@ -70,8 +74,20 @@ class MainViewModel : ViewModel() {
     var disableMarquee: MutableState<Boolean> = mutableStateOf(false)
     var sdCardPath = ""
 
+    var displaySongs by mutableStateOf(
+        when {
+            searchQuery.isNotEmpty() -> _searchResults.value
+            _cachedFilteredSongs.value.isNotEmpty() -> _cachedFilteredSongs.value
+            else -> allSongs ?: listOf()
+        }
+    )
+
     // selected provider
     var selectedProvider by mutableStateOf(Providers.SPOTIFY)
+    val songsToBatchDownload = if (selected.isEmpty())
+        displaySongs
+    else
+        (allSongs ?: listOf()).filter { selected.contains(it.filePath) }.toList()
 
     // LRCLib Track ID
     private var lrcLibID = 0
@@ -85,7 +101,28 @@ class MainViewModel : ViewModel() {
     // TODO: Use values from SongInfo object returned by search instead of storing them here
 
     init {
-        viewModelScope.launch { updateAbleToSelect() }
+        viewModelScope.launch {
+            launch { updateAbleToSelect() }
+            launch { updateSongsToDisplay() }
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private suspend fun updateSongsToDisplay() = coroutineScope {
+        snapshotFlow { allSongs }
+            .filterNotNull()
+            // simple .combine wasn't enough apparently, so im using this
+            .flatMapLatest { all ->
+                _cachedFilteredSongs.combine(_searchResults) { filtered, searchResults ->
+                    when {
+                        searchQuery.isNotEmpty() -> searchResults
+                        filtered.isNotEmpty() -> filtered
+                        else -> all
+                    }
+                }
+            }.collect { newDisplaySongs ->
+                displaySongs = newDisplaySongs
+            }
     }
 
     /**
@@ -243,7 +280,7 @@ class MainViewModel : ViewModel() {
             }
 
             val data: List<Song> = when {
-                cachedFilteredSongs.value.isNotEmpty() -> cachedFilteredSongs.value
+                _cachedFilteredSongs.value.isNotEmpty() -> _cachedFilteredSongs.value
                 cachedSongs != null -> cachedSongs!!
                 else -> { return@launch }
             }
@@ -256,6 +293,7 @@ class MainViewModel : ViewModel() {
             _searchResults.value = results
         }
     }
+
     /**
      * Loads all songs' folders
      * @param context The application context.
@@ -295,10 +333,12 @@ class MainViewModel : ViewModel() {
                         )
                     }
             }
+
             hideLyrics -> {
                 _cachedFilteredSongs?.value = cachedSongs!!
                     .filter { it.filePath.toLrcFile()?.exists() != true }
             }
+
             hideFolders -> {
                 _cachedFilteredSongs?.value = cachedSongs!!.filter {
                     !blacklistedFolders.contains(
@@ -309,6 +349,7 @@ class MainViewModel : ViewModel() {
                     )
                 }
             }
+
             else -> {
                 _cachedFilteredSongs?.value = emptyList()
             }
@@ -316,7 +357,7 @@ class MainViewModel : ViewModel() {
     }
 
     private suspend fun updateAbleToSelect() = coroutineScope {
-        searchResults.combine(cachedFilteredSongs) { searched, filtered ->
+        _searchResults.combine(_cachedFilteredSongs) { searched, filtered ->
             ableToSelect = when {
                 searched.isNotEmpty() -> searched
                 filtered.isNotEmpty() -> filtered
@@ -328,7 +369,9 @@ class MainViewModel : ViewModel() {
     fun invertSongSelection() {
         val willBeSelected = ableToSelect?.map { it.filePath }?.toMutableList()
 
-        for (song in selected) { willBeSelected?.remove(song) }
+        for (song in selected) {
+            willBeSelected?.remove(song)
+        }
 
         selected.clear()
         if (willBeSelected != null) {

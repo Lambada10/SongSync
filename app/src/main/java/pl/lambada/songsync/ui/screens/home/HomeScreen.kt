@@ -1,7 +1,5 @@
 package pl.lambada.songsync.ui.screens.home
 
-import android.os.Parcelable
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -25,12 +23,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -38,13 +34,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import kotlinx.parcelize.Parcelize
 import pl.lambada.songsync.data.MainViewModel
-import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.ui.ScreenAbout
 import pl.lambada.songsync.ui.ScreenSearch
 import pl.lambada.songsync.ui.screens.home.components.BatchDownloadLyrics
@@ -124,15 +116,14 @@ fun HomeScreen(
             }
         }
     ) { paddingValues ->
-        AnimatedContent(viewModel.allSongs) { songsList ->
-            if (songsList == null)
+        Crossfade(viewModel.allSongs == null, label = "") { loading ->
+            if (loading)
                 LoadingScreen()
             else
                 HomeScreenLoaded(
                     navController = navController,
                     viewModel = viewModel,
                     selected = viewModel.selected,
-                    songs = songsList,
                     paddingValues = paddingValues,
                     isBatchDownload = isBatchDownload,
                     onBatchDownload = { onBatchDownload -> isBatchDownload = onBatchDownload },
@@ -163,7 +154,6 @@ fun HomeScreenLoaded(
     selected: SnapshotStateList<String>,
     navController: NavHostController,
     viewModel: MainViewModel,
-    songs: List<Song>,
     paddingValues: PaddingValues,
     isBatchDownload: Boolean,
     onBatchDownload: (Boolean) -> Unit,
@@ -172,25 +162,8 @@ fun HomeScreenLoaded(
 ) {
     var showingSearch by rememberSaveable { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(showingSearch) }
-    var query by rememberSaveable(
-        stateSaver = Saver(save = {
-            MyTextFieldValue(
-                it.text,
-                it.selection.start,
-                it.selection.end
-            )
-        },
-            restore = { TextFieldValue(it.text, TextRange(it.cursorStart, it.cursorEnd)) })
-    ) { mutableStateOf(TextFieldValue()) }
     var showFilters by rememberSaveable { mutableStateOf(false) }
-    val filtered = viewModel.cachedFilteredSongs.collectAsState()
-    val searched = viewModel.searchResults.collectAsState()
     val context = LocalContext.current
-    val displaySongs = when {
-        query.text.isNotEmpty() -> searched.value
-        filtered.value.isNotEmpty() -> filtered.value
-        else -> songs
-    }
 
     val dataStore = context.dataStore
 
@@ -201,10 +174,6 @@ fun HomeScreenLoaded(
     Column {
         if (isBatchDownload) {
             BatchDownloadLyrics(
-                songs = if (selected.isEmpty())
-                    displaySongs
-                else
-                    songs.filter { selected.contains(it.filePath) }.toList(),
                 viewModel = viewModel,
                 onDone = { onBatchDownload(false) })
         }
@@ -224,10 +193,10 @@ fun HomeScreenLoaded(
                         showingSearch = showingSearch,
                         searchBar = {
                             HomeSearchBar(
-                                query = query,
+                                query = viewModel.searchQuery,
                                 onQueryChange = { newQuery ->
-                                    query = newQuery
-                                    viewModel.updateSearchResults(newQuery.text.lowercaseWithLocale())
+                                    viewModel.searchQuery = newQuery
+                                    viewModel.updateSearchResults(newQuery.lowercaseWithLocale())
                                     showingSearch = true
                                 },
                                 showSearch = showSearch,
@@ -238,7 +207,7 @@ fun HomeScreenLoaded(
                         },
                         filterBar = {
                             FilterAndSongCount(
-                                displaySongsCount = displaySongs.size,
+                                displaySongsCount = viewModel.displaySongs.size,
                                 onFilterClick = { showFilters = true },
                                 onSearchClick = {
                                     showSearch = true
@@ -264,11 +233,11 @@ fun HomeScreenLoaded(
                 }
             }
 
-            items(displaySongs.size) { i ->
-                val song = displaySongs[i]
+            items(viewModel.displaySongs.size) { index ->
+                val song = viewModel.displaySongs[index]
 
                 SongItem(
-                    id = i.toString(),
+                    id = index.toString(),
                     selected = selected.contains(song.filePath),
                     quickSelect = selected.size > 0,
                     onSelectionChanged = { newValue ->
@@ -278,8 +247,8 @@ fun HomeScreenLoaded(
                             showingSearch = false
                         } else {
                             selected.remove(song.filePath)
-                            if (selected.size == 0 && query.text.isNotEmpty()) showingSearch =
-                                true // show again but don't focus
+                            if (selected.size == 0 && viewModel.searchQuery.isNotEmpty())
+                                showingSearch = true // show again but don't focus
                         }
                     },
                     navController = navController,
@@ -294,6 +263,3 @@ fun HomeScreenLoaded(
         }
     }
 }
-
-@Parcelize
-data class MyTextFieldValue(val text: String, val cursorStart: Int, val cursorEnd: Int) : Parcelable
