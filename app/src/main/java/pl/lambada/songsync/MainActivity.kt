@@ -80,7 +80,6 @@ class MainActivity : ComponentActivity() {
         val dataStore = this.dataStore
         setContent {
             val context = LocalContext.current
-            val scope = rememberCoroutineScope()
             val navController = rememberNavController()
             var hasLoadedPermissions by remember { mutableStateOf(false) }
             var hasPermissions by remember { mutableStateOf(false) }
@@ -136,25 +135,11 @@ class MainActivity : ComponentActivity() {
 
             if (themeDefined)
                 SongSyncTheme(pureBlack = viewModel.pureBlack.value) {
-                    // I'll cry if this crashes due to memory concerns
-                    val selected = rememberSaveable(saver = Saver(
-                        save = { it.toTypedArray() }, restore = { mutableStateListOf(*it) }
-                    )) { mutableStateListOf<String>() }
-                    var allSongs by remember { mutableStateOf<List<Song>?>(null) }
-
                     // Check for permissions and get all songs
                     RequestPermissions(
                         onGranted = { hasPermissions = true },
                         context = context,
-                        onDone = {
-                            if (hasPermissions) {
-                                // Get all songs
-                                scope.launch(Dispatchers.IO) {
-                                    allSongs = viewModel.getAllSongs(context)
-                                }
-                            }
-                            hasLoadedPermissions = true
-                        }
+                        onDone = { hasLoadedPermissions = true }
                     )
 
                     Surface( modifier = Modifier.fillMaxSize() ) {
@@ -164,11 +149,7 @@ class MainActivity : ComponentActivity() {
                             AlertDialog(
                                 onDismissRequest = { /* don't dismiss */ },
                                 confirmButton = {
-                                    OutlinedButton(
-                                        onClick = {
-                                            finishAndRemoveTask()
-                                        }
-                                    ) {
+                                    OutlinedButton(onClick = { finishAndRemoveTask() }) {
                                         Text(stringResource(R.string.close_app))
                                     }
                                 },
@@ -182,8 +163,6 @@ class MainActivity : ComponentActivity() {
                         } else {
                             Navigator(
                                 navController = navController,
-                                selected = selected,
-                                allSongs = allSongs,
                                 viewModel = viewModel
                             )
                         }

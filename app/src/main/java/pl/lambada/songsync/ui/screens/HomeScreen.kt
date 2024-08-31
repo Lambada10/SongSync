@@ -87,6 +87,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -159,8 +160,6 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun HomeScreen(
-    selected: SnapshotStateList<String>,
-    allSongs: List<Song>?,
     navController: NavHostController,
     viewModel: MainViewModel,
     sharedTransitionScope: SharedTransitionScope,
@@ -168,13 +167,17 @@ fun HomeScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var isBatchDownload by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    SideEffect { viewModel.updateAllSongs(context) }
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             var cachedSize by remember { mutableIntStateOf(1) }
-            if (selected.size > 0) {
+            if (viewModel.selected.size > 0) {
                 // keep displaying "1 selected" during fade-out, don't say "0 selected"
-                cachedSize = selected.size
+                cachedSize = viewModel.selected.size
             }
             var ableToSelect by remember { mutableStateOf<List<Song>?>(null) }
 
@@ -184,18 +187,18 @@ fun HomeScreen(
             ableToSelect = when {
                 searched.value.isNotEmpty() -> searched.value
                 filtered.value.isNotEmpty() -> filtered.value
-                else -> allSongs
+                else -> viewModel.allSongs
             }
 
-            BackPressHandler(enabled = selected.size > 0, onBackPressed = { selected.clear() })
+            BackPressHandler(enabled = viewModel.selected.size > 0, onBackPressed = { viewModel.selected.clear() })
             Crossfade(
-                targetState = selected.size > 0,
+                targetState = viewModel.selected.size > 0,
                 label = ""
             ) { showing ->
                 MediumTopAppBar(
                     navigationIcon = {
                         if (showing) {
-                            IconButton(onClick = { selected.clear() }) {
+                            IconButton(onClick = { viewModel.selected.clear() }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = stringResource(R.string.back)
@@ -225,10 +228,10 @@ fun HomeScreen(
                         if (showing) {
                             IconButton(
                                 onClick = {
-                                    selected.clear()
+                                    viewModel.selected.clear()
                                     ableToSelect?.map { it.filePath }?.forEach {
                                         if (it != null) {
-                                            selected.add(it)
+                                            viewModel.selected.add(it)
                                         }
                                     }
                                 }
@@ -242,13 +245,13 @@ fun HomeScreen(
                                 onClick = {
                                     val willBeSelected =
                                         ableToSelect?.map { it.filePath }?.toMutableList()
-                                    for (song in selected) {
+                                    for (song in viewModel.selected) {
                                         willBeSelected?.remove(song)
                                     }
-                                    selected.clear()
+                                    viewModel.selected.clear()
                                     if (willBeSelected != null) {
                                         for (song in willBeSelected) {
-                                            song?.let { selected.add(it) }
+                                            song?.let { viewModel.selected.add(it) }
                                         }
                                     }
                                 }
@@ -420,14 +423,14 @@ fun HomeScreen(
             }
         }
     ) { paddingValues ->
-        if (allSongs == null) {
+        if (viewModel.allSongs == null) {
             LoadingScreen()
         } else {
             HomeScreenLoaded(
                 navController = navController,
                 viewModel = viewModel,
-                selected = selected,
-                songs = allSongs,
+                selected = viewModel.selected,
+                songs = viewModel.allSongs,
                 paddingValues = paddingValues,
                 isBatchDownload = isBatchDownload,
                 onBatchDownload = { onBatchDownload -> isBatchDownload = onBatchDownload },

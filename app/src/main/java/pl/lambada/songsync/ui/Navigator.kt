@@ -25,8 +25,6 @@ import pl.lambada.songsync.ui.screens.HomeScreen
 @Composable
 fun Navigator(
     navController: NavHostController,
-    selected: SnapshotStateList<String>,
-    allSongs: List<Song>?,
     viewModel: MainViewModel
 ) {
     SharedTransitionLayout {
@@ -37,8 +35,6 @@ fun Navigator(
             composable<ScreenHome> {
                 HomeScreen(
                     navController = navController,
-                    selected = selected,
-                    allSongs = allSongs,
                     viewModel = viewModel,
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,

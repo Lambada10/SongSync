@@ -6,6 +6,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -33,6 +34,8 @@ import java.net.UnknownHostException
  */
 class MainViewModel : ViewModel() {
     private var cachedSongs: List<Song>? = null
+    val selected = mutableStateListOf<String>()
+    val allSongs = mutableStateListOf<Song>()
 
     // Filter settings
     private var cachedFolders: MutableList<String>? = null
@@ -150,12 +153,19 @@ class MainViewModel : ViewModel() {
         return latestVersion > currentVersion
     }
 
+    fun updateAllSongs(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+        val newSongsList = getAllSongs(context)
+        // do not clear the list until the songs are actually loaded
+        allSongs.clear()
+        allSongs.addAll(newSongsList)
+    }
+
     /**
      * Loads all songs from the MediaStore.
      * @param context The application context.
      * @return A list of Song objects representing the songs.
      */
-    fun getAllSongs(context: Context): List<Song> {
+    private fun getAllSongs(context: Context): List<Song> {
         return cachedSongs ?: run {
             val selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
             val projection = arrayOf(
