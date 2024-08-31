@@ -82,6 +82,10 @@ class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
         }
     )
 
+    var showFilters by mutableStateOf(false)
+    var showingSearch by  mutableStateOf(false)
+    var showSearch by mutableStateOf(showingSearch)
+
     // selected provider
     var selectedProvider by mutableStateOf(Providers.SPOTIFY)
     val songsToBatchDownload = if (selected.isEmpty())

@@ -27,7 +27,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -126,7 +125,7 @@ fun HomeScreen(
                     selected = viewModel.selected,
                     paddingValues = paddingValues,
                     isBatchDownload = isBatchDownload,
-                    onBatchDownload = { onBatchDownload -> isBatchDownload = onBatchDownload },
+                    onBatchDownloadState = { onBatchDownload -> isBatchDownload = onBatchDownload },
                     sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope
                 )
@@ -156,26 +155,20 @@ fun HomeScreenLoaded(
     viewModel: MainViewModel,
     paddingValues: PaddingValues,
     isBatchDownload: Boolean,
-    onBatchDownload: (Boolean) -> Unit,
+    onBatchDownloadState: (isBatchDownload: Boolean) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
-    var showingSearch by rememberSaveable { mutableStateOf(false) }
-    var showSearch by remember { mutableStateOf(showingSearch) }
-    var showFilters by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
-
     val dataStore = context.dataStore
 
-    LaunchedEffect(Unit) {
-        viewModel.filterSongs()
-    }
+    LaunchedEffect(Unit) { viewModel.filterSongs() }
 
     Column {
         if (isBatchDownload) {
             BatchDownloadLyrics(
                 viewModel = viewModel,
-                onDone = { onBatchDownload(false) })
+                onDone = { onBatchDownloadState(false) })
         }
 
         LazyColumn(
@@ -190,39 +183,39 @@ fun HomeScreenLoaded(
                     modifier = Modifier.padding(top = 5.dp, bottom = 5.dp, start = 22.dp, end = 4.dp),
                 ) {
                     HomeSearchThing(
-                        showingSearch = showingSearch,
+                        showingSearch = viewModel.showingSearch,
                         searchBar = {
                             HomeSearchBar(
                                 query = viewModel.searchQuery,
                                 onQueryChange = { newQuery ->
                                     viewModel.searchQuery = newQuery
                                     viewModel.updateSearchResults(newQuery.lowercaseWithLocale())
-                                    showingSearch = true
+                                    viewModel.showingSearch = true
                                 },
-                                showSearch = showSearch,
-                                onShowSearchChange = { showSearch = it },
-                                showingSearch = showingSearch,
-                                onShowingSearchChange = { showingSearch = it }
+                                showSearch = viewModel.showSearch,
+                                onShowSearchChange = { viewModel.showSearch = it },
+                                showingSearch = viewModel.showingSearch,
+                                onShowingSearchChange = { viewModel.showingSearch = it }
                             )
                         },
                         filterBar = {
                             FilterAndSongCount(
                                 displaySongsCount = viewModel.displaySongs.size,
-                                onFilterClick = { showFilters = true },
+                                onFilterClick = { viewModel.showFilters = true },
                                 onSearchClick = {
-                                    showSearch = true
-                                    showingSearch = true
+                                    viewModel.showSearch = true
+                                    viewModel.showingSearch = true
                                 }
                             )
                         }
                     )
 
-                    if (showFilters) {
+                    if (viewModel.showFilters) {
                         FiltersDialog(
                             hideLyrics = viewModel.hideLyrics,
                             folders = viewModel.getSongFolders(context),
                             blacklistedFolders = viewModel.blacklistedFolders,
-                            onDismiss = { showFilters = false },
+                            onDismiss = { viewModel.showFilters = false },
                             onFilterChange = { viewModel.filterSongs() },
                             onHideLyricsChange = { viewModel.onHideLyricsChange(dataStore, it) },
                             onToggleFolderBlacklist = { folder, blacklisted ->
@@ -243,12 +236,12 @@ fun HomeScreenLoaded(
                     onSelectionChanged = { newValue ->
                         if (newValue) {
                             song.filePath?.let { selected.add(it) }
-                            showSearch = false
-                            showingSearch = false
+                            viewModel.showSearch = false
+                            viewModel.showingSearch = false
                         } else {
                             selected.remove(song.filePath)
                             if (selected.size == 0 && viewModel.searchQuery.isNotEmpty())
-                                showingSearch = true // show again but don't focus
+                                viewModel.showingSearch = true // show again but don't focus
                         }
                     },
                     navController = navController,
