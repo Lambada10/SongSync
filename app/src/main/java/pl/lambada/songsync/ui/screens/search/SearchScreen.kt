@@ -56,7 +56,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -87,7 +86,7 @@ fun SharedTransitionScope.SearchScreen(
     artists: String?,
     coverUri: String?,
     filePath: String?,
-    viewModel: SearchViewModel = viewModel(),
+    viewModel: SearchViewModel,
     navController: NavController,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,

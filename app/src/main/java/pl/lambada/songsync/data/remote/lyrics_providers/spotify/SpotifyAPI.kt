@@ -26,21 +26,23 @@ class SpotifyAPI {
     /**
      * Refreshes the access token by sending a request to the Spotify API.
      */
-    suspend fun refreshToken() {
-        val response = client.get(
-            webPlayerURL + "get_access_token?reason=transport&productType=web_player"
-        ) {
-            headers.append(
-                "User-Agent",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
-            )
+    suspend fun refreshToken(force: Boolean = false) {
+        if (force || spotifyToken == "") {
+            val response = client.get(
+                webPlayerURL + "get_access_token?reason=transport&productType=web_player"
+            ) {
+                headers.append(
+                    "User-Agent",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+                )
+            }
+            val responseBody = response.bodyAsText(Charsets.UTF_8)
+
+            val json = json.decodeFromString<WebPlayerTokenResponse>(responseBody)
+
+            this.spotifyToken = json.accessToken
+            this.tokenTime = System.currentTimeMillis()
         }
-        val responseBody = response.bodyAsText(Charsets.UTF_8)
-
-        val json = json.decodeFromString<WebPlayerTokenResponse>(responseBody)
-
-        this.spotifyToken = json.accessToken
-        this.tokenTime = System.currentTimeMillis()
     }
 
     /**

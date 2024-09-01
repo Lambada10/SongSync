@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,8 +36,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import pl.lambada.songsync.MainViewModel
 import pl.lambada.songsync.ui.ScreenAbout
 import pl.lambada.songsync.ui.ScreenSearch
@@ -47,7 +46,6 @@ import pl.lambada.songsync.ui.screens.home.components.HomeAppBar
 import pl.lambada.songsync.ui.screens.home.components.HomeSearchBar
 import pl.lambada.songsync.ui.screens.home.components.HomeSearchThing
 import pl.lambada.songsync.ui.screens.home.components.SongItem
-import pl.lambada.songsync.util.dataStore
 import pl.lambada.songsync.util.ext.BackPressHandler
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
 
@@ -68,20 +66,7 @@ fun HomeScreen(
     var isBatchDownload by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    var internetConnection by remember { mutableStateOf(true) }
-
-    LaunchedEffect(Unit) {
-        viewModel.updateAllSongs(context)
-
-        // Get token upon app start
-        launch(Dispatchers.IO) {
-            try {
-                viewModel.refreshToken()
-            } catch (e: Exception) {
-                internetConnection = false
-            }
-        }
-    }
+    SideEffect { viewModel.updateAllSongs(context) }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -94,7 +79,9 @@ fun HomeScreen(
 
             BackPressHandler(
                 enabled = viewModel.selected.size > 0,
-                onBackPressed = { viewModel.selected.clear() })
+                onBackPressed = { viewModel.selected.clear() }
+            )
+
             Crossfade(
                 targetState = viewModel.selected.size > 0,
                 label = ""
@@ -177,7 +164,6 @@ fun HomeScreenLoaded(
     animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val context = LocalContext.current
-    val dataStore = context.dataStore
 
     LaunchedEffect(Unit) { viewModel.filterSongs() }
 

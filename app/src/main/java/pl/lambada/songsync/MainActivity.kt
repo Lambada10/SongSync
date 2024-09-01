@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,7 +41,9 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
 import pl.lambada.songsync.data.remote.UserSettingsController
+import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
 import pl.lambada.songsync.ui.Navigator
+import pl.lambada.songsync.ui.components.dialogs.NoInternetDialog
 import pl.lambada.songsync.ui.screens.home.LoadingScreen
 import pl.lambada.songsync.ui.theme.SongSyncTheme
 import pl.lambada.songsync.util.dataStore
@@ -50,12 +53,10 @@ import java.io.File
  * The main activity of the SongSync app.
  */
 class MainActivity : ComponentActivity() {
-    /**
-     * Called when the activity is starting.
-     *
-     * @param savedInstanceState The saved instance state.
-     */
+    private val lyricsProviderService = LyricsProviderService()
+
     @SuppressLint("SuspiciousIndentation")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -67,21 +68,21 @@ class MainActivity : ComponentActivity() {
         }
 
         val dataStore = this.dataStore
-        // its ok for this to recreate on config changes, no need to retain
         val userSettingsController = UserSettingsController(dataStore)
 
+        var networkError by mutableStateOf(false)
 
         setContent {
-            val viewModel = viewModel { MainViewModel(userSettingsController) }
+            val scope = rememberCoroutineScope()
+            val viewModel = viewModel {
+                MainViewModel(userSettingsController)
+            }
             val context = LocalContext.current
             val navController = rememberNavController()
             var hasLoadedPermissions by remember { mutableStateOf(false) }
             var hasPermissions by remember { mutableStateOf(false) }
-            var themeDefined by remember { mutableStateOf(false) }
 
             LaunchedEffect(Unit) {
-                themeDefined = true
-
                 // Create our subdirectory in downloads if it doesn't exist
                 val downloadsDir =
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
@@ -91,45 +92,54 @@ class MainActivity : ComponentActivity() {
                 }
 
                 createNotificationChannel()
+
+                lyricsProviderService.refreshSpotifyToken()
+                    .onFailure { networkError = true }
             }
 
-            if (themeDefined)
-                SongSyncTheme(pureBlack = userSettingsController.pureBlack) {
-                    // Check for permissions and get all songs
-                    RequestPermissions(
-                        onGranted = { hasPermissions = true },
-                        context = context,
-                        onDone = { hasLoadedPermissions = true }
-                    )
+            SongSyncTheme(pureBlack = userSettingsController.pureBlack) {
+                // Check for permissions and get all songs
+                RequestPermissions(
+                    onGranted = { hasPermissions = true },
+                    context = context,
+                    onDone = { hasLoadedPermissions = true }
+                )
 
-                    Surface( modifier = Modifier.fillMaxSize()) {
-                        if (!hasLoadedPermissions) {
-                            LoadingScreen()
-                        } else if (!hasPermissions) {
-                            AlertDialog(
-                                onDismissRequest = { /* don't dismiss */ },
-                                confirmButton = {
-                                    OutlinedButton(onClick = ::finishAndRemoveTask) {
-                                        Text(stringResource(R.string.close_app))
-                                    }
-                                },
-                                title = { Text(stringResource(R.string.permission_denied)) },
-                                text = {
-                                    Column {
-                                        Text(stringResource(R.string.requires_higher_storage_permissions))
-                                    }
+                if (networkError) NoInternetDialog(
+                    onConfirm = ::finishAndRemoveTask,
+                    onIgnore = { networkError = false }
+                )
+
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    if (!hasLoadedPermissions) {
+                        LoadingScreen()
+                    } else if (!hasPermissions) {
+                        AlertDialog(
+                            onDismissRequest = { /* don't dismiss */ },
+                            confirmButton = {
+                                OutlinedButton(onClick = ::finishAndRemoveTask) {
+                                    Text(stringResource(R.string.close_app))
                                 }
-                            )
-                        } else {
-                            Navigator(
-                                navController = navController,
-                                viewModel = viewModel
-                            )
-                        }
+                            },
+                            title = { Text(stringResource(R.string.permission_denied)) },
+                            text = {
+                                Column {
+                                    Text(stringResource(R.string.requires_higher_storage_permissions))
+                                }
+                            }
+                        )
+                    } else {
+                        Navigator(
+                            navController = navController,
+                            viewModel = viewModel,
+                            userSettingsController = userSettingsController,
+                            lyricsProviderService = lyricsProviderService
+                        )
+                    }
                 }
+            }
         }
     }
-}
 
     override fun onResume() {
         val notificationManager =
@@ -160,7 +170,8 @@ class MainActivity : ComponentActivity() {
 fun RequestPermissions(onGranted: () -> Unit, context: Context, onDone: () -> Unit) {
     var storageManager: ActivityResultLauncher<Intent>? = null
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        storageManager = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        storageManager =
+            rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 if (Environment.isExternalStorageManager()) {
                     onGranted()
                 }

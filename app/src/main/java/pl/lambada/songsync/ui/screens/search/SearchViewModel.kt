@@ -13,91 +13,17 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.kyant.taglib.TagLib
 import pl.lambada.songsync.data.remote.UserSettingsController
-import pl.lambada.songsync.data.remote.lyrics_providers.others.AppleAPI
-import pl.lambada.songsync.data.remote.lyrics_providers.others.LRCLibAPI
-import pl.lambada.songsync.data.remote.lyrics_providers.others.NeteaseAPI
-import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyAPI
-import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyLyricsAPI
+import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
 import pl.lambada.songsync.domain.model.SongInfo
-import pl.lambada.songsync.ui.screens.Providers
-import pl.lambada.songsync.ui.screens.home.EmptyQueryException
-import pl.lambada.songsync.ui.screens.home.InternalErrorException
-import pl.lambada.songsync.ui.screens.home.NoTrackFoundException
 import java.io.FileNotFoundException
-import java.net.UnknownHostException
 
 /**
  * ViewModel class for the main functionality of the app.
  */
-class SearchViewModel(val userSettingsController: UserSettingsController) : ViewModel() {
-    // Spotify API token
-    private val spotifyAPI = SpotifyAPI()
-
-    // LRCLib Track ID
-    private var lrcLibID = 0
-
-    // Netease Track ID and stuff
-    private var neteaseID = 0L
-
-    // Apple Track ID
-    private var appleID = 0L
-    // TODO: Use values from SongInfo object returned by search instead of storing them here
-
-    /**
-     * Gets song information from the Spotify API.
-     * @param query The SongInfo object with songName and artistName fields filled.
-     * @param offset (optional) The offset used for trying to find a better match or searching again.
-     * @return The SongInfo object containing the song information.
-     */
-    @Throws(
-        UnknownHostException::class, FileNotFoundException::class, NoTrackFoundException::class,
-        EmptyQueryException::class, InternalErrorException::class
-    )
-    suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
-        return try {
-            when (userSettingsController.selectedProvider) {
-                Providers.SPOTIFY -> spotifyAPI.getSongInfo(query, offset)
-                Providers.LRCLIB -> LRCLibAPI().getSongInfo(query).also {
-                    this.lrcLibID = it?.lrcLibID ?: 0
-                } ?: throw NoTrackFoundException()
-
-                Providers.NETEASE -> NeteaseAPI().getSongInfo(query, offset).also {
-                    this.neteaseID = it?.neteaseID ?: 0
-                } ?: throw NoTrackFoundException()
-
-                Providers.APPLE -> AppleAPI().getSongInfo(query).also {
-                    this.appleID = it?.appleID ?: 0
-                } ?: throw NoTrackFoundException()
-            }
-        } catch (e: InternalErrorException) {
-            throw e
-        } catch (e: NoTrackFoundException) {
-            throw e
-        } catch (e: EmptyQueryException) {
-            throw e
-        } catch (e: Exception) {
-            throw InternalErrorException(Log.getStackTraceString(e))
-        }
-    }
-
-    /**
-     * Gets synced lyrics using the song link and returns them as a string formatted as an LRC file.
-     * @param songLink The link to the song.
-     * @return The synced lyrics as a string.
-     */
-    suspend fun getSyncedLyrics(songLink: String, version: String): String? {
-        return try {
-            when (userSettingsController.selectedProvider) {
-                Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink, version)
-                Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(this.lrcLibID)
-                Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID, userSettingsController.includeTranslation)
-                Providers.APPLE -> AppleAPI().getSyncedLyrics(this.appleID)
-            }
-        } catch (e: Exception) {
-            null
-        }
-    }
-
+class SearchViewModel(
+    val userSettingsController: UserSettingsController,
+    private val lyricsProviderService: LyricsProviderService
+) : ViewModel() {
     @SuppressLint("Range")
     private fun getFileDescriptorFromPath(
         context: Context, filePath: String, mode: String = "r"
@@ -177,4 +103,10 @@ class SearchViewModel(val userSettingsController: UserSettingsController) : View
             false
         }
     }
+
+    suspend fun getSongInfo(queryResult: SongInfo, offset: Int): SongInfo? =
+        lyricsProviderService.getSongInfo(queryResult, offset, userSettingsController.selectedProvider)
+
+    suspend fun getSyncedLyrics(s: String, version: String): String? =
+        lyricsProviderService.getSyncedLyrics(s, version, userSettingsController.selectedProvider)
 }

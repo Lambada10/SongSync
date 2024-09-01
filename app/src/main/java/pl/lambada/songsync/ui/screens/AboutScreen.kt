@@ -467,6 +467,6 @@ enum class UpdateState {
 enum class Providers(val displayName: String) {
     SPOTIFY("Spotify (via SpotifyLyricsAPI)"),
     LRCLIB("LRCLib"),
-    NETEASE("Netease"),
+    NETEASE("Netease") { val inf = 0},
     APPLE("Apple Music")
 }

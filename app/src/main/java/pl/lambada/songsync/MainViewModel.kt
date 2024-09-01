@@ -10,7 +10,9 @@ import pl.lambada.songsync.util.ext.getVersion
 /**
  * ViewModel class for the main functionality of the app.
  */
-class MainViewModel(val userSettingsController: UserSettingsController) : ViewModel() {
+class MainViewModel(
+    val userSettingsController: UserSettingsController,
+) : ViewModel() {
     /**
      * Gets latest GitHub release information.
      * @return The latest release version.
