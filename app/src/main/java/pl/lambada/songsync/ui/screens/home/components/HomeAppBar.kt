@@ -7,6 +7,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Deselect
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.SelectAll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import pl.lambada.songsync.R
 import pl.lambada.songsync.ui.screens.Providers
 
@@ -40,6 +42,8 @@ fun HomeAppBar(
     onBatchDownloadRequest: () -> Unit,
     onSelectAllSongsRequest: () -> Unit,
     onInvertSongSelectionRequest: () -> Unit,
+    embedLyrics: Boolean,
+    onEmbedLyricsChangeRequest: (Boolean) -> Unit,
     cachedSize: Int,
 ) {
     MediumTopAppBar(
@@ -121,7 +125,9 @@ fun HomeAppBar(
                     onNavigateToAboutSectionRequest = onNavigateToAboutSectionRequest,
                     selectedProvider = selectedProvider,
                     onProviderSelectRequest = onProviderSelectRequest,
-                    onBatchDownloadRequest = onBatchDownloadRequest
+                    onBatchDownloadRequest = onBatchDownloadRequest,
+                    embedLyrics = embedLyrics,
+                    onEmbedLyricsChangeRequest = onEmbedLyricsChangeRequest
                 )
             }
         },

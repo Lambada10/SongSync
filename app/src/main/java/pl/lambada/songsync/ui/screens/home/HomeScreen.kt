@@ -34,11 +34,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pl.lambada.songsync.MainViewModel
 import pl.lambada.songsync.ui.ScreenAbout
 import pl.lambada.songsync.ui.ScreenSearch
+import pl.lambada.songsync.ui.screens.Providers
 import pl.lambada.songsync.ui.screens.home.components.BatchDownloadLyrics
 import pl.lambada.songsync.ui.screens.home.components.FilterAndSongCount
 import pl.lambada.songsync.ui.screens.home.components.FiltersDialog
@@ -49,6 +54,7 @@ import pl.lambada.songsync.ui.screens.home.components.SongItem
 import pl.lambada.songsync.util.dataStore
 import pl.lambada.songsync.util.ext.BackPressHandler
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
+import pl.lambada.songsync.util.get
 
 /**
  * Composable function representing the home screen.
@@ -66,8 +72,36 @@ fun HomeScreen(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var isBatchDownload by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val dataStore = context.dataStore
 
-    SideEffect { viewModel.updateAllSongs(context) }
+    var internetConnection by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        viewModel.updateAllSongs(context)
+
+        // Get token upon app start
+        launch(Dispatchers.IO) {
+            try {
+                viewModel.refreshToken()
+            } catch (e: Exception) {
+                internetConnection = false
+            }
+        }
+
+        val includeTranslation = dataStore.get(booleanPreferencesKey("include_translation"), false)
+        viewModel.includeTranslation = includeTranslation
+
+        val blacklist = dataStore.get(stringPreferencesKey("blacklist"), null)
+        if (blacklist != null) {
+            viewModel.blacklistedFolders = blacklist.split(",").toMutableList()
+        }
+
+        val hideLyrics = dataStore.get(booleanPreferencesKey("hide_lyrics"), false)
+        viewModel.hideLyrics = hideLyrics
+
+        val provider = dataStore.get(stringPreferencesKey("provider"), Providers.SPOTIFY.displayName)
+        viewModel.selectedProvider = Providers.entries.find { it.displayName == provider }!!
+    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -95,6 +129,8 @@ fun HomeScreen(
                     selectedProvider = viewModel.selectedProvider,
                     onSelectAllSongsRequest = viewModel::selectAllSongs,
                     onInvertSongSelectionRequest = viewModel::invertSongSelection,
+                    embedLyrics = viewModel.userSettingsController.embedLyricsIntoFiles,
+                    onEmbedLyricsChangeRequest = viewModel.userSettingsController::setEmbedLyrics,
                     cachedSize = cachedSize
                 )
             }

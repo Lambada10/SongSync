@@ -77,7 +77,6 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             var hasLoadedPermissions by remember { mutableStateOf(false) }
             var hasPermissions by remember { mutableStateOf(false) }
-            var internetConnection by remember { mutableStateOf(true) }
             var themeDefined by remember { mutableStateOf(false) }
 
             LaunchedEffect(Unit) {
@@ -91,31 +90,6 @@ class MainActivity : ComponentActivity() {
                 val sdCardPath = dataStore.get(stringPreferencesKey("sd_card_path"), null)
                 if (sdCardPath != null) {
                     viewModel.sdCardPath = sdCardPath
-                }
-
-                val includeTranslation = dataStore.get(booleanPreferencesKey("include_translation"), false)
-                viewModel.includeTranslation = includeTranslation
-
-                val blacklist = dataStore.get(stringPreferencesKey("blacklist"), null)
-                if (blacklist != null) {
-                    viewModel.blacklistedFolders = blacklist.split(",").toMutableList()
-                }
-
-                val hideLyrics = dataStore.get(booleanPreferencesKey("hide_lyrics"), false)
-                viewModel.hideLyrics = hideLyrics
-
-                val provider = dataStore.get(stringPreferencesKey("provider"), Providers.SPOTIFY.displayName)
-                viewModel.selectedProvider = Providers.entries.find { it.displayName == provider }!!
-
-//                val embedLyrics = dataStore.get(booleanPreferencesKey("embed_lyrics"), false)
-//                viewModel.embedLyricsInFile = embedLyrics
-                // Get token upon app start
-                launch(Dispatchers.IO) {
-                    try {
-                        viewModel.refreshToken()
-                    } catch (e: Exception) {
-                        internetConnection = false
-                    }
                 }
 
                 // Create our subdirectory in downloads if it doesn't exist
@@ -160,14 +134,6 @@ class MainActivity : ComponentActivity() {
                             Navigator(
                                 navController = navController,
                                 viewModel = viewModel
-                            )
-                        }
-                        if (!internetConnection) {
-                            NoInternetDialog(
-                                onConfirm = { finishAndRemoveTask() },
-                                onIgnore = {
-                                    internetConnection = true // assume connected (if spotify is down, can use other providers)
-                                }
                             )
                         }
                 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -33,6 +34,8 @@ fun HomeTopAppBarDropDown(
     onNavigateToAboutSectionRequest: () -> Unit,
     selectedProvider: Providers,
     onProviderSelectRequest: (Providers) -> Unit,
+    embedLyrics: Boolean,
+    onEmbedLyricsChangeRequest: (Boolean) -> Unit,
     onBatchDownloadRequest: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -64,6 +67,21 @@ fun HomeTopAppBarDropDown(
                 expanded = false
                 expandedProviders = true
             }
+        )
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = stringResource(id = R.string.embed_lyrics_in_file),
+                    modifier = Modifier.padding(horizontal = 6.dp),
+                )
+            },
+            trailingIcon = {
+                Checkbox(
+                    checked = embedLyrics,
+                    onCheckedChange = onEmbedLyricsChangeRequest
+                )
+            },
+            onClick = { onEmbedLyricsChangeRequest(!embedLyrics) }
         )
         DropdownMenuItem(
             text = {
