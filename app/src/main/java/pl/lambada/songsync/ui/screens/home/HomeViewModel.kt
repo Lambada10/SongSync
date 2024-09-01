@@ -83,6 +83,7 @@ class HomeViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
     var showSearch by mutableStateOf(showingSearch)
 
     // selected provider
+    // TODO bring back saving
     var selectedProvider by mutableStateOf(Providers.SPOTIFY)
     val songsToBatchDownload = if (selected.isEmpty())
         displaySongs
