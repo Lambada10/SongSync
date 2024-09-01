@@ -50,8 +50,6 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -60,9 +58,7 @@ import pl.lambada.songsync.R
 import pl.lambada.songsync.domain.model.Release
 import pl.lambada.songsync.ui.components.AboutItem
 import pl.lambada.songsync.ui.components.SwitchItem
-import pl.lambada.songsync.util.dataStore
 import pl.lambada.songsync.util.ext.getVersion
-import pl.lambada.songsync.util.set
 
 /**
  * Composable function for AboutScreen component.
@@ -75,9 +71,6 @@ fun AboutScreen(
 ) {
     val uriHandler = LocalUriHandler.current
     val version = LocalContext.current.getVersion()
-    val context = LocalContext.current
-
-    val dataStore = context.dataStore
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
@@ -116,18 +109,13 @@ fun AboutScreen(
             item {
                 if (isSystemInDarkTheme()) {
                     AboutItem(label = stringResource(R.string.theme)) {
-                        val pureBlack = viewModel.pureBlack
-                        var selected by remember { mutableStateOf(pureBlack.value) }
+                        val selected =  viewModel.userSettingsController.pureBlack
+
                         SwitchItem(
                             label = stringResource(R.string.pure_black_theme),
                             selected = selected
                         ) {
-                            viewModel.pureBlack.value = !selected
-                            selected = !selected
-                            dataStore.set(
-                                key = booleanPreferencesKey("pure_black"),
-                                value = selected
-                            )
+                            viewModel.userSettingsController.updatePureBlack(!selected)
                         }
                     }
                 }
@@ -135,36 +123,26 @@ fun AboutScreen(
 
             item {
                 AboutItem(label = stringResource(R.string.disable_marquee)) {
-                    val disableMarquee = viewModel.disableMarquee
-                    var selected by remember { mutableStateOf(disableMarquee.value) }
+                    val selected = viewModel.userSettingsController.disableMarquee
+
                     SwitchItem(
                         label = stringResource(R.string.disable_marquee_summary),
                         selected = selected
                     ) {
-                        viewModel.disableMarquee.value = !selected
-                        selected = !selected
-                        dataStore.set(
-                            key = booleanPreferencesKey("marquee_disable"),
-                            value = selected
-                        )
+                        viewModel.userSettingsController.updateDisableMarquee(!selected)
                     }
                 }
             }
 
             item {
                 AboutItem(label = stringResource(id = R.string.include_translation)) {
-                    val includeTranslation = viewModel.includeTranslation
-                    var selected by remember { mutableStateOf(includeTranslation) }
+                    val selected = viewModel.userSettingsController.includeTranslation
+
                     SwitchItem(
                         label = stringResource(id = R.string.include_translation_summary),
                         selected = selected
                     ) {
-                        viewModel.includeTranslation = !selected
-                        selected = !selected
-                        dataStore.set(
-                            key = booleanPreferencesKey("include_translation"),
-                            value = selected
-                        )
+                        viewModel.userSettingsController.updateIncludeTranslation(!selected)
                     }
                 }
             }
@@ -172,8 +150,7 @@ fun AboutScreen(
             item {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                     var picker by remember { mutableStateOf(false) }
-                    val sdCardPath = viewModel.sdCardPath
-                    var sdPath by rememberSaveable { mutableStateOf(sdCardPath) }
+                    val sdPath = viewModel.userSettingsController.sdCardPath
                     AboutItem(
                         label = stringResource(R.string.sd_card),
                         modifier = Modifier.padding(horizontal = 22.dp, vertical = 16.dp)
@@ -198,12 +175,7 @@ fun AboutScreen(
                             Spacer(modifier = Modifier.weight(1f))
                             OutlinedButton(
                                 onClick = {
-                                    sdPath = ""
-                                    viewModel.sdCardPath = ""
-                                    dataStore.set(
-                                        key = stringPreferencesKey("sd_card_path"),
-                                        value = sdPath
-                                    )
+                                    viewModel.userSettingsController.updateSdCardPath("")
                                 }
                             ) {
                                 Text(stringResource(R.string.clear_sd_card_path))
@@ -221,12 +193,7 @@ fun AboutScreen(
                                         picker = false
                                         return@rememberLauncherForActivityResult
                                     }
-                                    sdPath = it.toString()
-                                    viewModel.sdCardPath = it.toString()
-                                    dataStore.set(
-                                        key = stringPreferencesKey("sd_card_path"),
-                                        value = sdPath
-                                    )
+                                    viewModel.userSettingsController.updateSdCardPath(it.toString())
                                     picker = false
                                 }
                             LaunchedEffect(Unit) {

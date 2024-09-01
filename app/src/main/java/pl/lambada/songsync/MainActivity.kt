@@ -15,7 +15,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
@@ -33,30 +32,24 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import pl.lambada.songsync.data.remote.UserSettingsController
 import pl.lambada.songsync.ui.Navigator
-import pl.lambada.songsync.ui.components.dialogs.NoInternetDialog
-import pl.lambada.songsync.ui.screens.Providers
 import pl.lambada.songsync.ui.screens.home.LoadingScreen
 import pl.lambada.songsync.ui.theme.SongSyncTheme
 import pl.lambada.songsync.util.dataStore
-import pl.lambada.songsync.util.get
 import java.io.File
 
 /**
  * The main activity of the SongSync app.
  */
 class MainActivity : ComponentActivity() {
-    val viewModel: MainViewModel by viewModels()
     /**
      * Called when the activity is starting.
      *
@@ -66,13 +59,20 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { view, insets ->
             view.setPadding(0, 0, 0, 0)
             insets
         }
+
         val dataStore = this.dataStore
+        // its ok for this to recreate on config changes, no need to retain
+        val userSettingsController = UserSettingsController(dataStore)
+
+
         setContent {
+            val viewModel = viewModel { MainViewModel(userSettingsController) }
             val context = LocalContext.current
             val navController = rememberNavController()
             var hasLoadedPermissions by remember { mutableStateOf(false) }
@@ -80,17 +80,7 @@ class MainActivity : ComponentActivity() {
             var themeDefined by remember { mutableStateOf(false) }
 
             LaunchedEffect(Unit) {
-                val disableMarquee = dataStore.get(booleanPreferencesKey("marquee_disable"), false)
-                viewModel.disableMarquee.value = disableMarquee
-
-                val pureBlack = dataStore.get(booleanPreferencesKey("pure_black"), false)
-                viewModel.pureBlack.value = pureBlack
                 themeDefined = true
-
-                val sdCardPath = dataStore.get(stringPreferencesKey("sd_card_path"), null)
-                if (sdCardPath != null) {
-                    viewModel.sdCardPath = sdCardPath
-                }
 
                 // Create our subdirectory in downloads if it doesn't exist
                 val downloadsDir =
@@ -104,7 +94,7 @@ class MainActivity : ComponentActivity() {
             }
 
             if (themeDefined)
-                SongSyncTheme(pureBlack = viewModel.pureBlack.value) {
+                SongSyncTheme(pureBlack = userSettingsController.pureBlack) {
                     // Check for permissions and get all songs
                     RequestPermissions(
                         onGranted = { hasPermissions = true },

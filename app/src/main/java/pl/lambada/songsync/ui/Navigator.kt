@@ -3,8 +3,6 @@ package pl.lambada.songsync.ui
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -12,13 +10,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import pl.lambada.songsync.MainViewModel
-import pl.lambada.songsync.data.remote.UserSettingsController
 import pl.lambada.songsync.ui.screens.AboutScreen
 import pl.lambada.songsync.ui.screens.home.HomeScreen
 import pl.lambada.songsync.ui.screens.home.HomeViewModel
 import pl.lambada.songsync.ui.screens.search.SearchScreen
 import pl.lambada.songsync.ui.screens.search.SearchViewModel
-import pl.lambada.songsync.util.dataStore
 
 /**
  * Composable function for handling navigation within the app.
@@ -32,10 +28,6 @@ fun Navigator(
     navController: NavHostController,
     viewModel: MainViewModel
 ) {
-    val dataStore = LocalContext.current.dataStore
-    // its ok for this to recreate on config changes, no need to retain
-    val userSettingsController = remember { UserSettingsController(dataStore) }
-
     SharedTransitionLayout {
         NavHost(
             navController = navController,
@@ -44,7 +36,7 @@ fun Navigator(
             composable<ScreenHome> {
                 HomeScreen(
                     navController = navController,
-                    viewModel = viewModel { HomeViewModel(userSettingsController) },
+                    viewModel = viewModel { HomeViewModel(viewModel.userSettingsController) },
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
                 )
@@ -53,7 +45,7 @@ fun Navigator(
                 val args = it.toRoute<ScreenSearch>()
                 SearchScreen(
                     id = args.id,
-                    viewModel = viewModel { SearchViewModel(userSettingsController) },
+                    viewModel = viewModel { SearchViewModel(viewModel.userSettingsController) },
                     songName = args.songName,
                     artists = args.artists,
                     coverUri = args.coverUri,

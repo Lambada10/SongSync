@@ -183,7 +183,7 @@ fun SharedTransitionScope.SearchScreen(
                     coverUrl = coverUri,
                     sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope,
-                    animateText = !viewModel.disableMarquee.value,
+                    animateText = !viewModel.userSettingsController.disableMarquee,
                 )
             }
 
@@ -261,7 +261,7 @@ fun SharedTransitionScope.SearchScreen(
                         modifier = Modifier.clickable { result.songLink?.let { uriHandler.openUri(it) } },
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = animatedVisibilityScope,
-                        animateText = !viewModel.disableMarquee.value,
+                        animateText = !viewModel.userSettingsController.disableMarquee,
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Row(
@@ -270,7 +270,8 @@ fun SharedTransitionScope.SearchScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         OutlinedButton(
-                            enabled = viewModel.selectedProvider != Providers.LRCLIB && viewModel.selectedProvider != Providers.APPLE,
+                            enabled = viewModel.userSettingsController.selectedProvider != Providers.LRCLIB
+                                    && viewModel.userSettingsController.selectedProvider != Providers.APPLE,
                             onClick = {
                                 offset += 1
                                 queryResult = SongInfo(
@@ -360,7 +361,7 @@ fun SharedTransitionScope.SearchScreen(
                                                 )?.split("/")?.dropLast(1)
                                             var sdCardFiles = DocumentFile.fromTreeUri(
                                                 context,
-                                                Uri.parse(viewModel.sdCardPath)
+                                                Uri.parse(viewModel.userSettingsController.sdCardPath)
                                             )
                                             for (element in path!!) {
                                                 for (sdCardFile in sdCardFiles!!.listFiles()) {

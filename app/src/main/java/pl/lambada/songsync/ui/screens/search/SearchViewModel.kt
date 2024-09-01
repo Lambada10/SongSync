@@ -10,11 +10,6 @@ import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.kyant.taglib.TagLib
 import pl.lambada.songsync.data.remote.UserSettingsController
@@ -34,23 +29,15 @@ import java.net.UnknownHostException
 /**
  * ViewModel class for the main functionality of the app.
  */
-class SearchViewModel(private val userSettingsController: UserSettingsController) : ViewModel() {
+class SearchViewModel(val userSettingsController: UserSettingsController) : ViewModel() {
     // Spotify API token
     private val spotifyAPI = SpotifyAPI()
-
-    // other settings
-    var disableMarquee: MutableState<Boolean> = mutableStateOf(false)
-    var sdCardPath = ""
-
-    // selected provider
-    var selectedProvider by mutableStateOf(Providers.SPOTIFY)
 
     // LRCLib Track ID
     private var lrcLibID = 0
 
     // Netease Track ID and stuff
     private var neteaseID = 0L
-    var includeTranslation = false
 
     // Apple Track ID
     private var appleID = 0L
@@ -68,7 +55,7 @@ class SearchViewModel(private val userSettingsController: UserSettingsController
     )
     suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
         return try {
-            when (this.selectedProvider) {
+            when (userSettingsController.selectedProvider) {
                 Providers.SPOTIFY -> spotifyAPI.getSongInfo(query, offset)
                 Providers.LRCLIB -> LRCLibAPI().getSongInfo(query).also {
                     this.lrcLibID = it?.lrcLibID ?: 0
@@ -100,10 +87,10 @@ class SearchViewModel(private val userSettingsController: UserSettingsController
      */
     suspend fun getSyncedLyrics(songLink: String, version: String): String? {
         return try {
-            when (this.selectedProvider) {
+            when (userSettingsController.selectedProvider) {
                 Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink, version)
                 Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(this.lrcLibID)
-                Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID, includeTranslation)
+                Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID, userSettingsController.includeTranslation)
                 Providers.APPLE -> AppleAPI().getSyncedLyrics(this.appleID)
             }
         } catch (e: Exception) {

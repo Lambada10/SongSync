@@ -1,30 +1,17 @@
 package pl.lambada.songsync.ui.screens.home
 
-import android.annotation.SuppressLint
-import android.app.PendingIntent
-import android.app.RecoverableSecurityException
-import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
-import android.os.Build
-import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kyant.taglib.TagLib
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
@@ -43,7 +30,6 @@ import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.screens.Providers
 import pl.lambada.songsync.util.ext.toLrcFile
-import pl.lambada.songsync.util.set
 import java.io.FileNotFoundException
 import java.net.UnknownHostException
 
@@ -61,9 +47,7 @@ class HomeViewModel(val userSettingsController: UserSettingsController) : ViewMo
 
     // Filter settings
     private var cachedFolders: MutableList<String>? = null
-    var blacklistedFolders = mutableListOf<String>()
-    var hideLyrics by mutableStateOf(false)
-    private var hideFolders = blacklistedFolders.isNotEmpty()
+    private var hideFolders = userSettingsController.blacklistedFolders.isNotEmpty()
 
     // filtered folders/lyrics songs
     private var _cachedFilteredSongs = MutableStateFlow<List<Song>>(emptyList())
@@ -73,10 +57,6 @@ class HomeViewModel(val userSettingsController: UserSettingsController) : ViewMo
 
     // Spotify API token
     private val spotifyAPI = SpotifyAPI()
-
-    // other settings
-    var disableMarquee: MutableState<Boolean> = mutableStateOf(false)
-    var sdCardPath = ""
 
     var displaySongs by mutableStateOf(
         when {
@@ -90,8 +70,6 @@ class HomeViewModel(val userSettingsController: UserSettingsController) : ViewMo
     var showingSearch by  mutableStateOf(false)
     var showSearch by mutableStateOf(showingSearch)
 
-    // selected provider
-    var selectedProvider by mutableStateOf(Providers.SPOTIFY)
     val songsToBatchDownload = if (selected.isEmpty())
         displaySongs
     else
@@ -102,7 +80,6 @@ class HomeViewModel(val userSettingsController: UserSettingsController) : ViewMo
 
     // Netease Track ID and stuff
     private var neteaseID = 0L
-    var includeTranslation = false
 
     // Apple Track ID
     private var appleID = 0L
@@ -145,7 +122,7 @@ class HomeViewModel(val userSettingsController: UserSettingsController) : ViewMo
     )
     suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo {
         return try {
-            when (this.selectedProvider) {
+            when (userSettingsController.selectedProvider) {
                 Providers.SPOTIFY -> spotifyAPI.getSongInfo(query, offset)
                 Providers.LRCLIB -> LRCLibAPI().getSongInfo(query).also {
                     this.lrcLibID = it?.lrcLibID ?: 0
@@ -177,10 +154,10 @@ class HomeViewModel(val userSettingsController: UserSettingsController) : ViewMo
      */
     suspend fun getSyncedLyrics(songLink: String, version: String): String? {
         return try {
-            when (this.selectedProvider) {
+            when (userSettingsController.selectedProvider) {
                 Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink, version)
                 Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(this.lrcLibID)
-                Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID, includeTranslation)
+                Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID, userSettingsController.includeTranslation)
                 Providers.APPLE -> AppleAPI().getSyncedLyrics(this.appleID)
             }
         } catch (e: Exception) {
@@ -303,13 +280,13 @@ class HomeViewModel(val userSettingsController: UserSettingsController) : ViewMo
      * @return A list of songs depending on the user's preferences. If no preferences are set, null is returned, so app will use all songs.
      */
     fun filterSongs() = viewModelScope.launch {
-        hideFolders = blacklistedFolders.isNotEmpty()
+        hideFolders = userSettingsController.blacklistedFolders.isNotEmpty()
 
         when {
-            hideLyrics && hideFolders -> {
+            userSettingsController.hideLyrics && hideFolders -> {
                 _cachedFilteredSongs?.value = cachedSongs!!
                     .filter {
-                        it.filePath.toLrcFile()?.exists() != true && !blacklistedFolders.contains(
+                        it.filePath.toLrcFile()?.exists() != true && !userSettingsController.blacklistedFolders.contains(
                             it.filePath!!.substring(
                                 0, it.filePath.lastIndexOf("/")
                             )
@@ -317,14 +294,14 @@ class HomeViewModel(val userSettingsController: UserSettingsController) : ViewMo
                     }
             }
 
-            hideLyrics -> {
+            userSettingsController.hideLyrics -> {
                 _cachedFilteredSongs?.value = cachedSongs!!
                     .filter { it.filePath.toLrcFile()?.exists() != true }
             }
 
             hideFolders -> {
                 _cachedFilteredSongs?.value = cachedSongs!!.filter {
-                    !blacklistedFolders.contains(
+                    !userSettingsController.blacklistedFolders.contains(
                         it.filePath!!.substring(
                             0,
                             it.filePath.lastIndexOf("/")
@@ -378,24 +355,20 @@ class HomeViewModel(val userSettingsController: UserSettingsController) : ViewMo
             ?.forEach(selected::add)
     }
 
-    fun onHideLyricsChange(dataStore: DataStore<Preferences>, newHideLyrics: Boolean) {
-        dataStore.set(
-            booleanPreferencesKey("hide_lyrics"),
-            newHideLyrics
-        )
-        hideLyrics = newHideLyrics
+    fun onHideLyricsChange(newHideLyrics: Boolean) {
+        userSettingsController.updateHideLyrics(newHideLyrics)
     }
 
-    fun onToggleFolderBlacklist(dataStore: DataStore<Preferences>, folder: String, blacklisted: Boolean) {
+    fun onToggleFolderBlacklist(folder: String, blacklisted: Boolean) {
         if (blacklisted) {
-            blacklistedFolders.add(folder)
+            userSettingsController.updateBlacklistedFolders(
+                userSettingsController.blacklistedFolders + folder
+            )
         } else {
-            blacklistedFolders.remove(folder)
+            userSettingsController.updateBlacklistedFolders(
+                userSettingsController.blacklistedFolders - folder
+            )
         }
-        dataStore.set(
-            stringPreferencesKey("blacklist"),
-            blacklistedFolders.joinToString(",")
-        )
     }
 }
 

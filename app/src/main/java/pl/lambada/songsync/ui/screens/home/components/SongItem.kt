@@ -108,7 +108,7 @@ fun SongItem(
                 verticalArrangement = Arrangement.SpaceAround
             ) {
                 AnimatedText(
-                    animate = !viewModel.disableMarquee.value,
+                    animate = !viewModel.userSettingsController.disableMarquee,
                     text = songName,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.contentColorFor(bgColor),
@@ -118,7 +118,7 @@ fun SongItem(
                     )
                 )
                 AnimatedText(
-                    animate = !viewModel.disableMarquee.value,
+                    animate = !viewModel.userSettingsController.disableMarquee,
                     text = artists,
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.contentColorFor(bgColor),

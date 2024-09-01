@@ -173,7 +173,7 @@ fun BatchDownloadLyrics(viewModel: HomeViewModel, onDone: () -> Unit) {
                     Column {
                         Text(text = stringResource(R.string.downloading_lyrics))
                         AnimatedText(
-                            animate = !viewModel.disableMarquee.value,
+                            animate = !viewModel.userSettingsController.disableMarquee,
                             text = stringResource(
                                 R.string.song,
                                 songs.getOrNull((count) % total.coerceAtLeast(1))?.title
@@ -279,7 +279,7 @@ fun BatchDownloadLyrics(viewModel: HomeViewModel, onDone: () -> Unit) {
                                     val path = file?.absolutePath?.substringAfter(sd)?.split("/")
                                         ?.dropLast(1)
                                     var sdCardFiles = DocumentFile.fromTreeUri(
-                                        context, Uri.parse(viewModel.sdCardPath)
+                                        context, Uri.parse(viewModel.userSettingsController.sdCardPath)
                                     )
                                     for (element in path!!) {
                                         for (sdCardFile in sdCardFiles!!.listFiles()) {
