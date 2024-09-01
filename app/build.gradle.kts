@@ -86,6 +86,7 @@ dependencies {
     implementation(libs.androidx.preference)
     implementation(libs.ktor.core)
     implementation(libs.ktor.cio)
+    implementation(libs.taglib)
     implementation(libs.datastore.preferences)
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.tooling.preview)

@@ -43,7 +43,8 @@ class AppleAPI {
             songName = result.songName,
             artistName = result.artistName,
             songLink = result.url,
-            albumCoverLink = result.artwork.replace("{w}", "100").replace("{h}", "100").replace("{f}", "png"),
+            albumCoverLink = result.artwork.replace("{w}", "100").replace("{h}", "100")
+                .replace("{f}", "png"),
             appleID = result.id
         )
     }
@@ -80,11 +81,13 @@ class AppleAPI {
                     syncedLyrics.append("<${line.endtime.toLrcTimestamp()}>\n")
                 }
             }
+
             "Line" -> {
                 for (line in lines) {
                     syncedLyrics.append("[${line.timestamp.toLrcTimestamp()}]${line.text[0].text}\n")
                 }
             }
+
             else -> return null
         }
 

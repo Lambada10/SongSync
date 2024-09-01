@@ -1,14 +1,21 @@
 package pl.lambada.songsync.data
 
+import android.annotation.SuppressLint
+import android.app.PendingIntent
+import android.app.RecoverableSecurityException
+import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
+import android.os.Build
+import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kyant.taglib.TagLib
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -70,6 +77,8 @@ class MainViewModel : ViewModel() {
     private var appleID = 0L
     // TODO: Use values from SongInfo object returned by search instead of storing them here
 
+    var embedLyricsInFile = false
+
     /**
      * Refreshes the access token by sending a request to the Spotify API.
      */
@@ -124,7 +133,11 @@ class MainViewModel : ViewModel() {
             when (this.provider) {
                 Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink, version)
                 Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(this.lrcLibID)
-                Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(this.neteaseID, includeTranslation)
+                Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(
+                    this.neteaseID,
+                    includeTranslation
+                )
+
                 Providers.APPLE -> AppleAPI().getSyncedLyrics(this.appleID)
             }
         } catch (e: Exception) {
@@ -148,6 +161,37 @@ class MainViewModel : ViewModel() {
         val latestVersion = getLatestRelease().tagName.replace(".", "").replace("v", "").toInt()
 
         return latestVersion > currentVersion
+    }
+
+    @SuppressLint("Range")
+    private fun getFileDescriptorFromPath(
+        context: Context, filePath: String, mode: String = "r"
+    ): ParcelFileDescriptor? {
+        val resolver: ContentResolver = context.contentResolver
+        val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+
+        val projection = arrayOf(MediaStore.Files.FileColumns._ID)
+        val selection = "${MediaStore.Files.FileColumns.DATA}=?"
+        val selectionArgs = arrayOf(filePath)
+
+        resolver.query(uri, projection, selection, selectionArgs, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val fileId: Int =
+                    cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
+                if (fileId == -1) {
+                    return null
+                } else {
+                    val fileUri: Uri = Uri.withAppendedPath(uri, fileId.toString())
+                    try {
+                        return resolver.openFileDescriptor(fileUri, mode)
+                    } catch (e: FileNotFoundException) {
+                        Log.e("MainViewModel", "File not found: ${e.message}")
+                    }
+                }
+            }
+        }
+
+        return null
     }
 
     /**
@@ -223,17 +267,20 @@ class MainViewModel : ViewModel() {
             val data: List<Song> = when {
                 cachedFilteredSongs.value.isNotEmpty() -> cachedFilteredSongs.value
                 cachedSongs != null -> cachedSongs!!
-                else -> { return@launch }
+                else -> {
+                    return@launch
+                }
             }
 
             val results = data.filter {
                 it.title?.contains(query, ignoreCase = true) == true ||
-                it.artist?.contains(query, ignoreCase = true) == true
+                        it.artist?.contains(query, ignoreCase = true) == true
             }
 
             _searchResults.value = results
         }
     }
+
     /**
      * Loads all songs' folders
      * @param context The application context.
@@ -273,10 +320,12 @@ class MainViewModel : ViewModel() {
                         )
                     }
             }
+
             hideLyrics -> {
                 _cachedFilteredSongs?.value = cachedSongs!!
                     .filter { it.filePath.toLrcFile()?.exists() != true }
             }
+
             hideFolders -> {
                 _cachedFilteredSongs?.value = cachedSongs!!.filter {
                     !blacklistedFolders.contains(
@@ -287,9 +336,59 @@ class MainViewModel : ViewModel() {
                     )
                 }
             }
+
             else -> {
                 _cachedFilteredSongs?.value = emptyList()
             }
+        }
+    }
+
+    fun embedLyricsInFile(
+        context: Context,
+        filePath: String,
+        lyrics: String,
+        securityExceptionHandler: (PendingIntent) -> Unit = {}
+    ): Boolean {
+        return try {
+            val fd = getFileDescriptorFromPath(context, filePath, mode = "w")
+                ?: throw IllegalStateException("File descriptor is null")
+
+            val fileDescriptor = fd.dup().detachFd()
+
+            val metadata = TagLib.getMetadata(fileDescriptor, false) ?: throw IllegalStateException(
+                "Metadata is null"
+            )
+
+            fd.dup().detachFd().let {
+                TagLib.savePropertyMap(
+                    it, propertyMap = metadata.propertyMap.apply {
+                        put("LYRICS", arrayOf(lyrics))
+                    }
+                )
+            }
+
+            true
+        } catch (securityException: SecurityException) {
+            handleSecurityException(securityException, securityExceptionHandler)
+            false
+        } catch (e: Exception) {
+            Log.e("MainViewModel", "Error embedding lyrics: ${e.message}")
+            false
+        }
+    }
+
+    private fun handleSecurityException(
+        securityException: SecurityException, intentPassthrough: (PendingIntent) -> Unit
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val recoverableSecurityException =
+                securityException as? RecoverableSecurityException ?: throw RuntimeException(
+                    securityException.message, securityException
+                )
+
+            intentPassthrough(recoverableSecurityException.userAction.actionIntent)
+        } else {
+            throw RuntimeException(securityException.message, securityException)
         }
     }
 }

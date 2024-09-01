@@ -117,9 +117,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getString
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.documentfile.provider.DocumentFile
 import androidx.navigation.NavHostController
@@ -140,10 +138,10 @@ import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.ScreenAbout
 import pl.lambada.songsync.ui.ScreenSearch
-import pl.lambada.songsync.util.ext.BackPressHandler
 import pl.lambada.songsync.ui.components.AnimatedText
 import pl.lambada.songsync.ui.components.SwitchItem
 import pl.lambada.songsync.util.dataStore
+import pl.lambada.songsync.util.ext.BackPressHandler
 import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
 import pl.lambada.songsync.util.ext.toLrcFile
@@ -166,6 +164,8 @@ fun HomeScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
+    val context = LocalContext.current
+    var embedLyrics by remember { mutableStateOf(viewModel.embedLyricsInFile) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var isBatchDownload by remember { mutableStateOf(false) }
     Scaffold(
@@ -330,6 +330,33 @@ fun HomeScreen(
                                 DropdownMenuItem(
                                     text = {
                                         Text(
+                                            text = stringResource(id = R.string.embed_lyrics_in_file),
+                                            modifier = Modifier.padding(horizontal = 6.dp),
+                                        )
+                                    },
+                                    trailingIcon = {
+                                        Checkbox(
+                                            checked = embedLyrics,
+                                            onCheckedChange = {
+                                                embedLyrics = it
+                                                context.dataStore.set(
+                                                    booleanPreferencesKey("embed_lyrics"),
+                                                    it
+                                                )
+                                            }
+                                        )
+                                    },
+                                    onClick = {
+                                        embedLyrics = !embedLyrics
+                                        context.dataStore.set(
+                                            booleanPreferencesKey("embed_lyrics"),
+                                            embedLyrics
+                                        )
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
                                             text = stringResource(id = R.string.about),
                                             modifier = Modifier.padding(horizontal = 6.dp),
                                         )
@@ -340,7 +367,8 @@ fun HomeScreen(
                                     }
                                 )
                             }
-                            val selectedProvider = rememberSaveable { mutableStateOf(viewModel.provider) }
+                            val selectedProvider =
+                                rememberSaveable { mutableStateOf(viewModel.provider) }
                             val providers = Providers.entries.toTypedArray()
                             val context = LocalContext.current
                             val dataStore = context.dataStore
@@ -498,7 +526,11 @@ fun HomeScreenLoaded(
     Column {
         if (isBatchDownload) {
             BatchDownloadLyrics(
-                songs = if (selected.isEmpty()) displaySongs else songs.filter { selected.contains(it.filePath) }.toList(),
+                songs = if (selected.isEmpty()) displaySongs else songs.filter {
+                    selected.contains(
+                        it.filePath
+                    )
+                }.toList(),
                 viewModel = viewModel,
                 onDone = { onBatchDownload(false) })
         }
@@ -800,7 +832,10 @@ fun FiltersDialog(
                                     .padding(start = 22.dp, end = 16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Icon(imageVector = Icons.Outlined.Folder, contentDescription = "Folder icon")
+                                Icon(
+                                    imageVector = Icons.Outlined.Folder,
+                                    contentDescription = "Folder icon"
+                                )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = folder.removePrefix("/storage/emulated/0/"),
@@ -1145,7 +1180,10 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                         if (queryResult != null) {
                             val lyricsResult: String
                             try {
-                                lyricsResult = viewModel.getSyncedLyrics(queryResult.songLink ?: "", context.getVersion())!!
+                                lyricsResult = viewModel.getSyncedLyrics(
+                                    queryResult.songLink ?: "",
+                                    context.getVersion()
+                                )!!
                             } catch (e: Exception) {
                                 when (e) {
                                     is NullPointerException, is FileNotFoundException -> {
@@ -1159,7 +1197,12 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                             val lrc =
                                 "[ti:${queryResult.songName}]\n" + "[ar:${queryResult.artistName}]\n" + "[by:$generatedUsingString]\n" + lyricsResult
                             try {
-                                file?.writeText(lrc)
+                                if (viewModel.embedLyricsInFile) viewModel.embedLyricsInFile(
+                                    context,
+                                    song.filePath
+                                        ?: throw FileNotFoundException("File path must not be null"),
+                                    lrc
+                                ) else file?.writeText(lrc)
                             } catch (e: FileNotFoundException) {
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && !song.filePath!!.contains(
                                         "/storage/emulated/0"
@@ -1181,6 +1224,7 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                                             }
                                         }
                                     }
+                                    //In here we won't try to embed lyrics in file because if it failed before, it will fail again
                                     sdCardFiles?.listFiles()?.forEach {
                                         if (it.name == file.name) {
                                             it.delete()
@@ -1190,7 +1234,8 @@ fun BatchDownloadLyrics(songs: List<Song>, viewModel: MainViewModel, onDone: () 
                                     sdCardFiles?.createFile(
                                         "text/lrc", file.name
                                     )?.let {
-                                        val outputStream = context.contentResolver.openOutputStream(it.uri)
+                                        val outputStream =
+                                            context.contentResolver.openOutputStream(it.uri)
                                         outputStream?.write(lrc.toByteArray())
                                         outputStream?.close()
                                     }
