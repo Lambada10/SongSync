@@ -55,7 +55,6 @@ class MainActivity : ComponentActivity() {
     private val lyricsProviderService = LyricsProviderService()
 
     @SuppressLint("SuspiciousIndentation")
-
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -110,20 +109,7 @@ class MainActivity : ComponentActivity() {
                     if (!hasLoadedPermissions) {
                         LoadingScreen()
                     } else if (!hasPermissions) {
-                        AlertDialog(
-                            onDismissRequest = { /* don't dismiss */ },
-                            confirmButton = {
-                                OutlinedButton(onClick = ::finishAndRemoveTask) {
-                                    Text(stringResource(R.string.close_app))
-                                }
-                            },
-                            title = { Text(stringResource(R.string.permission_denied)) },
-                            text = {
-                                Column {
-                                    Text(stringResource(R.string.requires_higher_storage_permissions))
-                                }
-                            }
-                        )
+                        PermissionsDeniedDialogue(onCloseAppRequest = ::finishAndRemoveTask)
                     } else {
                         Navigator(
                             navController = navController,
@@ -158,6 +144,24 @@ class MainActivity : ComponentActivity() {
             notificationManager.createNotificationChannel(channel)
         }
     }
+}
+
+@Composable
+fun PermissionsDeniedDialogue(onCloseAppRequest: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = { /* don't dismiss */ },
+        confirmButton = {
+            OutlinedButton(onClick = onCloseAppRequest) {
+                Text(stringResource(R.string.close_app))
+            }
+        },
+        title = { Text(stringResource(R.string.permission_denied)) },
+        text = {
+            Column {
+                Text(stringResource(R.string.requires_higher_storage_permissions))
+            }
+        }
+    )
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
