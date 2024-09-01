@@ -26,14 +26,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -70,17 +69,13 @@ class MainActivity : ComponentActivity() {
         val dataStore = this.dataStore
         val userSettingsController = UserSettingsController(dataStore)
 
-        var networkError by mutableStateOf(false)
-
         setContent {
-            val scope = rememberCoroutineScope()
-            val viewModel = viewModel {
-                MainViewModel(userSettingsController)
-            }
             val context = LocalContext.current
             val navController = rememberNavController()
             var hasLoadedPermissions by remember { mutableStateOf(false) }
             var hasPermissions by remember { mutableStateOf(false) }
+            var networkError by rememberSaveable { mutableStateOf<Boolean?>(null) }
+
 
             LaunchedEffect(Unit) {
                 // Create our subdirectory in downloads if it doesn't exist
@@ -93,7 +88,8 @@ class MainActivity : ComponentActivity() {
 
                 createNotificationChannel()
 
-                lyricsProviderService.refreshSpotifyToken()
+                if (networkError == null) lyricsProviderService
+                    .refreshSpotifyToken()
                     .onFailure { networkError = true }
             }
 
@@ -105,7 +101,7 @@ class MainActivity : ComponentActivity() {
                     onDone = { hasLoadedPermissions = true }
                 )
 
-                if (networkError) NoInternetDialog(
+                if (networkError == true) NoInternetDialog(
                     onConfirm = ::finishAndRemoveTask,
                     onIgnore = { networkError = false }
                 )
@@ -131,7 +127,6 @@ class MainActivity : ComponentActivity() {
                     } else {
                         Navigator(
                             navController = navController,
-                            viewModel = viewModel,
                             userSettingsController = userSettingsController,
                             lyricsProviderService = lyricsProviderService
                         )

@@ -1,4 +1,4 @@
-package pl.lambada.songsync
+package pl.lambada.songsync.ui.screens.about
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -10,8 +10,8 @@ import pl.lambada.songsync.util.ext.getVersion
 /**
  * ViewModel class for the main functionality of the app.
  */
-class MainViewModel(
-    val userSettingsController: UserSettingsController,
+class AboutViewModel(
+    val userSettingsController: UserSettingsController
 ) : ViewModel() {
     /**
      * Gets latest GitHub release information.
@@ -31,9 +31,3 @@ class MainViewModel(
         return latestVersion > currentVersion
     }
 }
-
-class NoTrackFoundException : Exception()
-
-class InternalErrorException(msg: String) : Exception(msg)
-
-class EmptyQueryException : Exception()

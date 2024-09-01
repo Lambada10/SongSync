@@ -36,9 +36,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import pl.lambada.songsync.MainViewModel
 import pl.lambada.songsync.ui.ScreenAbout
 import pl.lambada.songsync.ui.ScreenSearch
+import pl.lambada.songsync.ui.screens.about.AboutViewModel
 import pl.lambada.songsync.ui.screens.home.components.BatchDownloadLyrics
 import pl.lambada.songsync.ui.screens.home.components.FilterAndSongCount
 import pl.lambada.songsync.ui.screens.home.components.FiltersDialog
@@ -52,7 +52,7 @@ import pl.lambada.songsync.util.ext.lowercaseWithLocale
 /**
  * Composable function representing the home screen.
  *
- * @param viewModel The [MainViewModel] instance.
+ * @param viewModel The [AboutViewModel] instance.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable

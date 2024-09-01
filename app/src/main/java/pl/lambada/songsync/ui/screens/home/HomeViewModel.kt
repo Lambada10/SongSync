@@ -296,9 +296,3 @@ class HomeViewModel(
     suspend fun getSyncedLyrics(link: String, version: String): String? =
         lyricsProviderService.getSyncedLyrics(link, version, provider = userSettingsController.selectedProvider)
 }
-
-class NoTrackFoundException : Exception()
-
-class InternalErrorException(msg: String) : Exception(msg)
-
-class EmptyQueryException : Exception()

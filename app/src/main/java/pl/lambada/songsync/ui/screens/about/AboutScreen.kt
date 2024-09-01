@@ -1,6 +1,6 @@
 @file:Suppress("SpellCheckingInspection")
 
-package pl.lambada.songsync.ui.screens
+package pl.lambada.songsync.ui.screens.about
 
 import android.content.Context
 import android.net.Uri
@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import pl.lambada.songsync.MainViewModel
 import pl.lambada.songsync.R
 import pl.lambada.songsync.domain.model.Release
 import pl.lambada.songsync.ui.components.AboutItem
@@ -66,7 +65,7 @@ import pl.lambada.songsync.util.ext.getVersion
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(
-    viewModel: MainViewModel,
+    viewModel: AboutViewModel,
     navController: NavController
 ) {
     val uriHandler = LocalUriHandler.current
@@ -334,7 +333,7 @@ fun CheckForUpdates(
     onDismiss: () -> Unit,
     onDownload: (String) -> Unit,
     context: Context,
-    viewModel: MainViewModel,
+    viewModel: AboutViewModel,
     version: String
 ) {
     var updateState by rememberSaveable { mutableStateOf(UpdateState.CHECKING) }

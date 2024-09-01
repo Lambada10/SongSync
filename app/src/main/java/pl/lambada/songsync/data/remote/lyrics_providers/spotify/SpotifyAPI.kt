@@ -4,11 +4,11 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import pl.lambada.songsync.EmptyQueryException
-import pl.lambada.songsync.NoTrackFoundException
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.lyrics_providers.spotify.TrackSearchResult
 import pl.lambada.songsync.domain.model.lyrics_providers.spotify.WebPlayerTokenResponse
+import pl.lambada.songsync.util.EmptyQueryException
+import pl.lambada.songsync.util.NoTrackFoundException
 import pl.lambada.songsync.util.networking.Ktor.client
 import pl.lambada.songsync.util.networking.Ktor.json
 import java.io.FileNotFoundException

@@ -29,14 +29,14 @@ import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import pl.lambada.songsync.EmptyQueryException
-import pl.lambada.songsync.InternalErrorException
 import pl.lambada.songsync.MainActivity
-import pl.lambada.songsync.NoTrackFoundException
 import pl.lambada.songsync.R
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.components.AnimatedText
 import pl.lambada.songsync.ui.screens.home.HomeViewModel
+import pl.lambada.songsync.util.EmptyQueryException
+import pl.lambada.songsync.util.InternalErrorException
+import pl.lambada.songsync.util.NoTrackFoundException
 import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.FileNotFoundException

@@ -59,14 +59,14 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import pl.lambada.songsync.EmptyQueryException
-import pl.lambada.songsync.MainViewModel
-import pl.lambada.songsync.NoTrackFoundException
 import pl.lambada.songsync.R
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.components.CommonTextField
 import pl.lambada.songsync.ui.components.SongCard
-import pl.lambada.songsync.ui.screens.Providers
+import pl.lambada.songsync.ui.screens.about.AboutViewModel
+import pl.lambada.songsync.ui.screens.about.Providers
+import pl.lambada.songsync.util.EmptyQueryException
+import pl.lambada.songsync.util.NoTrackFoundException
 import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.File
@@ -76,7 +76,7 @@ import java.net.UnknownHostException
 /**
  * Composable function for BrowseScreen component.
  *
- * @param viewModel the [MainViewModel] instance.
+ * @param viewModel the [AboutViewModel] instance.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable

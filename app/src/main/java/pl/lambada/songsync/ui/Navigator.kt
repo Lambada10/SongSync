@@ -9,10 +9,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import pl.lambada.songsync.MainViewModel
 import pl.lambada.songsync.data.remote.UserSettingsController
 import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
-import pl.lambada.songsync.ui.screens.AboutScreen
+import pl.lambada.songsync.ui.screens.about.AboutScreen
+import pl.lambada.songsync.ui.screens.about.AboutViewModel
 import pl.lambada.songsync.ui.screens.home.HomeScreen
 import pl.lambada.songsync.ui.screens.home.HomeViewModel
 import pl.lambada.songsync.ui.screens.search.SearchScreen
@@ -28,7 +28,6 @@ import pl.lambada.songsync.ui.screens.search.SearchViewModel
 @Composable
 fun Navigator(
     navController: NavHostController,
-    viewModel: MainViewModel,
     userSettingsController: UserSettingsController,
     lyricsProviderService: LyricsProviderService
 ) {
@@ -65,7 +64,7 @@ fun Navigator(
             }
             composable<ScreenAbout> {
                 AboutScreen(
-                    viewModel = viewModel,
+                    viewModel = viewModel { AboutViewModel(userSettingsController) },
                     navController = navController
                 )
             }
