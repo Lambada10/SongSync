@@ -124,7 +124,10 @@ fun AboutScreen(
                         ) {
                             viewModel.pureBlack.value = !selected
                             selected = !selected
-                            dataStore.set(key = booleanPreferencesKey("pure_black"), value = selected)
+                            dataStore.set(
+                                key = booleanPreferencesKey("pure_black"),
+                                value = selected
+                            )
                         }
                     }
                 }
@@ -140,7 +143,10 @@ fun AboutScreen(
                     ) {
                         viewModel.disableMarquee.value = !selected
                         selected = !selected
-                        dataStore.set(key = booleanPreferencesKey("marquee_disable"), value = selected)
+                        dataStore.set(
+                            key = booleanPreferencesKey("marquee_disable"),
+                            value = selected
+                        )
                     }
                 }
             }
@@ -155,7 +161,10 @@ fun AboutScreen(
                     ) {
                         viewModel.includeTranslation = !selected
                         selected = !selected
-                        dataStore.set(key = booleanPreferencesKey("include_translation"), value = selected)
+                        dataStore.set(
+                            key = booleanPreferencesKey("include_translation"),
+                            value = selected
+                        )
                     }
                 }
             }
@@ -304,7 +313,8 @@ fun AboutScreen(
             item {
                 AboutItem(stringResource(R.string.contributors)) {
                     Contributor.entries.forEach {
-                        val additionalInfo = stringResource(id = it.contributionLevel.stringResource)
+                        val additionalInfo =
+                            stringResource(id = it.contributionLevel.stringResource)
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()

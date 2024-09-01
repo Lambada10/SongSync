@@ -1,8 +1,14 @@
 package pl.lambada.songsync.ui.screens.home
 
+import android.annotation.SuppressLint
+import android.app.PendingIntent
+import android.app.RecoverableSecurityException
+import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
+import android.os.Build
+import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -18,6 +24,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kyant.taglib.TagLib
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
@@ -183,6 +190,37 @@ class HomeViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
 
     fun updateAllSongs(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         allSongs = getAllSongs(context)
+    }
+
+    @SuppressLint("Range")
+    private fun getFileDescriptorFromPath(
+        context: Context, filePath: String, mode: String = "r"
+    ): ParcelFileDescriptor? {
+        val resolver: ContentResolver = context.contentResolver
+        val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+
+        val projection = arrayOf(MediaStore.Files.FileColumns._ID)
+        val selection = "${MediaStore.Files.FileColumns.DATA}=?"
+        val selectionArgs = arrayOf(filePath)
+
+        resolver.query(uri, projection, selection, selectionArgs, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val fileId: Int =
+                    cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
+                if (fileId == -1) {
+                    return null
+                } else {
+                    val fileUri: Uri = Uri.withAppendedPath(uri, fileId.toString())
+                    try {
+                        return resolver.openFileDescriptor(fileUri, mode)
+                    } catch (e: FileNotFoundException) {
+                        Log.e("MainViewModel", "File not found: ${e.message}")
+                    }
+                }
+            }
+        }
+
+        return null
     }
 
     /**
@@ -381,6 +419,55 @@ class HomeViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
             stringPreferencesKey("blacklist"),
             blacklistedFolders.joinToString(",")
         )
+    }
+
+    fun embedLyricsInFile(
+        context: Context,
+        filePath: String,
+        lyrics: String,
+        securityExceptionHandler: (PendingIntent) -> Unit = {}
+    ): Boolean {
+        return try {
+            val fd = getFileDescriptorFromPath(context, filePath, mode = "w")
+                ?: throw IllegalStateException("File descriptor is null")
+
+            val fileDescriptor = fd.dup().detachFd()
+
+            val metadata = TagLib.getMetadata(fileDescriptor, false) ?: throw IllegalStateException(
+                "Metadata is null"
+            )
+
+            fd.dup().detachFd().let {
+                TagLib.savePropertyMap(
+                    it, propertyMap = metadata.propertyMap.apply {
+                        put("LYRICS", arrayOf(lyrics))
+                    }
+                )
+            }
+
+            true
+        } catch (securityException: SecurityException) {
+            handleSecurityException(securityException, securityExceptionHandler)
+            false
+        } catch (e: Exception) {
+            Log.e("MainViewModel", "Error embedding lyrics: ${e.message}")
+            false
+        }
+    }
+
+    private fun handleSecurityException(
+        securityException: SecurityException, intentPassthrough: (PendingIntent) -> Unit
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val recoverableSecurityException =
+                securityException as? RecoverableSecurityException ?: throw RuntimeException(
+                    securityException.message, securityException
+                )
+
+            intentPassthrough(recoverableSecurityException.userAction.actionIntent)
+        } else {
+            throw RuntimeException(securityException.message, securityException)
+        }
     }
 }
 

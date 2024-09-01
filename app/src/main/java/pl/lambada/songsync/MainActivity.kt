@@ -107,6 +107,8 @@ class MainActivity : ComponentActivity() {
                 val provider = dataStore.get(stringPreferencesKey("provider"), Providers.SPOTIFY.displayName)
                 viewModel.selectedProvider = Providers.entries.find { it.displayName == provider }!!
 
+//                val embedLyrics = dataStore.get(booleanPreferencesKey("embed_lyrics"), false)
+//                viewModel.embedLyricsInFile = embedLyrics
                 // Get token upon app start
                 launch(Dispatchers.IO) {
                     try {
@@ -136,14 +138,14 @@ class MainActivity : ComponentActivity() {
                         onDone = { hasLoadedPermissions = true }
                     )
 
-                    Surface( modifier = Modifier.fillMaxSize() ) {
+                    Surface( modifier = Modifier.fillMaxSize()) {
                         if (!hasLoadedPermissions) {
                             LoadingScreen()
                         } else if (!hasPermissions) {
                             AlertDialog(
                                 onDismissRequest = { /* don't dismiss */ },
                                 confirmButton = {
-                                    OutlinedButton(onClick = { finishAndRemoveTask() }) {
+                                    OutlinedButton(onClick = ::finishAndRemoveTask) {
                                         Text(stringResource(R.string.close_app))
                                     }
                                 },

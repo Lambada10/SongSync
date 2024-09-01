@@ -51,10 +51,23 @@ fun AnimatedText(
     modifier: Modifier = Modifier,
 ) {
     if (animate) {
-        MarqueeText(text = text, fontSize = fontSize, fontWeight = fontWeight, modifier = modifier, color = color)
-    }
-    else {
-        Text(text = text, fontSize = fontSize, fontWeight = fontWeight, modifier = modifier, color = color, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        MarqueeText(
+            text = text,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            modifier = modifier,
+            color = color
+        )
+    } else {
+        Text(
+            text = text,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            modifier = modifier,
+            color = color,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
