@@ -1,6 +1,7 @@
 package pl.lambada.songsync
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -32,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -56,10 +56,10 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        // fixes weird system bars background upon app loading
+        enableEdgeToEdge()
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { view, insets ->
             view.setPadding(0, 0, 0, 0)
             insets
@@ -68,6 +68,9 @@ class MainActivity : ComponentActivity() {
         val dataStore = this.dataStore
         val userSettingsController = UserSettingsController(dataStore)
 
+        checkOrCreateDownloadSubFolder()
+        createNotificationChannel()
+
         setContent {
             val context = LocalContext.current
             val navController = rememberNavController()
@@ -75,18 +78,7 @@ class MainActivity : ComponentActivity() {
             var hasPermissions by remember { mutableStateOf(false) }
             var networkError by rememberSaveable { mutableStateOf<Boolean?>(null) }
 
-
             LaunchedEffect(Unit) {
-                // Create our subdirectory in downloads if it doesn't exist
-                val downloadsDir =
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                val songSyncDir = File(downloadsDir, "SongSync")
-                if (!songSyncDir.exists()) {
-                    songSyncDir.mkdir()
-                }
-
-                createNotificationChannel()
-
                 if (networkError == null) lyricsProviderService
                     .refreshSpotifyToken()
                     .onFailure { networkError = true }
@@ -128,21 +120,31 @@ class MainActivity : ComponentActivity() {
         notificationManager.cancel(2) // "Done" notification
         super.onResume()
     }
+}
 
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+private fun checkOrCreateDownloadSubFolder() {
+    val downloadsDir = Environment.getExternalStoragePublicDirectory(
+        Environment.DIRECTORY_DOWNLOADS
+    )
 
-            val channelId = getString(R.string.batch_download_lyrics)
-            val channelName = getString(R.string.batch_download_lyrics)
-            val channelDescription = getString(R.string.batch_download_lyrics)
-            val importance = NotificationManager.IMPORTANCE_LOW
-            val channel = NotificationChannel(channelId, channelName, importance)
-            channel.description = channelDescription
+    val songSyncDir = File(downloadsDir, "SongSync")
 
-            notificationManager.createNotificationChannel(channel)
-        }
+    if (!songSyncDir.exists()) songSyncDir.mkdir()
+}
+
+private fun Activity.createNotificationChannel() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val channelId = getString(R.string.batch_download_lyrics)
+        val channelName = getString(R.string.batch_download_lyrics)
+        val channelDescription = getString(R.string.batch_download_lyrics)
+        val importance = NotificationManager.IMPORTANCE_LOW
+        val channel = NotificationChannel(channelId, channelName, importance)
+        channel.description = channelDescription
+
+        notificationManager.createNotificationChannel(channel)
     }
 }
 
