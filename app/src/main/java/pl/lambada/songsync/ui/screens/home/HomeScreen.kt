@@ -72,29 +72,29 @@ fun HomeScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             var cachedSize by remember { mutableIntStateOf(1) }
-            if (viewModel.selected.size > 0) {
+            if (viewModel.selectedSongs.size > 0) {
                 // keep displaying "1 selected" during fade-out, don't say "0 selected"
-                cachedSize = viewModel.selected.size
+                cachedSize = viewModel.selectedSongs.size
             }
 
             BackPressHandler(
-                enabled = viewModel.selected.size > 0,
-                onBackPressed = { viewModel.selected.clear() }
+                enabled = viewModel.selectedSongs.size > 0,
+                onBackPressed = { viewModel.selectedSongs.clear() }
             )
 
             Crossfade(
-                targetState = viewModel.selected.size > 0,
+                targetState = viewModel.selectedSongs.size > 0,
                 label = ""
             ) { showing ->
                 HomeAppBar(
                     showing = showing,
                     scrollBehavior = scrollBehavior,
-                    onSelectedClearAction = viewModel.selected::clear,
+                    onSelectedClearAction = viewModel.selectedSongs::clear,
                     onNavigateToAboutSectionRequest = { navController.navigate(ScreenAbout) },
                     onProviderSelectRequest = viewModel.userSettingsController::updateSelectedProviders,
                     onBatchDownloadRequest = { isBatchDownload = true },
                     selectedProvider = viewModel.userSettingsController.selectedProvider,
-                    onSelectAllSongsRequest = viewModel::selectAllSongs,
+                    onSelectAllSongsRequest = viewModel::selectAllDisplayingSongs,
                     onInvertSongSelectionRequest = viewModel::invertSongSelection,
                     embedLyrics = viewModel.userSettingsController.embedLyricsIntoFiles,
                     onEmbedLyricsChangeRequest = viewModel.userSettingsController::updateEmbedLyrics,
@@ -126,7 +126,7 @@ fun HomeScreen(
                 HomeScreenLoaded(
                     navController = navController,
                     viewModel = viewModel,
-                    selected = viewModel.selected,
+                    selected = viewModel.selectedSongs,
                     paddingValues = paddingValues,
                     isBatchDownload = isBatchDownload,
                     onBatchDownloadState = { onBatchDownload -> isBatchDownload = onBatchDownload },
@@ -235,15 +235,7 @@ fun HomeScreenLoaded(
                     selected = selected.contains(song.filePath),
                     quickSelect = selected.size > 0,
                     onSelectionChanged = { newValue ->
-                        if (newValue) {
-                            song.filePath?.let { selected.add(it) }
-                            viewModel.showSearch = false
-                            viewModel.showingSearch = false
-                        } else {
-                            selected.remove(song.filePath)
-                            if (selected.size == 0 && viewModel.searchQuery.isNotEmpty())
-                                viewModel.showingSearch = true // show again but don't focus
-                        }
+                       viewModel.selectSong(song, newValue)
                     },
                     navController = navController,
                     song = song,

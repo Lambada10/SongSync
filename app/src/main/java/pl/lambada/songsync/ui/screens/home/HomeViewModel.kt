@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.util.fastMapNotNull
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -33,12 +34,10 @@ class HomeViewModel(
     val lyricsProviderService: LyricsProviderService
 ) : ViewModel() {
     private var cachedSongs: List<Song>? = null
-    val selected = mutableStateListOf<String>()
+    val selectedSongs = mutableStateListOf<String>()
     var allSongs by mutableStateOf<List<Song>?>(null)
 
     var searchQuery by mutableStateOf("")
-
-    private var ableToSelect by mutableStateOf<List<Song>?>(null)
 
     // Filter settings
     private var cachedFolders: MutableList<String>? = null
@@ -62,16 +61,13 @@ class HomeViewModel(
     var showingSearch by  mutableStateOf(false)
     var showSearch by mutableStateOf(showingSearch)
 
-    val songsToBatchDownload = if (selected.isEmpty())
+    val songsToBatchDownload = if (selectedSongs.isEmpty())
         displaySongs
     else
-        (allSongs ?: listOf()).filter { selected.contains(it.filePath) }.toList()
+        (allSongs ?: listOf()).filter { selectedSongs.contains(it.filePath) }.toList()
 
     init {
-        viewModelScope.launch {
-            launch { updateAbleToSelect() }
-            launch { updateSongsToDisplay() }
-        }
+        viewModelScope.launch { updateSongsToDisplay() }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -211,7 +207,7 @@ class HomeViewModel(
 
         when {
             userSettingsController.hideLyrics && hideFolders -> {
-                _cachedFilteredSongs?.value = cachedSongs!!
+                _cachedFilteredSongs.value = cachedSongs!!
                     .filter {
                         it.filePath.toLrcFile()?.exists() != true && !userSettingsController.blacklistedFolders.contains(
                             it.filePath!!.substring(
@@ -222,12 +218,12 @@ class HomeViewModel(
             }
 
             userSettingsController.hideLyrics -> {
-                _cachedFilteredSongs?.value = cachedSongs!!
+                _cachedFilteredSongs.value = cachedSongs!!
                     .filter { it.filePath.toLrcFile()?.exists() != true }
             }
 
             hideFolders -> {
-                _cachedFilteredSongs?.value = cachedSongs!!.filter {
+                _cachedFilteredSongs.value = cachedSongs!!.filter {
                     !userSettingsController.blacklistedFolders.contains(
                         it.filePath!!.substring(
                             0,
@@ -238,40 +234,20 @@ class HomeViewModel(
             }
 
             else -> {
-                _cachedFilteredSongs?.value = emptyList()
+                _cachedFilteredSongs.value = emptyList()
             }
         }
     }
 
-    private suspend fun updateAbleToSelect() = coroutineScope {
-        _searchResults.combine(_cachedFilteredSongs) { searched, filtered ->
-            ableToSelect = when {
-                searched.isNotEmpty() -> searched
-                filtered.isNotEmpty() -> filtered
-                else -> allSongs
-            }
-        }
+    fun invertSongSelection() = viewModelScope.launch {
+        val newSelectedSongs = displaySongs.filter { it.filePath !in selectedSongs }
+        selectedSongs.clear()
+        selectedSongs.addAll(newSelectedSongs.mapNotNull { it.filePath })
     }
 
-    fun invertSongSelection() {
-        val willBeSelected = ableToSelect?.map { it.filePath }?.toMutableList()
-
-        for (song in selected) {
-            willBeSelected?.remove(song)
-        }
-
-        selected.clear()
-        if (willBeSelected != null) {
-            for (song in willBeSelected) {
-                song?.let { selected.add(it) }
-            }
-        }
-    }
-
-    fun selectAllSongs() {
-        ableToSelect
-            ?.mapNotNull { it.filePath }
-            ?.forEach(selected::add)
+    fun selectAllDisplayingSongs() = viewModelScope.launch {
+        selectedSongs.clear()
+        selectedSongs.addAll(displaySongs.fastMapNotNull { it.filePath })
     }
 
     fun onHideLyricsChange(newHideLyrics: Boolean) {
@@ -295,4 +271,17 @@ class HomeViewModel(
 
     suspend fun getSyncedLyrics(link: String, version: String): String? =
         lyricsProviderService.getSyncedLyrics(link, version, provider = userSettingsController.selectedProvider)
+
+    fun selectSong(song: Song, newValue: Boolean) {
+        if (newValue) {
+            song.filePath?.let { selectedSongs.add(it) }
+            showSearch = false
+            showingSearch = false
+        } else {
+            selectedSongs.remove(song.filePath)
+
+            if (selectedSongs.size == 0 && searchQuery.isNotEmpty())
+                showingSearch = true // show again but don't focus
+        }
+    }
 }
