@@ -38,7 +38,6 @@ fun SharedTransitionScope.SongCard(
     artists: String,
     coverUrl: String?,
     modifier: Modifier = Modifier,
-    sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     OutlinedCard(
@@ -65,7 +64,7 @@ fun SharedTransitionScope.SongCard(
                         .sharedBounds(
                             sharedContentState = rememberSharedContentState(key = "cover$id"),
                             animatedVisibilityScope = animatedVisibilityScope,
-                            clipInOverlayDuringTransition = sharedTransitionScope.OverlayClip(
+                            clipInOverlayDuringTransition = OverlayClip(
                                 RoundedCornerShape(
                                     topStart = 30f,
                                     bottomStart = 30f,

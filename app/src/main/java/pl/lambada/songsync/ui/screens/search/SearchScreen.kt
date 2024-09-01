@@ -88,7 +88,6 @@ fun SharedTransitionScope.SearchScreen(
     filePath: String?,
     viewModel: SearchViewModel,
     navController: NavController,
-    sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
 
@@ -180,7 +179,6 @@ fun SharedTransitionScope.SearchScreen(
                     songName = songName!!,
                     artists = artists!!,
                     coverUrl = coverUri,
-                    sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope,
                     animateText = !viewModel.userSettingsController.disableMarquee,
                 )
@@ -258,7 +256,6 @@ fun SharedTransitionScope.SearchScreen(
                         artists = result.artistName ?: stringResource(id = R.string.unknown),
                         coverUrl = result.albumCoverLink,
                         modifier = Modifier.clickable { result.songLink?.let { uriHandler.openUri(it) } },
-                        sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = animatedVisibilityScope,
                         animateText = !viewModel.userSettingsController.disableMarquee,
                     )

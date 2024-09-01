@@ -58,7 +58,6 @@ fun Navigator(
                     coverUri = args.coverUri,
                     filePath = args.filePath,
                     navController = navController,
-                    sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
                 )
             }
