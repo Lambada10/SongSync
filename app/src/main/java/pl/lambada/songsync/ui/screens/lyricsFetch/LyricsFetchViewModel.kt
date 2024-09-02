@@ -139,6 +139,7 @@ class LyricsFetchViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 queryState = QueryStatus.Pending
+                lyricsFetchState = LyricsFetchState.NotSubmitted
                 if (tryingAgain) queryOffset += 1 else queryOffset = 0
 
                 val result = lyricsProviderService

@@ -1,10 +1,12 @@
 package pl.lambada.songsync.ui.screens.lyricsFetch.components
 
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -45,7 +47,7 @@ fun SharedTransitionScope.SuccessContent(
 ) = Column {
     Spacer(modifier = Modifier.height(10.dp))
 
-    Row {
+    Row(Modifier.align(Alignment.CenterHorizontally)) {
         Icon(
             imageVector = Icons.Filled.Cloud,
             contentDescription = null,
@@ -88,24 +90,31 @@ fun SharedTransitionScope.SuccessContent(
 
     Spacer(modifier = Modifier.height(8.dp))
 
-    when (lyricsFetchState) {
-        LyricsFetchState.NotSubmitted -> CircularProgressIndicator()
+    Crossfade(lyricsFetchState, label = "") {
+        when (it) {
+            LyricsFetchState.NotSubmitted -> Box(
+                Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
 
-        is LyricsFetchState.Success -> LyricsSuccessContent(
-            lyrics = lyricsFetchState.lyrics,
-            onSaveLyrics = onSaveLyrics,
-            onEmbedLyrics = onEmbedLyrics,
-            onCopyLyrics = { onCopyLyrics(lyricsFetchState.lyrics) }
-        )
-
-        is LyricsFetchState.Failed -> {
-            Text(
-                text = lyricsFetchState.exception.stackTraceToString()
-                    ?: stringResource(id = R.string.this_track_has_no_lyrics)
+            is LyricsFetchState.Success -> LyricsSuccessContent(
+                lyrics = it.lyrics,
+                onSaveLyrics = onSaveLyrics,
+                onEmbedLyrics = onEmbedLyrics,
+                onCopyLyrics = { onCopyLyrics(it.lyrics) }
             )
-        }
 
-        LyricsFetchState.Pending -> CircularProgressIndicator()
+            is LyricsFetchState.Failed -> {
+                Text(
+                    text = stringResource(id = R.string.this_track_has_no_lyrics)
+                )
+            }
+
+            LyricsFetchState.Pending -> CircularProgressIndicator()
+        }
     }
+
     Spacer(modifier = Modifier.height(8.dp))
 }

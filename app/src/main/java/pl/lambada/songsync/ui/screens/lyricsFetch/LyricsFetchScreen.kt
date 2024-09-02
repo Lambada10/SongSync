@@ -1,14 +1,15 @@
 package pl.lambada.songsync.ui.screens.lyricsFetch
 
 import android.widget.Toast
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -121,7 +122,10 @@ fun SharedTransitionScope.LyricsFetchScreen(
                 )
             }
 
-            AnimatedContent(viewModel.queryState, label = "") { queryState ->
+            Crossfade(
+                viewModel.queryState,
+                label = ""
+            ) { queryState ->
                 when (queryState) {
                     QueryStatus.NotSubmitted -> NotSubmittedContent(
                         querySong = viewModel.querySongName,
@@ -131,7 +135,10 @@ fun SharedTransitionScope.LyricsFetchScreen(
                         onGetLyricsRequest = { viewModel.loadSongInfo(context) }
                     )
 
-                    QueryStatus.Pending -> Column {
+                    QueryStatus.Pending -> Column(
+                        Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Spacer(modifier = Modifier.height(16.dp))
                         CircularProgressIndicator()
                     }
