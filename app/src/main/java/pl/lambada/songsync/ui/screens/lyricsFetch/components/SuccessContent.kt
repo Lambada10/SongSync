@@ -100,8 +100,8 @@ fun SharedTransitionScope.SuccessContent(
 
                 is LyricsFetchState.Success -> LyricsSuccessContent(
                     lyrics = it.lyrics,
-                    onSaveLyrics = onSaveLyrics,
-                    onEmbedLyrics = onEmbedLyrics,
+                    onSaveLyrics = { onSaveLyrics(it.lyrics) },
+                    onEmbedLyrics = { onEmbedLyrics(it.lyrics) },
                     onCopyLyrics = { onCopyLyrics(it.lyrics) }
                 )
 
