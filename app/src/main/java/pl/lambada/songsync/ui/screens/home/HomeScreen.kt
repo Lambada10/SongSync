@@ -36,8 +36,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import pl.lambada.songsync.ui.LyricsFetchScreen
 import pl.lambada.songsync.ui.ScreenAbout
-import pl.lambada.songsync.ui.ScreenSearch
 import pl.lambada.songsync.ui.screens.about.AboutViewModel
 import pl.lambada.songsync.ui.screens.home.components.BatchDownloadLyrics
 import pl.lambada.songsync.ui.screens.home.components.FilterAndSongCount
@@ -109,7 +109,7 @@ fun HomeScreen(
                         sharedContentState = rememberSharedContentState(key = "fab"),
                         animatedVisibilityScope = animatedVisibilityScope
                     ),
-                    onClick = { navController.navigate(ScreenSearch()) }
+                    onClick = { navController.navigate(LyricsFetchScreen()) }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -183,7 +183,12 @@ fun HomeScreenLoaded(
         ) {
             item {
                 Column(
-                    modifier = Modifier.padding(top = 5.dp, bottom = 5.dp, start = 22.dp, end = 4.dp),
+                    modifier = Modifier.padding(
+                        top = 5.dp,
+                        bottom = 5.dp,
+                        start = 22.dp,
+                        end = 4.dp
+                    ),
                 ) {
                     HomeSearchThing(
                         showingSearch = viewModel.showingSearch,
@@ -231,17 +236,27 @@ fun HomeScreenLoaded(
                 val song = viewModel.displaySongs[index]
 
                 SongItem(
-                    id = index.toString(),
+                    filePath = song.filePath
+                        ?: error("a song in the list of files did not have a file path"),
                     selected = selected.contains(song.filePath),
                     quickSelect = selected.size > 0,
                     onSelectionChanged = { newValue ->
-                       viewModel.selectSong(song, newValue)
+                        viewModel.selectSong(song, newValue)
                     },
-                    navController = navController,
+                    onNavigateToSongRequest = {
+                        navController.navigate(
+                            LyricsFetchScreen(
+                                songName = song.title ?: error("song.title was null"),
+                                artists = song.artist ?: "",
+                                coverUri = song.imgUri?.path ?: "",
+                                filePath = song.filePath
+                            )
+                        )
+                    },
                     song = song,
                     sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope,
-                    viewModel = viewModel,
+                    disableMarquee = viewModel.userSettingsController.disableMarquee
                 )
             }
 

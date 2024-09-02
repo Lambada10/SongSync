@@ -27,29 +27,26 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import pl.lambada.songsync.R
 import pl.lambada.songsync.domain.model.Song
-import pl.lambada.songsync.ui.ScreenSearch
 import pl.lambada.songsync.ui.components.AnimatedText
-import pl.lambada.songsync.ui.screens.home.HomeViewModel
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun SongItem(
-    id: String,
+    filePath: String,
     selected: Boolean,
     quickSelect: Boolean,
     onSelectionChanged: (Boolean) -> Unit,
-    navController: NavHostController,
+    onNavigateToSongRequest: () -> Unit,
     song: Song,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    viewModel: HomeViewModel,
+    disableMarquee: Boolean = true
 ) {
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current).data(data = song.imgUri).apply {
@@ -68,19 +65,10 @@ fun SongItem(
             .background(bgColor)
             .combinedClickable(
                 onClick = {
-                    if (quickSelect) {
+                    if (quickSelect)
                         onSelectionChanged(!selected)
-                    } else {
-                        navController.navigate(
-                            ScreenSearch(
-                                id = id,
-                                songName = songName,
-                                artists = artists,
-                                coverUri = song.imgUri.toString(),
-                                filePath = song.filePath,
-                            )
-                        )
-                    }
+                    else
+                        onNavigateToSongRequest()
                 },
                 onLongClick = { onSelectionChanged(!selected) }
             )
@@ -92,7 +80,7 @@ fun SongItem(
                 contentDescription = stringResource(id = R.string.album_cover),
                 modifier = Modifier
                     .sharedBounds(
-                        sharedContentState = rememberSharedContentState(key = "cover$id"),
+                        sharedContentState = rememberSharedContentState(key = "cover$filePath"),
                         animatedVisibilityScope = animatedVisibilityScope,
                         clipInOverlayDuringTransition = sharedTransitionScope.OverlayClip(
                             RoundedCornerShape(20f)
@@ -108,22 +96,22 @@ fun SongItem(
                 verticalArrangement = Arrangement.SpaceAround
             ) {
                 AnimatedText(
-                    animate = !viewModel.userSettingsController.disableMarquee,
+                    animate = !disableMarquee,
                     text = songName,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.contentColorFor(bgColor),
                     modifier = Modifier.sharedBounds(
-                        sharedContentState = rememberSharedContentState(key = "title$id"),
+                        sharedContentState = rememberSharedContentState(key = "title$filePath"),
                         animatedVisibilityScope = animatedVisibilityScope
                     )
                 )
                 AnimatedText(
-                    animate = !viewModel.userSettingsController.disableMarquee,
+                    animate = !disableMarquee,
                     text = artists,
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.contentColorFor(bgColor),
                     modifier = Modifier.sharedBounds(
-                        sharedContentState = rememberSharedContentState(key = "artist$id"),
+                        sharedContentState = rememberSharedContentState(key = "artist$filePath"),
                         animatedVisibilityScope = animatedVisibilityScope
                     )
                 )

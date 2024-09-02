@@ -32,7 +32,7 @@ import pl.lambada.songsync.R
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.SongCard(
-    id: String,
+    filePath: String?,
     animateText: Boolean,
     songName: String,
     artists: String,
@@ -40,6 +40,8 @@ fun SharedTransitionScope.SongCard(
     modifier: Modifier = Modifier,
     animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
+    val unknownArtistString = stringResource(R.string.unknown)
+
     OutlinedCard(
         shape = RoundedCornerShape(10.dp),
         modifier = CombinedModifier(
@@ -62,7 +64,7 @@ fun SharedTransitionScope.SongCard(
                     contentDescription = stringResource(R.string.album_cover),
                     modifier = Modifier
                         .sharedBounds(
-                            sharedContentState = rememberSharedContentState(key = "cover$id"),
+                            sharedContentState = rememberSharedContentState(key = "cover$filePath"),
                             animatedVisibilityScope = animatedVisibilityScope,
                             clipInOverlayDuringTransition = OverlayClip(
                                 RoundedCornerShape(
@@ -96,17 +98,17 @@ fun SharedTransitionScope.SongCard(
                     fontWeight = FontWeight.SemiBold,
                     animate = animateText,
                     modifier = Modifier.sharedBounds(
-                        sharedContentState = rememberSharedContentState(key = "title$id"),
+                        sharedContentState = rememberSharedContentState(key = "title$filePath"),
                         animatedVisibilityScope = animatedVisibilityScope
                     )
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 AnimatedText(
-                    text = artists,
+                    text = artists.ifBlank { unknownArtistString },
                     fontSize = 14.sp,
                     animate = animateText,
                     modifier = Modifier.sharedBounds(
-                        sharedContentState = rememberSharedContentState(key = "artist$id"),
+                        sharedContentState = rememberSharedContentState(key = "artist$filePath"),
                         animatedVisibilityScope = animatedVisibilityScope
                     )
                 )
