@@ -66,9 +66,7 @@ class HomeViewModel(
     else
         (allSongs ?: listOf()).filter { selectedSongs.contains(it.filePath) }.toList()
 
-    init {
-        viewModelScope.launch { updateSongsToDisplay() }
-    }
+    init { viewModelScope.launch { updateSongsToDisplay() } }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun updateSongsToDisplay() = coroutineScope {
@@ -147,6 +145,7 @@ class HomeViewModel(
             }
             cursor?.close()
             cachedSongs = songs
+            viewModelScope.launch { filterSongs() }
             cachedSongs!!
         }
     }
