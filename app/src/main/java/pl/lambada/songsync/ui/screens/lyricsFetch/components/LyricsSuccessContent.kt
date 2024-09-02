@@ -26,6 +26,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import pl.lambada.songsync.R
 
@@ -92,7 +93,7 @@ private fun CopyToClipboardElement(modifier: Modifier = Modifier) {
         ) {
             Text(
                 stringResource(R.string.copy_lyrics_to_clipboard),
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W500)
             )
 
             Spacer(Modifier.width(4.dp))
