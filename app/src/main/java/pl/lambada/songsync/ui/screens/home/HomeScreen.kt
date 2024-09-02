@@ -107,7 +107,8 @@ fun HomeScreen(
                 FloatingActionButton(
                     modifier = Modifier.sharedBounds(
                         sharedContentState = rememberSharedContentState(key = "fab"),
-                        animatedVisibilityScope = animatedVisibilityScope
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
                     ),
                     onClick = { navController.navigate(LyricsFetchScreen()) }
                 ) {
