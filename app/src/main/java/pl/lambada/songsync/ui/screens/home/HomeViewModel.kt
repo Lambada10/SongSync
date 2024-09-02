@@ -31,7 +31,7 @@ import pl.lambada.songsync.util.ext.toLrcFile
  */
 class HomeViewModel(
     val userSettingsController: UserSettingsController,
-    val lyricsProviderService: LyricsProviderService
+    private val lyricsProviderService: LyricsProviderService
 ) : ViewModel() {
     private var cachedSongs: List<Song>? = null
     val selectedSongs = mutableStateListOf<String>()
