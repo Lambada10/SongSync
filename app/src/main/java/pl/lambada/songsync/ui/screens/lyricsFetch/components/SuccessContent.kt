@@ -91,28 +91,24 @@ fun SharedTransitionScope.SuccessContent(
     Spacer(modifier = Modifier.height(8.dp))
 
     Crossfade(lyricsFetchState, label = "") {
-        when (it) {
-            LyricsFetchState.NotSubmitted -> Box(
-                Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+        Box(
+            Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            when (it) {
+                LyricsFetchState.NotSubmitted -> { /* nothing */ }
 
-            is LyricsFetchState.Success -> LyricsSuccessContent(
-                lyrics = it.lyrics,
-                onSaveLyrics = onSaveLyrics,
-                onEmbedLyrics = onEmbedLyrics,
-                onCopyLyrics = { onCopyLyrics(it.lyrics) }
-            )
-
-            is LyricsFetchState.Failed -> {
-                Text(
-                    text = stringResource(id = R.string.this_track_has_no_lyrics)
+                is LyricsFetchState.Success -> LyricsSuccessContent(
+                    lyrics = it.lyrics,
+                    onSaveLyrics = onSaveLyrics,
+                    onEmbedLyrics = onEmbedLyrics,
+                    onCopyLyrics = { onCopyLyrics(it.lyrics) }
                 )
-            }
 
-            LyricsFetchState.Pending -> CircularProgressIndicator()
+                is LyricsFetchState.Failed -> Text(stringResource(R.string.this_track_has_no_lyrics))
+
+                LyricsFetchState.Pending -> CircularProgressIndicator()
+            }
         }
     }
 

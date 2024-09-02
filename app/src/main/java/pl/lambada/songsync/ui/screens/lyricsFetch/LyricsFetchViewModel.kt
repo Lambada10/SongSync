@@ -186,6 +186,7 @@ class LyricsFetchViewModel(
 
     private fun loadLyrics(songLink: String?, context: Context) {
         viewModelScope.launch {
+            lyricsFetchState = LyricsFetchState.Pending
             try {
                 val lyrics = getSyncedLyrics(
                     songLink ?: error("attempted lyrics retrieval with empty url"),
