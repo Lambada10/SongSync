@@ -52,88 +52,12 @@ class LyricsFetchViewModel(
 
     var lyricsFetchState by mutableStateOf<LyricsFetchState>(LyricsFetchState.NotSubmitted)
 
-    @SuppressLint("Range")
-    private fun getFileDescriptorFromPath(
-        context: Context, filePath: String, mode: String = "r"
-    ): ParcelFileDescriptor? {
-        val resolver: ContentResolver = context.contentResolver
-        val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-
-        val projection = arrayOf(MediaStore.Files.FileColumns._ID)
-        val selection = "${MediaStore.Files.FileColumns.DATA}=?"
-        val selectionArgs = arrayOf(filePath)
-
-        resolver.query(uri, projection, selection, selectionArgs, null)?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                val fileId: Int =
-                    cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
-                if (fileId == -1) {
-                    return null
-                } else {
-                    val fileUri: Uri = Uri.withAppendedPath(uri, fileId.toString())
-                    try {
-                        return resolver.openFileDescriptor(fileUri, mode)
-                    } catch (e: FileNotFoundException) {
-                        Log.e("MainViewModel", "File not found: ${e.message}")
-                    }
-                }
-            }
-        }
-
-        return null
-    }
-
-    private fun handleSecurityException(
-        securityException: SecurityException, intentPassthrough: (PendingIntent) -> Unit
-    ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val recoverableSecurityException =
-                securityException as? RecoverableSecurityException ?: throw RuntimeException(
-                    securityException.message, securityException
-                )
-
-            intentPassthrough(recoverableSecurityException.userAction.actionIntent)
-        } else {
-            throw RuntimeException(securityException.message, securityException)
-        }
-    }
-
-    private fun embedLyricsInFile(
-        context: Context,
-        filePath: String,
-        lyrics: String,
-        securityExceptionHandler: (PendingIntent) -> Unit = {}
-    ): Boolean {
-        return try {
-            val fd = getFileDescriptorFromPath(context, filePath, mode = "w")
-                ?: throw IllegalStateException("File descriptor is null")
-
-            val fileDescriptor = fd.dup().detachFd()
-
-            val metadata = TagLib.getMetadata(fileDescriptor, false) ?: throw IllegalStateException(
-                "Metadata is null"
-            )
-
-            fd.dup().detachFd().let {
-                TagLib.savePropertyMap(
-                    it, propertyMap = metadata.propertyMap.apply {
-                        put("LYRICS", arrayOf(lyrics))
-                    }
-                )
-            }
-
-            true
-        } catch (securityException: SecurityException) {
-            handleSecurityException(securityException, securityExceptionHandler)
-            false
-        } catch (e: Exception) {
-            Log.e("MainViewModel", "Error embedding lyrics: ${e.message}")
-            false
-        }
-    }
-
     private suspend fun getSyncedLyrics(link: String, version: String): String? =
-        lyricsProviderService.getSyncedLyrics(link, version, userSettingsController.selectedProvider)
+        lyricsProviderService.getSyncedLyrics(
+            link,
+            version,
+            userSettingsController.selectedProvider
+        )
 
     fun loadSongInfo(context: Context, tryingAgain: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -171,7 +95,8 @@ class LyricsFetchViewModel(
         context: Context,
         generatedUsingString: String
     ) {
-        val lrc = "[ti:${song.songName}]\n[ar:${song.artistName}]\n[by:$generatedUsingString]\n$lyrics"
+        val lrc =
+            "[ti:${song.songName}]\n[ar:${song.artistName}]\n[by:$generatedUsingString]\n$lyrics"
         val file = filePath?.toLrcFile() ?: File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
             "SongSync/${song.songName} - ${song.artistName}.lrc"
@@ -179,9 +104,13 @@ class LyricsFetchViewModel(
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || filePath?.contains("/storage/emulated/0/") == true) {
             file.writeText(lrc)
         } else {
-            saveToExternalSDCard(context, filePath, lrc, file.name)
+            saveToExternalSDCard(context, filePath, lrc, file.name, userSettingsController.sdCardPath)
         }
-        Toast.makeText(context, context.getString(R.string.file_saved_to, file.absolutePath), Toast.LENGTH_LONG).show()
+        Toast.makeText(
+            context,
+            context.getString(R.string.file_saved_to, file.absolutePath),
+            Toast.LENGTH_LONG
+        ).show()
     }
 
     private fun loadLyrics(songLink: String?, context: Context) {
@@ -207,7 +136,8 @@ class LyricsFetchViewModel(
         generatedUsingString: String,
         song: SongInfo
     ) {
-        val lrc = "[ti:${song.songName}]\n[ar:${song.artistName}]\n[by:$generatedUsingString]\n$lyrics"
+        val lrc =
+            "[ti:${song.songName}]\n[ar:${song.artistName}]\n[by:$generatedUsingString]\n$lyrics"
         kotlin.runCatching {
             embedLyricsInFile(
                 context = context,
@@ -221,30 +151,114 @@ class LyricsFetchViewModel(
             }
             Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
         }.onSuccess {
-            Toast.makeText(context, context.getString(R.string.embedded_lyrics_in_file), Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                context,
+                context.getString(R.string.embedded_lyrics_in_file),
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
+}
 
-    private fun saveToExternalSDCard(
-        context: Context,
-        filePath: String?,
-        lrc: String,
-        fileName: String
-    ) {
-        val sd = context.externalCacheDirs[1].absolutePath.substring(0, context.externalCacheDirs[1].absolutePath.indexOf("/Android/data"))
-        val path = filePath?.toLrcFile()?.absolutePath?.substringAfter(sd)?.split("/")?.dropLast(1)
-        var sdCardFiles = DocumentFile.fromTreeUri(context, Uri.parse(userSettingsController.sdCardPath))
-        for (element in path!!) {
-            sdCardFiles = sdCardFiles?.listFiles()?.firstOrNull { it.name == element }
-        }
-        sdCardFiles?.listFiles()?.firstOrNull { it.name == fileName }?.delete()
-        sdCardFiles?.createFile("text/lrc", fileName)?.let {
-            context.contentResolver.openOutputStream(it.uri)?.use { outputStream ->
-                outputStream.write(lrc.toByteArray())
+@SuppressLint("Range")
+private fun getFileDescriptorFromPath(
+    context: Context, filePath: String, mode: String = "r"
+): ParcelFileDescriptor? {
+    val resolver: ContentResolver = context.contentResolver
+    val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+
+    val projection = arrayOf(MediaStore.Files.FileColumns._ID)
+    val selection = "${MediaStore.Files.FileColumns.DATA}=?"
+    val selectionArgs = arrayOf(filePath)
+
+    resolver.query(uri, projection, selection, selectionArgs, null)?.use { cursor ->
+        if (cursor.moveToFirst()) {
+            val fileId: Int =
+                cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
+            if (fileId == -1) {
+                return null
+            } else {
+                val fileUri: Uri = Uri.withAppendedPath(uri, fileId.toString())
+                try {
+                    return resolver.openFileDescriptor(fileUri, mode)
+                } catch (e: FileNotFoundException) {
+                    Log.e("LyricsFetchViewModel", "File not found: ${e.message}")
+                }
             }
         }
     }
 
+    return null
+}
+
+private fun embedLyricsInFile(
+    context: Context,
+    filePath: String,
+    lyrics: String,
+    securityExceptionHandler: (PendingIntent) -> Unit = {}
+): Boolean {
+    return try {
+        val fd = getFileDescriptorFromPath(context, filePath, mode = "w")
+            ?: throw IllegalStateException("File descriptor is null")
+
+        val fileDescriptor = fd.dup().detachFd()
+
+        val metadata = TagLib.getMetadata(fileDescriptor, false) ?: throw IllegalStateException(
+            "Metadata is null"
+        )
+
+        fd.dup().detachFd().let {
+            TagLib.savePropertyMap(
+                it, propertyMap = metadata.propertyMap.apply {
+                    put("LYRICS", arrayOf(lyrics))
+                }
+            )
+        }
+
+        true
+    } catch (securityException: SecurityException) {
+        handleSecurityException(securityException, securityExceptionHandler)
+        false
+    } catch (e: Exception) {
+        Log.e("MainViewModel", "Error embedding lyrics: ${e.message}")
+        false
+    }
+}
+
+private fun saveToExternalSDCard(
+    context: Context,
+    filePath: String?,
+    lrc: String,
+    fileName: String,
+    sdCardPath: String?
+) {
+    val sd = context.externalCacheDirs[1].absolutePath.substring(0, context.externalCacheDirs[1].absolutePath.indexOf("/Android/data"))
+    val path = filePath?.toLrcFile()?.absolutePath?.substringAfter(sd)?.split("/")?.dropLast(1)
+    var sdCardFiles = DocumentFile.fromTreeUri(context, Uri.parse(sdCardPath))
+    for (element in path!!) {
+        sdCardFiles = sdCardFiles?.listFiles()?.firstOrNull { it.name == element }
+    }
+    sdCardFiles?.listFiles()?.firstOrNull { it.name == fileName }?.delete()
+    sdCardFiles?.createFile("text/lrc", fileName)?.let {
+        context.contentResolver.openOutputStream(it.uri)?.use { outputStream ->
+            outputStream.write(lrc.toByteArray())
+        }
+    }
+}
+
+private fun handleSecurityException(
+    securityException: SecurityException, intentPassthrough: (PendingIntent) -> Unit
+) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val recoverableSecurityException =
+            securityException as? RecoverableSecurityException ?: throw RuntimeException(
+                securityException.message, securityException
+            )
+
+        intentPassthrough(recoverableSecurityException.userAction.actionIntent)
+    } else {
+        throw RuntimeException(securityException.message, securityException)
+    }
 }
 
 sealed interface LyricsFetchState {
