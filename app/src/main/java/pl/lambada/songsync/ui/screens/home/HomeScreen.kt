@@ -249,7 +249,7 @@ fun HomeScreenLoaded(
                             LyricsFetchScreen(
                                 songName = song.title ?: error("song.title was null"),
                                 artists = song.artist ?: "",
-                                coverUri = song.imgUri?.path ?: "",
+                                coverUri = song.imgUri.toString(),
                                 filePath = song.filePath
                             )
                         )
