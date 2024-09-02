@@ -3,7 +3,6 @@ package pl.lambada.songsync.ui.screens.lyricsFetch
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.app.RecoverableSecurityException
-import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.os.Build
@@ -64,7 +63,7 @@ class LyricsFetchViewModel(
             try {
                 queryState = QueryStatus.Pending
                 lyricsFetchState = LyricsFetchState.NotSubmitted
-                if (tryingAgain) queryOffset += 1 else queryOffset = 0
+                queryOffset = if (tryingAgain) queryOffset + 1 else 0
 
                 val result = lyricsProviderService
                     .getSongInfo(
@@ -95,22 +94,16 @@ class LyricsFetchViewModel(
         context: Context,
         generatedUsingString: String
     ) {
-        val lrc =
-            "[ti:${song.songName}]\n[ar:${song.artistName}]\n[by:$generatedUsingString]\n$lyrics"
-        val file = filePath?.toLrcFile() ?: File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-            "SongSync/${song.songName} - ${song.artistName}.lrc"
-        )
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || filePath?.contains("/storage/emulated/0/") == true) {
-            file.writeText(lrc)
+        val lrcContent = generateLrcContent(song, lyrics, generatedUsingString)
+        val file = newLyricsFilePath(filePath, song)
+
+        if (isLegacyFileAccessRequired(filePath)) {
+            file.writeText(lrcContent)
         } else {
-            saveToExternalSDCard(context, filePath, lrc, file.name, userSettingsController.sdCardPath)
+            saveToExternalSDCard(context, filePath, lrcContent, file.name, userSettingsController.sdCardPath)
         }
-        Toast.makeText(
-            context,
-            context.getString(R.string.file_saved_to, file.absolutePath),
-            Toast.LENGTH_LONG
-        ).show()
+
+        showToast(context, R.string.file_saved_to, file.absolutePath)
     }
 
     private fun loadLyrics(songLink: String?, context: Context) {
@@ -118,10 +111,9 @@ class LyricsFetchViewModel(
             lyricsFetchState = LyricsFetchState.Pending
             try {
                 val lyrics = getSyncedLyrics(
-                    songLink ?: error("attempted lyrics retrieval with empty url"),
+                    songLink ?: throw IllegalStateException("Attempted lyrics retrieval with empty URL"),
                     context.getVersion()
-                )
-                if (lyrics == null) throw NullPointerException("lyricsResult is null")
+                ) ?: throw NullPointerException("Lyrics result is null")
                 lyricsFetchState = LyricsFetchState.Success(lyrics)
             } catch (e: Exception) {
                 lyricsFetchState = LyricsFetchState.Failed(e)
@@ -136,59 +128,81 @@ class LyricsFetchViewModel(
         generatedUsingString: String,
         song: SongInfo
     ) {
-        val lrc =
-            "[ti:${song.songName}]\n[ar:${song.artistName}]\n[by:$generatedUsingString]\n$lyrics"
-        kotlin.runCatching {
+        val lrcContent = generateLrcContent(song, lyrics, generatedUsingString)
+
+        runCatching {
             embedLyricsInFile(
-                context = context,
-                filePath = filePath ?: throw NullPointerException("filePath is null"),
-                lyrics = lrc
+                context,
+                filePath ?: throw NullPointerException("File path is null"),
+                lrcContent
             )
         }.onFailure { exception ->
-            val errorMessage = when (exception) {
-                is NullPointerException -> context.getString(R.string.embed_non_local_song_error)
-                else -> exception.message ?: context.getString(R.string.error)
-            }
-            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            showToast(context, resolveEmbedErrorMessage(context, exception))
         }.onSuccess {
-            Toast.makeText(
-                context,
-                context.getString(R.string.embedded_lyrics_in_file),
-                Toast.LENGTH_LONG
-            ).show()
+            showToast(context, R.string.embedded_lyrics_in_file)
         }
     }
+}
+
+private fun generateLrcContent(
+    song: SongInfo,
+    lyrics: String,
+    generatedUsingString: String
+): String {
+    return "[ti:${song.songName}]\n[ar:${song.artistName}]\n[by:$generatedUsingString]\n$lyrics"
+}
+
+private fun newLyricsFilePath(filePath: String?, song: SongInfo): File {
+    return filePath?.toLrcFile() ?: File(
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+        "SongSync/${song.songName} - ${song.artistName}.lrc"
+    )
+}
+
+private fun isLegacyFileAccessRequired(filePath: String?): Boolean {
+    return Build.VERSION.SDK_INT < Build.VERSION_CODES.R
+            || filePath?.contains("/storage/emulated/0/") == true
+}
+
+private fun resolveEmbedErrorMessage(context: Context, exception: Throwable): String {
+    return when (exception) {
+        is NullPointerException -> context.getString(R.string.embed_non_local_song_error)
+        else -> exception.message ?: context.getString(R.string.error)
+    }
+}
+
+private fun showToast(context: Context, messageResId: Int, vararg args: Any) {
+    Toast.makeText(context, context.getString(messageResId, *args), Toast.LENGTH_LONG).show()
+}
+private fun showToast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 }
 
 @SuppressLint("Range")
 private fun getFileDescriptorFromPath(
     context: Context, filePath: String, mode: String = "r"
 ): ParcelFileDescriptor? {
-    val resolver: ContentResolver = context.contentResolver
+    val resolver = context.contentResolver
     val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
     val projection = arrayOf(MediaStore.Files.FileColumns._ID)
     val selection = "${MediaStore.Files.FileColumns.DATA}=?"
     val selectionArgs = arrayOf(filePath)
 
-    resolver.query(uri, projection, selection, selectionArgs, null)?.use { cursor ->
+    return resolver.query(uri, projection, selection, selectionArgs, null)?.use { cursor ->
         if (cursor.moveToFirst()) {
-            val fileId: Int =
-                cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
-            if (fileId == -1) {
-                return null
-            } else {
-                val fileUri: Uri = Uri.withAppendedPath(uri, fileId.toString())
+            val fileId = cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID))
+            if (fileId != -1) {
+                val fileUri = Uri.withAppendedPath(uri, fileId.toString())
                 try {
-                    return resolver.openFileDescriptor(fileUri, mode)
+                    resolver.openFileDescriptor(fileUri, mode)
                 } catch (e: FileNotFoundException) {
                     Log.e("LyricsFetchViewModel", "File not found: ${e.message}")
+                    null
                 }
-            }
-        }
+            } else null
+        } else null
     }
-
-    return null
 }
 
 private fun embedLyricsInFile(
@@ -202,25 +216,19 @@ private fun embedLyricsInFile(
             ?: throw IllegalStateException("File descriptor is null")
 
         val fileDescriptor = fd.dup().detachFd()
+        val metadata = TagLib.getMetadata(fileDescriptor, false) ?: error("Metadata is null")
 
-        val metadata = TagLib.getMetadata(fileDescriptor, false) ?: throw IllegalStateException(
-            "Metadata is null"
+        TagLib.savePropertyMap(
+            fd.dup().detachFd(),
+            propertyMap = metadata.propertyMap.apply { put("LYRICS", arrayOf(lyrics)) }
         )
-
-        fd.dup().detachFd().let {
-            TagLib.savePropertyMap(
-                it, propertyMap = metadata.propertyMap.apply {
-                    put("LYRICS", arrayOf(lyrics))
-                }
-            )
-        }
 
         true
     } catch (securityException: SecurityException) {
         handleSecurityException(securityException, securityExceptionHandler)
         false
     } catch (e: Exception) {
-        Log.e("MainViewModel", "Error embedding lyrics: ${e.message}")
+        Log.e("LyricsFetchViewModel", "Error embedding lyrics: ${e.message}")
         false
     }
 }
@@ -232,10 +240,16 @@ private fun saveToExternalSDCard(
     fileName: String,
     sdCardPath: String?
 ) {
-    val sd = context.externalCacheDirs[1].absolutePath.substring(0, context.externalCacheDirs[1].absolutePath.indexOf("/Android/data"))
-    val path = filePath?.toLrcFile()?.absolutePath?.substringAfter(sd)?.split("/")?.dropLast(1)
+    val sd = context.externalCacheDirs[1].absolutePath.substringBefore("/Android/data")
+    val path = filePath
+        ?.toLrcFile()
+        ?.absolutePath
+        ?.substringAfter(sd)
+        ?.split("/")
+        ?.dropLast(1)
+        ?: error("path was null when trying to save to sd card")
     var sdCardFiles = DocumentFile.fromTreeUri(context, Uri.parse(sdCardPath))
-    for (element in path!!) {
+    path.forEach { element ->
         sdCardFiles = sdCardFiles?.listFiles()?.firstOrNull { it.name == element }
     }
     sdCardFiles?.listFiles()?.firstOrNull { it.name == fileName }?.delete()
@@ -247,13 +261,13 @@ private fun saveToExternalSDCard(
 }
 
 private fun handleSecurityException(
-    securityException: SecurityException, intentPassthrough: (PendingIntent) -> Unit
+    securityException: SecurityException,
+    intentPassthrough: (PendingIntent) -> Unit
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         val recoverableSecurityException =
-            securityException as? RecoverableSecurityException ?: throw RuntimeException(
-                securityException.message, securityException
-            )
+            securityException as? RecoverableSecurityException
+                ?: throw RuntimeException(securityException.message, securityException)
 
         intentPassthrough(recoverableSecurityException.userAction.actionIntent)
     } else {
