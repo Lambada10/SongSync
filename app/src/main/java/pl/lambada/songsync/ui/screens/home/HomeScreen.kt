@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
@@ -107,8 +108,9 @@ fun HomeScreen(
                     modifier = Modifier.sharedBounds(
                         sharedContentState = rememberSharedContentState(key = "fab"),
                         animatedVisibilityScope = animatedVisibilityScope,
-                        resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
+                        resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
                     ),
+                    elevation = FloatingActionButtonDefaults.elevation(0.dp),
                     onClick = { navController.navigate(LyricsFetchScreen()) }
                 ) {
                     Icon(
@@ -117,7 +119,8 @@ fun HomeScreen(
                     )
                 }
             }
-        }
+        },
+        bottomBar = { Spacer(Modifier) } // fixing broken edge to edge here
     ) { paddingValues ->
         Crossfade(viewModel.allSongs == null, label = "") { loading ->
             if (loading)
