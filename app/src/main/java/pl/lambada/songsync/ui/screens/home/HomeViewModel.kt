@@ -4,6 +4,7 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -61,10 +62,12 @@ class HomeViewModel(
     var showingSearch by  mutableStateOf(false)
     var showSearch by mutableStateOf(showingSearch)
 
-    val songsToBatchDownload = if (selectedSongs.isEmpty())
-        displaySongs
-    else
-        (allSongs ?: listOf()).filter { selectedSongs.contains(it.filePath) }.toList()
+    val songsToBatchDownload by derivedStateOf {
+        if (selectedSongs.isEmpty())
+            displaySongs
+        else
+            (allSongs ?: listOf()).filter { selectedSongs.contains(it.filePath) }.toList()
+    }
 
     init { viewModelScope.launch { updateSongsToDisplay() } }
 
