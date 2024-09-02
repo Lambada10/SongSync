@@ -190,10 +190,3 @@ fun SharedTransitionScope.LyricsFetchScreen(
         }
     }
 }
-
-
-
-
-
-
-

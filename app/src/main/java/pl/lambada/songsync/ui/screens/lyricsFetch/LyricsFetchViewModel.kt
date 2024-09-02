@@ -152,7 +152,7 @@ class LyricsFetchViewModel(
                     )
                     ?: error("Error fetching lyrics for the song.")
 
-                QueryStatus.Success(result)
+                queryState = QueryStatus.Success(result)
                 loadLyrics(result.songLink, context)
             } catch (e: Exception) {
                 queryState = when (e) {
