@@ -8,7 +8,6 @@ import pl.lambada.songsync.ui.screens.about.components.UpdateState
 import pl.lambada.songsync.util.ext.getVersion
 
 class UpdateService {
-    // Function to check for updates
     fun checkForUpdates(context: Context) = flow {
         emit(UpdateState.Checking)
 
