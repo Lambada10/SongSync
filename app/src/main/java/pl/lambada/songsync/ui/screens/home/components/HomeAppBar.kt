@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import pl.lambada.songsync.R
-import pl.lambada.songsync.ui.screens.about.Providers
+import pl.lambada.songsync.util.Providers
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

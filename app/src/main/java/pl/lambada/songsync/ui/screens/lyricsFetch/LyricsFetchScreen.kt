@@ -37,12 +37,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import pl.lambada.songsync.R
 import pl.lambada.songsync.ui.screens.about.AboutViewModel
-import pl.lambada.songsync.ui.screens.about.Providers
 import pl.lambada.songsync.ui.screens.lyricsFetch.components.FailedDialogue
 import pl.lambada.songsync.ui.screens.lyricsFetch.components.LocalSongContent
 import pl.lambada.songsync.ui.screens.lyricsFetch.components.NoConnectionDialogue
 import pl.lambada.songsync.ui.screens.lyricsFetch.components.NotSubmittedContent
 import pl.lambada.songsync.ui.screens.lyricsFetch.components.SuccessContent
+import pl.lambada.songsync.util.Providers
 import pl.lambada.songsync.util.showToast
 
 /**

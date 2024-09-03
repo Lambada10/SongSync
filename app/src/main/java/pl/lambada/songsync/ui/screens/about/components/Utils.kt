@@ -43,18 +43,9 @@ enum class ContributionLevel(val stringResource: Int) {
  * Defines the state of the update check.
  */
 sealed interface UpdateState {
+    data object Idle : UpdateState
     data object Checking : UpdateState
     data object UpToDate : UpdateState
     data class UpdateAvailable(val release: Release) : UpdateState
     data class Error(val reason: Throwable) : UpdateState
-}
-
-/**
- * Defines possible provider choices
- */
-enum class Providers(val displayName: String) {
-    SPOTIFY("Spotify (via SpotifyLyricsAPI)"),
-    LRCLIB("LRCLib"),
-    NETEASE("Netease") { val inf = 0},
-    APPLE("Apple Music")
 }

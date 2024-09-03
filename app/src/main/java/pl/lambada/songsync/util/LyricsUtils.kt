@@ -157,6 +157,16 @@ fun handleSecurityException(
     }
 }
 
+/**
+ * Defines possible provider choices
+ */
+enum class Providers(val displayName: String) {
+    SPOTIFY("Spotify (via SpotifyLyricsAPI)"),
+    LRCLIB("LRCLib"),
+    NETEASE("Netease") { val inf = 0},
+    APPLE("Apple Music")
+}
+
 // only for invoking the task and handling and reporting progress
 suspend fun downloadLyrics(
     songs: List<Song>,
@@ -198,6 +208,8 @@ suspend fun downloadLyrics(
 
     onDownloadComplete()
 }
+
+
 
 // only for retrieval, processing, and saving data
 private suspend fun downloadLyricsForSong(

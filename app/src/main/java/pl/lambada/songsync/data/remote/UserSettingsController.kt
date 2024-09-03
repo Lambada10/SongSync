@@ -7,7 +7,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import pl.lambada.songsync.ui.screens.about.Providers
+import pl.lambada.songsync.util.Providers
 import pl.lambada.songsync.util.get
 import pl.lambada.songsync.util.set
 

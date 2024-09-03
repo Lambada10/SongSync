@@ -211,9 +211,7 @@ fun AboutScreen(
                         Spacer(modifier = Modifier.weight(1f))
                         Button(
                             modifier = Modifier.padding(top = 8.dp),
-                            onClick = {
-                                viewModel.checkForUpdates(context)
-                            }
+                            onClick = { viewModel.checkForUpdates(context) }
                         ) {
                             Text(stringResource(R.string.check_for_updates))
                         }
@@ -315,7 +313,7 @@ fun AboutScreen(
 
     val updateState = viewModel.updateState
     if (updateState is UpdateState.UpdateAvailable) UpdateAvailableDialog(
-        onDismiss = { viewModel.updateState = UpdateState.Checking },
+        onDismiss = viewModel::dismissUpdate,
         onDownloadRequest = { uriHandler.openUri(updateState.release.htmlURL) },
         latestVersion = updateState.release.tagName,
         currentVersion = version,
