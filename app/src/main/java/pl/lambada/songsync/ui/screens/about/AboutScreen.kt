@@ -6,7 +6,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -58,6 +57,7 @@ import pl.lambada.songsync.domain.model.Release
 import pl.lambada.songsync.ui.components.AboutItem
 import pl.lambada.songsync.ui.components.SwitchItem
 import pl.lambada.songsync.util.ext.getVersion
+import pl.lambada.songsync.util.showToast
 
 /**
  * Composable function for AboutScreen component.
@@ -342,11 +342,11 @@ fun CheckForUpdates(
 
     when (updateState) {
         UpdateState.CHECKING -> {
-            Toast.makeText(
+            showToast(
                 context,
                 stringResource(R.string.checking_for_updates),
-                Toast.LENGTH_SHORT
-            ).show()
+                long = false
+            )
 
             LaunchedEffect(Unit) {
                 launch(Dispatchers.IO) {
@@ -398,20 +398,20 @@ fun CheckForUpdates(
         }
 
         UpdateState.UP_TO_DATE -> {
-            Toast.makeText(
+            showToast(
                 context,
                 stringResource(R.string.up_to_date),
-                Toast.LENGTH_SHORT
-            ).show()
+                long = false
+            )
             onDismiss()
         }
 
         UpdateState.ERROR -> {
-            Toast.makeText(
+            showToast(
                 context,
                 stringResource(R.string.error_checking_for_updates),
-                Toast.LENGTH_SHORT
-            ).show()
+                long = false
+            )
             onDismiss()
         }
     }
