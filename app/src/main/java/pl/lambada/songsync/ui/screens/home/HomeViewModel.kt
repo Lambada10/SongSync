@@ -25,6 +25,7 @@ import pl.lambada.songsync.data.remote.UserSettingsController
 import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
+import pl.lambada.songsync.util.downloadLyrics
 import pl.lambada.songsync.util.ext.toLrcFile
 
 /**
@@ -285,5 +286,22 @@ class HomeViewModel(
             if (selectedSongs.size == 0 && searchQuery.isNotEmpty())
                 showingSearch = true // show again but don't focus
         }
+    }
+
+    fun batchDownloadLyrics(
+        context: Context,
+        onProgressUpdate: (successCount: Int, noLyricsCount: Int, failedCount: Int) -> Unit,
+        onDownloadComplete: () -> Unit,
+        onRateLimitReached: () -> Unit
+    ) = viewModelScope.launch {
+        downloadLyrics(
+            songs = songsToBatchDownload,
+            viewModel = this@HomeViewModel,
+            context = context,
+            onProgressUpdate = onProgressUpdate,
+            onDownloadComplete = onDownloadComplete,
+            onRateLimitReached = onRateLimitReached,
+            sdCardPath = userSettingsController.sdCardPath
+        )
     }
 }
