@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.remote.UpdateService
+import pl.lambada.songsync.data.remote.UpdateState
 import pl.lambada.songsync.data.remote.UserSettingsController
-import pl.lambada.songsync.ui.screens.about.components.UpdateState
 import pl.lambada.songsync.util.showToast
 
 /**

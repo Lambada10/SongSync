@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import pl.lambada.songsync.R
+import pl.lambada.songsync.data.remote.UpdateState
 import pl.lambada.songsync.ui.screens.about.components.AboutScreenTopBar
 import pl.lambada.songsync.ui.screens.about.components.AppInfoSection
 import pl.lambada.songsync.ui.screens.about.components.ContributorsSection
@@ -28,7 +29,6 @@ import pl.lambada.songsync.ui.screens.about.components.SdCardPathSetting
 import pl.lambada.songsync.ui.screens.about.components.SupportSection
 import pl.lambada.songsync.ui.screens.about.components.TranslationSwitch
 import pl.lambada.songsync.ui.screens.about.components.UpdateAvailableDialog
-import pl.lambada.songsync.ui.screens.about.components.UpdateState
 import pl.lambada.songsync.util.ext.getVersion
 
 /**
