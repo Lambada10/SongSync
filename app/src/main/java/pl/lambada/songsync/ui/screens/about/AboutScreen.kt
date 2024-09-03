@@ -2,7 +2,6 @@
 
 package pl.lambada.songsync.ui.screens.about
 
-import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -18,12 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -50,14 +46,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
-import pl.lambada.songsync.domain.model.Release
 import pl.lambada.songsync.ui.components.AboutItem
 import pl.lambada.songsync.ui.components.SwitchItem
+import pl.lambada.songsync.ui.screens.about.components.CheckForUpdates
+import pl.lambada.songsync.ui.screens.about.components.Contributor
 import pl.lambada.songsync.util.ext.getVersion
-import pl.lambada.songsync.util.showToast
 
 /**
  * Composable function for AboutScreen component.
@@ -326,146 +320,4 @@ fun AboutScreen(
             }
         }
     }
-}
-
-@Composable
-fun CheckForUpdates(
-    onDismiss: () -> Unit,
-    onDownload: (String) -> Unit,
-    context: Context,
-    viewModel: AboutViewModel,
-    version: String
-) {
-    var updateState by rememberSaveable { mutableStateOf(UpdateState.CHECKING) }
-    var latest: Release? by rememberSaveable { mutableStateOf(null) }
-    var isUpdate by rememberSaveable { mutableStateOf(false) }
-
-    when (updateState) {
-        UpdateState.CHECKING -> {
-            showToast(
-                context,
-                stringResource(R.string.checking_for_updates),
-                long = false
-            )
-
-            LaunchedEffect(Unit) {
-                launch(Dispatchers.IO) {
-                    try {
-                        latest = viewModel.getLatestRelease()
-                        isUpdate = viewModel.isNewerRelease(context)
-                    } catch (e: Exception) {
-                        updateState = UpdateState.ERROR
-                        return@launch
-                    }
-                    updateState = if (isUpdate) {
-                        UpdateState.UPDATE_AVAILABLE
-                    } else {
-                        UpdateState.UP_TO_DATE
-                    }
-                }
-            }
-        }
-
-        UpdateState.UPDATE_AVAILABLE -> {
-            AlertDialog(
-                onDismissRequest = onDismiss,
-                title = { Text(stringResource(R.string.update_available)) },
-                text = {
-                    Column(
-                        modifier = Modifier.verticalScroll(rememberScrollState())
-                    ) {
-                        Text("v$version -> ${latest?.tagName}")
-                        Text(stringResource(R.string.changelog, latest?.changelog!!))
-                    }
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            onDownload(latest?.htmlURL!!)
-                        }
-                    ) {
-                        Text(stringResource(R.string.download))
-                    }
-                },
-                dismissButton = {
-                    OutlinedButton(
-                        onClick = onDismiss
-                    ) {
-                        Text(stringResource(R.string.cancel))
-                    }
-                }
-            )
-        }
-
-        UpdateState.UP_TO_DATE -> {
-            showToast(
-                context,
-                stringResource(R.string.up_to_date),
-                long = false
-            )
-            onDismiss()
-        }
-
-        UpdateState.ERROR -> {
-            showToast(
-                context,
-                stringResource(R.string.error_checking_for_updates),
-                long = false
-            )
-            onDismiss()
-        }
-    }
-}
-
-@Suppress("SpellCheckingInspection")
-enum class Contributor(
-    val devName: String, val contributionLevel: ContributionLevel,
-    val github: String? = null, val telegram: String? = null
-) {
-    LAMBADA10(
-        "Lambada10", ContributionLevel.LEAD_DEVELOPER,
-        github = "https://github.com/Lambada10", telegram = "https://t.me/Lambada10"
-    ),
-    NIFT4(
-        "Nick", ContributionLevel.DEVELOPER,
-        github = "https://github.com/nift4", telegram = "https://t.me/nift4"
-    ),
-    BOBBYESP(
-        "BobbyESP", ContributionLevel.DEVELOPER,
-        github = "https://github.com/BobbyESP"
-    ),
-    PXEEMO(
-        "Pxeemo", ContributionLevel.CONTRIBUTOR,
-        github = "https://github.com/pxeemo"
-    ),
-    AKANETAN(
-        "AkaneTan", ContributionLevel.CONTRIBUTOR,
-        github = "https://github.com/AkaneTan"
-    )
-}
-
-/**
- * Defines the contribution level of a contributor.
- */
-enum class ContributionLevel(val stringResource: Int) {
-    CONTRIBUTOR(R.string.contributor),
-    DEVELOPER(R.string.developer),
-    LEAD_DEVELOPER(R.string.lead_developer)
-}
-
-/**
- * Defines the state of the update check.
- */
-enum class UpdateState {
-    CHECKING, UP_TO_DATE, UPDATE_AVAILABLE, ERROR
-}
-
-/**
- * Defines possible provider choices
- */
-enum class Providers(val displayName: String) {
-    SPOTIFY("Spotify (via SpotifyLyricsAPI)"),
-    LRCLIB("LRCLib"),
-    NETEASE("Netease") { val inf = 0},
-    APPLE("Apple Music")
 }
