@@ -1,6 +1,7 @@
 package pl.lambada.songsync.ui.screens.about.components
 
 import pl.lambada.songsync.R
+import pl.lambada.songsync.domain.model.Release
 
 @Suppress("SpellCheckingInspection")
 enum class Contributor(
@@ -41,8 +42,11 @@ enum class ContributionLevel(val stringResource: Int) {
 /**
  * Defines the state of the update check.
  */
-enum class UpdateState {
-    CHECKING, UP_TO_DATE, UPDATE_AVAILABLE, ERROR
+sealed interface UpdateState {
+    data object Checking : UpdateState
+    data object UpToDate : UpdateState
+    data class UpdateAvailable(val release: Release) : UpdateState
+    data class Error(val reason: Throwable) : UpdateState
 }
 
 /**

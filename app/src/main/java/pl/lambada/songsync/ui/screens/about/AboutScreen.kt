@@ -35,7 +35,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,8 +48,9 @@ import androidx.navigation.NavController
 import pl.lambada.songsync.R
 import pl.lambada.songsync.ui.components.AboutItem
 import pl.lambada.songsync.ui.components.SwitchItem
-import pl.lambada.songsync.ui.screens.about.components.CheckForUpdates
 import pl.lambada.songsync.ui.screens.about.components.Contributor
+import pl.lambada.songsync.ui.screens.about.components.UpdateAvailableDialog
+import pl.lambada.songsync.ui.screens.about.components.UpdateState
 import pl.lambada.songsync.util.ext.getVersion
 
 /**
@@ -62,6 +62,7 @@ fun AboutScreen(
     viewModel: AboutViewModel,
     navController: NavController
 ) {
+    val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
     val version = LocalContext.current.getVersion()
 
@@ -198,7 +199,6 @@ fun AboutScreen(
             }
 
             item {
-                var update by rememberSaveable { mutableStateOf(false) }
                 AboutItem(
                     label = stringResource(R.string.about_songsync),
                     modifier = Modifier.padding(horizontal = 22.dp, vertical = 16.dp)
@@ -211,21 +211,13 @@ fun AboutScreen(
                         Spacer(modifier = Modifier.weight(1f))
                         Button(
                             modifier = Modifier.padding(top = 8.dp),
-                            onClick = { update = true }
+                            onClick = {
+                                viewModel.checkForUpdates(context)
+                            }
                         ) {
                             Text(stringResource(R.string.check_for_updates))
                         }
                     }
-                }
-
-                if (update) {
-                    CheckForUpdates(
-                        onDismiss = { update = false },
-                        onDownload = { uriHandler.openUri(it) },
-                        context = LocalContext.current,
-                        viewModel = viewModel,
-                        version = version
-                    )
                 }
             }
 
@@ -320,4 +312,13 @@ fun AboutScreen(
             }
         }
     }
+
+    val updateState = viewModel.updateState
+    if (updateState is UpdateState.UpdateAvailable) UpdateAvailableDialog(
+        onDismiss = { viewModel.updateState = UpdateState.Checking },
+        onDownloadRequest = { uriHandler.openUri(updateState.release.htmlURL) },
+        latestVersion = updateState.release.tagName,
+        currentVersion = version,
+        changelog = updateState.release.changelog ?: ""
+    )
 }
