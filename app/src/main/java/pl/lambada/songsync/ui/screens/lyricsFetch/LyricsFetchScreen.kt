@@ -157,11 +157,10 @@ fun SharedTransitionScope.LyricsFetchScreen(
                             )
                         },
                         onEmbedLyrics = {
-                            viewModel.embedLyricsInFile(
+                            viewModel.embedLyrics(
                                 it,
                                 viewModel.source?.filePath,
                                 context,
-                                context.getString(R.string.generated_using),
                                 queryState.song
                             )
                         },
