@@ -4,11 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.os.Build
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,14 +12,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.documentfile.provider.DocumentFile
 import pl.lambada.songsync.R
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
-import pl.lambada.songsync.ui.components.AnimatedText
 import pl.lambada.songsync.ui.screens.home.HomeViewModel
+import pl.lambada.songsync.ui.screens.home.components.batchDownload.BatchDownloadWarningDialog
+import pl.lambada.songsync.ui.screens.home.components.batchDownload.DownloadCompleteDialog
+import pl.lambada.songsync.ui.screens.home.components.batchDownload.DownloadProgressDialog
+import pl.lambada.songsync.ui.screens.home.components.batchDownload.LegacyPromptDialog
+import pl.lambada.songsync.ui.screens.home.components.batchDownload.RateLimitedDialog
 import pl.lambada.songsync.util.EmptyQueryException
 import pl.lambada.songsync.util.InternalErrorException
 import pl.lambada.songsync.util.NoTrackFoundException
@@ -73,13 +70,14 @@ fun BatchDownloadLyrics(viewModel: HomeViewModel, onDone: () -> Unit) {
                     songs = songs,
                     viewModel = viewModel,
                     context = context,
-                    onProgressUpdate = { s, n, f ->
-                        successCount = s
-                        noLyricsCount = n
-                        failedCount = f
+                    onProgressUpdate = { newSuccessCount, newNoLyricsCount, newFailedCount ->
+                        successCount = newSuccessCount
+                        noLyricsCount = newNoLyricsCount
+                        failedCount = newFailedCount
                     },
                     onDownloadComplete = { uiState = UiState.Done },
-                    onRateLimitReached = { uiState = UiState.RateLimited }
+                    onRateLimitReached = { uiState = UiState.RateLimited },
+                    sdCardPath = viewModel.userSettingsController.sdCardPath
                 )
             }
             DownloadProgressDialog(
@@ -106,237 +104,112 @@ fun BatchDownloadLyrics(viewModel: HomeViewModel, onDone: () -> Unit) {
     }
 }
 
-@Composable
-fun BatchDownloadWarningDialog(songsCount: Int, onConfirm: () -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(
-        title = {
-            Text(text = stringResource(id = R.string.batch_download_lyrics))
-        },
-        text = {
-            Column {
-                Text(
-                    text = pluralStringResource(
-                        R.plurals.this_will_download_lyrics_for_all_songs,
-                        songsCount,
-                        songsCount
-                    )
-                )
-            }
-        },
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            Button(onClick = onConfirm) {
-                Text(text = stringResource(R.string.yes))
-            }
-        },
-        dismissButton = {
-            OutlinedButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.no))
-            }
-        }
-    )
-}
-
-@Composable
-fun LegacyPromptDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(
-        title = {
-            Text(text = stringResource(id = R.string.batch_download_lyrics))
-        },
-        text = {
-            Column {
-                Text(text = stringResource(R.string.set_sd_path_warn))
-            }
-        },
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            Button(onClick = onConfirm) {
-                Text(text = stringResource(R.string.ok))
-            }
-        },
-        dismissButton = {
-            OutlinedButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.cancel))
-            }
-        },
-    )
-}
-
-@Composable
-fun DownloadProgressDialog(
-    currentSongTitle: String?,
-    count: Int,
-    total: Int,
-    percentage: Int,
-    successCount: Int,
-    noLyricsCount: Int,
-    failedCount: Int,
-    onCancel: () -> Unit,
-    disableMarquee: Boolean,
-) {
-    AlertDialog(
-        title = {
-            Text(text = stringResource(id = R.string.batch_download_lyrics))
-        },
-        text = {
-            Column {
-                Text(text = stringResource(R.string.downloading_lyrics))
-                AnimatedText(
-                    animate = !disableMarquee,
-                    text = stringResource(
-                        R.string.song,
-                        currentSongTitle ?: stringResource(id = R.string.unknown)
-                    )
-                )
-                Text(text = stringResource(R.string.progress, count, total, percentage))
-                Text(
-                    text = stringResource(
-                        R.string.success_failed, successCount, noLyricsCount, failedCount
-                    )
-                )
-                Text(text = stringResource(R.string.please_do_not_close_the_app_this_may_take_a_while))
-            }
-        },
-        onDismissRequest = { /* Prevent accidental dismiss */ },
-        confirmButton = { /* Empty but required */ },
-        dismissButton = {
-            OutlinedButton(onClick = onCancel) {
-                Text(text = stringResource(R.string.cancel))
-            }
-        }
-    )
-}
-
-@Composable
-fun DownloadCompleteDialog(
-    successCount: Int,
-    noLyricsCount: Int,
-    failedCount: Int,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        title = {
-            Text(text = stringResource(id = R.string.batch_download_lyrics))
-        },
-        text = {
-            Column {
-                Text(text = stringResource(R.string.download_complete))
-                Text(text = stringResource(R.string.success, successCount))
-                Text(text = stringResource(R.string.no_lyrics, noLyricsCount))
-                Text(text = stringResource(R.string.failed, failedCount))
-            }
-        },
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            Button(onClick = onDismiss) {
-                Text(text = stringResource(id = R.string.ok))
-            }
-        }
-    )
-}
-
-
-@Composable
-fun RateLimitedDialog(onDismiss: () -> Unit) {
-    AlertDialog(
-        title = {
-            Text(text = stringResource(id = R.string.batch_download_lyrics))
-        },
-        text = {
-            Column {
-                Text(text = stringResource(R.string.spotify_api_rate_limit_reached))
-                Text(text = stringResource(R.string.please_try_again_later))
-                Text(text = stringResource(R.string.change_api_strategy))
-            }
-        },
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            Button(onClick = onDismiss) {
-                Text(text = stringResource(id = R.string.ok))
-            }
-        }
-    )
-}
-
 suspend fun downloadLyrics(
     songs: List<Song>,
     viewModel: HomeViewModel,
     context: Context,
     onProgressUpdate: (successCount: Int, noLyricsCount: Int, failedCount: Int) -> Unit,
     onDownloadComplete: () -> Unit,
-    onRateLimitReached: () -> Unit
+    onRateLimitReached: () -> Unit,
+    sdCardPath: String?
 ) {
     var successCount = 0
     var noLyricsCount = 0
     var failedCount = 0
-    var notFoundInARow = 0
+    var consecutiveNotFound = 0
 
-    for (i in songs.indices) {
-        val song = songs[i]
-
+    for (song in songs) {
         val file = song.filePath.toLrcFile()
         val query = SongInfo(song.title, song.artist)
-        var queryResult: SongInfo? = null
-        try {
-            queryResult = viewModel.getSongInfo(query)
+
+        val queryResult = try {
+            viewModel.getSongInfo(query)
         } catch (e: Exception) {
-            when (e) {
-                is FileNotFoundException -> {
-                    notFoundInARow++
-                    failedCount++
-                    if (notFoundInARow >= 5) {
-                        onRateLimitReached()
-                        return
-                    }
-                    continue
-                }
-
-                is NoTrackFoundException, is EmptyQueryException, is InternalErrorException -> {
-                    failedCount++
-                }
-
-                else -> throw e
+            handleQueryException(e, consecutiveNotFound, failedCount, onRateLimitReached)?.let {
+                consecutiveNotFound = it.first
+                failedCount = it.second
+                if (consecutiveNotFound >= 5) return
             }
+            continue
         }
 
-        notFoundInARow = 0
-        if (queryResult != null) {
-            val lyricsResult: String
-            try {
-                lyricsResult =
-                    viewModel.getSyncedLyrics(queryResult.songLink ?: "", context.getVersion())!!
+        consecutiveNotFound = 0
+        queryResult?.let { songInfo ->
+            val lyricsResult = try {
+                viewModel.getSyncedLyrics(songInfo.songLink ?: "", context.getVersion())
             } catch (e: Exception) {
-                when (e) {
-                    is NullPointerException, is FileNotFoundException -> {
-                        noLyricsCount++
-                        continue
-                    }
+                handleLyricsException(e, noLyricsCount)?.let { noLyricsCount = it }
+                return@let
+            } ?: return@let
 
-                    else -> throw e
-                }
-            }
-            val lrc = "[ti:${queryResult.songName}]\n" +
-                    "[ar:${queryResult.artistName}]\n" +
-                    "[by:${context.getString(R.string.generated_using)}]\n" +
-                    lyricsResult
-            try {
-                file?.writeText(lrc)
-            } catch (e: FileNotFoundException) {
-                handleFileNotFoundException(
-                    context,
-                    song,
-                    file,
-                    lrc,
-                    viewModel.userSettingsController.sdCardPath
-                )
-            }
+            val lrcContent = generateLrcContent(queryResult, context, lyricsResult)
+            writeLyricsToFile(file, lrcContent, context, song, sdCardPath)
             successCount++
         }
 
         onProgressUpdate(successCount, noLyricsCount, failedCount)
     }
+
     onDownloadComplete()
 }
+
+private fun handleQueryException(
+    e: Exception,
+    consecutiveNotFound: Int,
+    failedCount: Int,
+    onRateLimitReached: () -> Unit
+): Pair<Int, Int>? {
+    var notFoundInARow = consecutiveNotFound
+    var failedCountVar = failedCount
+    when (e) {
+        is FileNotFoundException -> {
+            notFoundInARow++
+            failedCountVar++
+            if (notFoundInARow >= 5) {
+                onRateLimitReached()
+            }
+            return Pair(notFoundInARow, failedCountVar)
+        }
+        is NoTrackFoundException, is EmptyQueryException, is InternalErrorException -> {
+            failedCountVar++
+            return Pair(notFoundInARow, failedCountVar)
+        }
+        else -> throw e
+    }
+}
+
+private fun handleLyricsException(e: Exception, noLyricsCount: Int): Int? {
+    var noLyricsCountVar = noLyricsCount
+    when (e) {
+        is NullPointerException, is FileNotFoundException -> {
+            noLyricsCountVar++
+            return noLyricsCountVar
+        }
+        else -> throw e
+    }
+}
+
+private fun generateLrcContent(songInfo: SongInfo, context: Context, lyrics: String): String {
+    return "[ti:${songInfo.songName}]\n" +
+            "[ar:${songInfo.artistName}]\n" +
+            "[by:${context.getString(R.string.generated_using)}]\n" +
+            lyrics
+}
+
+private fun writeLyricsToFile(
+    file: File?,
+    lrcContent: String,
+    context: Context,
+    song: Song,
+    sdCardPath: String?
+) {
+    try {
+        file?.writeText(lrcContent)
+    } catch (e: FileNotFoundException) {
+        handleFileNotFoundException(context, song, file, lrcContent, sdCardPath)
+    }
+}
+
 
 fun handleFileNotFoundException(
     context: Context,
