@@ -301,7 +301,6 @@ class HomeViewModel(
             onProgressUpdate = onProgressUpdate,
             onDownloadComplete = onDownloadComplete,
             onRateLimitReached = onRateLimitReached,
-            sdCardPath = userSettingsController.sdCardPath
         )
     }
 }

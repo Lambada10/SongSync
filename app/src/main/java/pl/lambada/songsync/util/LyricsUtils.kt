@@ -157,6 +157,7 @@ fun handleSecurityException(
     }
 }
 
+// only for invoking the task and handling and reporting progress
 suspend fun downloadLyrics(
     songs: List<Song>,
     viewModel: HomeViewModel,
@@ -164,7 +165,6 @@ suspend fun downloadLyrics(
     onProgressUpdate: (successCount: Int, noLyricsCount: Int, failedCount: Int) -> Unit,
     onDownloadComplete: () -> Unit,
     onRateLimitReached: () -> Unit,
-    sdCardPath: String?
 ) {
     var successCount = 0
     var noLyricsCount = 0
@@ -174,23 +174,23 @@ suspend fun downloadLyrics(
     songs.forEach { song ->
         downloadLyricsForSong(
             song,
+            viewModel,
             context,
-            sdCardPath,
-            onSongInfoRequest = { viewModel.getSongInfo(SongInfo(song.title, song.artist)) },
-            onGetSyncedLyricsRequest = {
-                viewModel.getSyncedLyrics(
-                    link = it.songLink ?: error("attempted to get lyrics without link"),
-                    version = context.getVersion()
-                ) ?: throw NullPointerException("Lyrics result is null")
-            },
-            onSaved = { successCount++ },
-            onNoLyrics = { noLyricsCount++ },
-            onFailed = {
+            onFailedSongInfoResponse = {
                 failedCount++
                 consecutiveNotFound++
                 if (consecutiveNotFound >= 5) onRateLimitReached()
             },
-            onProcessingQueryResult = { consecutiveNotFound = 0 }
+            onSuccessfulSongInfoResponse = { consecutiveNotFound = 0 },
+            onFailedLyricsResponse = {
+                if (it is NullPointerException || it is FileNotFoundException)
+                    noLyricsCount++
+                else {
+                    failedCount++
+                    consecutiveNotFound++
+                }
+            },
+            onLyricsSaved = { successCount++ }
         )
 
         onProgressUpdate(successCount, noLyricsCount, failedCount)
@@ -199,46 +199,64 @@ suspend fun downloadLyrics(
     onDownloadComplete()
 }
 
+// only for retrieval, processing, and saving data
 private suspend fun downloadLyricsForSong(
+    song: Song,
+    viewModel: HomeViewModel,
+    context: Context,
+    onFailedSongInfoResponse: (Throwable) -> Unit,
+    onSuccessfulSongInfoResponse: () -> Unit,
+    onFailedLyricsResponse: (Throwable) -> Unit,
+    onLyricsSaved: () -> Unit
+) {
+    runCatching {
+        viewModel
+            .getSongInfo(SongInfo(song.title, song.artist))
+            ?: throw NullPointerException("Song info result is null")
+    }
+        .onFailure(onFailedSongInfoResponse)
+        .onSuccess { songInfo ->
+            onSuccessfulSongInfoResponse()
+
+            runCatching {
+                viewModel
+                    .getSyncedLyrics(
+                        link = songInfo.songLink ?: error("attempted to get lyrics without link"),
+                        version = context.getVersion()
+                    )
+                    ?: throw NullPointerException("Lyrics result is null")
+            }
+                .onFailure(onFailedLyricsResponse)
+                .onSuccess {
+                    formatAndSaveLyricsForSong(
+                        song,
+                        context,
+                        viewModel.userSettingsController.sdCardPath,
+                        songInfo,
+                        it
+                    )
+
+                    onLyricsSaved()
+                }
+        }
+}
+
+private fun formatAndSaveLyricsForSong(
     song: Song,
     context: Context,
     sdCardPath: String?,
-    onSongInfoRequest: suspend () -> SongInfo?,
-    onGetSyncedLyricsRequest: suspend (queryResult: SongInfo) -> String?,
-    onSaved: () -> Unit,
-    onNoLyrics: () -> Unit,
-    onFailed: (Throwable) -> Unit,
-    onProcessingQueryResult: () -> Unit
+    songInfo: SongInfo,
+    lyrics: String,
 ) {
     val targetFile = song.filePath.toLrcFile()
 
-    runCatching { onSongInfoRequest() ?: throw NullPointerException("Song info result is null") }
-        .onFailure(onFailed)
-        .onSuccess { queryResult ->
-            onProcessingQueryResult()
+    val lrcContent = generateLrcContent(
+        songInfo,
+        lyrics,
+        context.getString(R.string.generated_using)
+    )
 
-            runCatching {
-                onGetSyncedLyricsRequest(queryResult)
-                    ?: throw NullPointerException("Lyrics result is null")
-            }
-                .onFailure {
-                    if (it is NullPointerException || it is FileNotFoundException)
-                        onNoLyrics()
-                    else
-                        onFailed(it)
-                }
-                .onSuccess { lyricsResult ->
-                    val lrcContent = generateLrcContent(
-                        queryResult,
-                        lyricsResult,
-                        context.getString(R.string.generated_using)
-                    )
-
-                    writeLyricsToFile(targetFile, lrcContent, context, song, sdCardPath)
-
-                    onSaved()
-                }
-        }
+    writeLyricsToFile(targetFile, lrcContent, context, song, sdCardPath)
 }
 
 fun saveToExternalPath(
