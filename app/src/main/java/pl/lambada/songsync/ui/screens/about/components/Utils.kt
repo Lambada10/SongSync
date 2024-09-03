@@ -5,8 +5,10 @@ import pl.lambada.songsync.domain.model.Release
 
 @Suppress("SpellCheckingInspection")
 enum class Contributor(
-    val devName: String, val contributionLevel: ContributionLevel,
-    val github: String? = null, val telegram: String? = null
+    val devName: String,
+    val contributionLevel: ContributionLevel,
+    val github: String? = null,
+    val telegram: String? = null
 ) {
     LAMBADA10(
         "Lambada10", ContributionLevel.LEAD_DEVELOPER,
@@ -27,6 +29,10 @@ enum class Contributor(
     AKANETAN(
         "AkaneTan", ContributionLevel.CONTRIBUTOR,
         github = "https://github.com/AkaneTan"
+    ),
+    NXOIM(
+        devName = "nxoim", ContributionLevel.CONTRIBUTOR,
+        github = "https://github.com/nxoim"
     )
 }
 
