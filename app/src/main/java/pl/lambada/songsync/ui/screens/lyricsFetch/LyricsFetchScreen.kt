@@ -36,7 +36,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import pl.lambada.songsync.R
-import pl.lambada.songsync.ui.screens.about.AboutViewModel
 import pl.lambada.songsync.ui.screens.lyricsFetch.components.FailedDialogue
 import pl.lambada.songsync.ui.screens.lyricsFetch.components.LocalSongContent
 import pl.lambada.songsync.ui.screens.lyricsFetch.components.NoConnectionDialogue
@@ -48,7 +47,7 @@ import pl.lambada.songsync.util.showToast
 /**
  * Composable function for BrowseScreen component.
  *
- * @param viewModel the [AboutViewModel] instance.
+ * @param viewModel the [LyricsFetchState] instance.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
