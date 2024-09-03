@@ -58,10 +58,7 @@ class LyricsFetchViewModel(
 
                 val result = lyricsProviderService
                     .getSongInfo(
-                        query = SongInfo(
-                            songName = querySongName,
-                            artistName = queryArtistName
-                        ),
+                        query = SongInfo(querySongName, queryArtistName),
                         offset = queryOffset,
                         provider = userSettingsController.selectedProvider
                     )
@@ -106,11 +103,13 @@ class LyricsFetchViewModel(
     private fun loadLyrics(songLink: String?, context: Context) {
         viewModelScope.launch {
             lyricsFetchState = LyricsFetchState.Pending
+
             try {
                 val lyrics = getSyncedLyrics(
-                    songLink ?: throw IllegalStateException("Attempted lyrics retrieval with empty URL"),
-                    context.getVersion()
+                    link = songLink ?: throw IllegalStateException("Attempted lyrics retrieval with empty URL"),
+                    version = context.getVersion()
                 ) ?: throw NullPointerException("Lyrics result is null")
+
                 lyricsFetchState = LyricsFetchState.Success(lyrics)
             } catch (e: Exception) {
                 lyricsFetchState = LyricsFetchState.Failed(e)
