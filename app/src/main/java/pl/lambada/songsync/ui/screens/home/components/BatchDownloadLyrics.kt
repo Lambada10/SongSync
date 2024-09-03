@@ -2,7 +2,6 @@ package pl.lambada.songsync.ui.screens.home.components
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.net.Uri
 import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,7 +11,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.documentfile.provider.DocumentFile
 import pl.lambada.songsync.R
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
@@ -27,7 +25,8 @@ import pl.lambada.songsync.util.InternalErrorException
 import pl.lambada.songsync.util.NoTrackFoundException
 import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.util.ext.toLrcFile
-import java.io.File
+import pl.lambada.songsync.util.generateLrcContent
+import pl.lambada.songsync.util.writeLyricsToFile
 import java.io.FileNotFoundException
 import kotlin.math.roundToInt
 
@@ -142,8 +141,14 @@ suspend fun downloadLyrics(
                 return@let
             } ?: return@let
 
-            val lrcContent = generateLrcContent(queryResult, context, lyricsResult)
+            val lrcContent = generateLrcContent(
+                queryResult,
+                lyricsResult,
+                context.getString(R.string.generated_using)
+            )
+
             writeLyricsToFile(file, lrcContent, context, song, sdCardPath)
+
             successCount++
         }
 
@@ -188,66 +193,6 @@ private fun handleLyricsException(e: Exception, noLyricsCount: Int): Int? {
         else -> throw e
     }
 }
-
-private fun generateLrcContent(songInfo: SongInfo, context: Context, lyrics: String): String {
-    return "[ti:${songInfo.songName}]\n" +
-            "[ar:${songInfo.artistName}]\n" +
-            "[by:${context.getString(R.string.generated_using)}]\n" +
-            lyrics
-}
-
-private fun writeLyricsToFile(
-    file: File?,
-    lrcContent: String,
-    context: Context,
-    song: Song,
-    sdCardPath: String?
-) {
-    try {
-        file?.writeText(lrcContent)
-    } catch (e: FileNotFoundException) {
-        handleFileNotFoundException(context, song, file, lrcContent, sdCardPath)
-    }
-}
-
-
-fun handleFileNotFoundException(
-    context: Context,
-    song: Song,
-    file: File?,
-    lrc: String,
-    sdCardPath: String?
-) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && !song.filePath!!.contains("/storage/emulated/0")) {
-        val sd = context.externalCacheDirs[1].absolutePath.substring(
-            0,
-            context.externalCacheDirs[1].absolutePath.indexOf("/Android/data")
-        )
-        val path = file?.absolutePath?.substringAfter(sd)?.split("/")?.dropLast(1)
-        var sdCardFiles = DocumentFile.fromTreeUri(context, Uri.parse(sdCardPath))
-        for (element in path!!) {
-            for (sdCardFile in sdCardFiles!!.listFiles()) {
-                if (sdCardFile.name == element) {
-                    sdCardFiles = sdCardFile
-                }
-            }
-        }
-        sdCardFiles?.listFiles()?.forEach {
-            if (it.name == file.name) {
-                it.delete()
-                return@forEach
-            }
-        }
-        sdCardFiles?.createFile("text/lrc", file.name)?.let {
-            val outputStream = context.contentResolver.openOutputStream(it.uri)
-            outputStream?.write(lrc.toByteArray())
-            outputStream?.close()
-        }
-    } else {
-        error("Unable to handle FileNotFoundException")
-    }
-}
-
 
 enum class UiState {
     Warning, LegacyPrompt, Pending, Done, RateLimited, Cancelled

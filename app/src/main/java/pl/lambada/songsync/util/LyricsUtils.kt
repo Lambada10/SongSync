@@ -12,6 +12,7 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import com.kyant.taglib.TagLib
+import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.File
@@ -30,6 +31,57 @@ fun newLyricsFilePath(filePath: String?, song: SongInfo): File {
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
         "SongSync/${song.songName} - ${song.artistName}.lrc"
     )
+}
+
+fun writeLyricsToFile(
+    file: File?,
+    lrcContent: String,
+    context: Context,
+    song: Song,
+    sdCardPath: String?
+) {
+    try {
+        file?.writeText(lrcContent)
+    } catch (e: FileNotFoundException) {
+        handleFileNotFoundException(context, song, file, lrcContent, sdCardPath)
+    }
+}
+
+fun handleFileNotFoundException(
+    context: Context,
+    song: Song,
+    file: File?,
+    lrc: String,
+    sdCardPath: String?
+) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && !song.filePath!!.contains("/storage/emulated/0")) {
+        val sd = context.externalCacheDirs[1].absolutePath.substring(
+            0,
+            context.externalCacheDirs[1].absolutePath.indexOf("/Android/data")
+        )
+        val path = file?.absolutePath?.substringAfter(sd)?.split("/")?.dropLast(1)
+        var sdCardFiles = DocumentFile.fromTreeUri(context, Uri.parse(sdCardPath))
+        for (element in path!!) {
+            for (sdCardFile in sdCardFiles!!.listFiles()) {
+                if (sdCardFile.name == element) {
+                    sdCardFiles = sdCardFile
+                }
+            }
+        }
+        sdCardFiles?.listFiles()?.forEach {
+            if (it.name == file.name) {
+                it.delete()
+                return@forEach
+            }
+        }
+        sdCardFiles?.createFile("text/lrc", file.name)?.let {
+            val outputStream = context.contentResolver.openOutputStream(it.uri)
+            outputStream?.write(lrc.toByteArray())
+            outputStream?.close()
+        }
+    } else {
+        error("Unable to handle FileNotFoundException")
+    }
 }
 
 @SuppressLint("Range")
