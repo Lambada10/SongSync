@@ -1,6 +1,5 @@
 package pl.lambada.songsync.ui.screens.lyricsFetch
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -44,6 +43,7 @@ import pl.lambada.songsync.ui.screens.lyricsFetch.components.LocalSongContent
 import pl.lambada.songsync.ui.screens.lyricsFetch.components.NoConnectionDialogue
 import pl.lambada.songsync.ui.screens.lyricsFetch.components.NotSubmittedContent
 import pl.lambada.songsync.ui.screens.lyricsFetch.components.SuccessContent
+import pl.lambada.songsync.util.showToast
 
 /**
  * Composable function for BrowseScreen component.
@@ -167,11 +167,10 @@ fun SharedTransitionScope.LyricsFetchScreen(
                         onCopyLyrics = {
                             clipboardManager.setText(AnnotatedString(it))
 
-                            Toast.makeText(
+                            showToast(
                                 context,
                                 context.getString(R.string.lyrics_copied_to_clipboard),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            )
                         },
                         openUri = uriHandler::openUri,
                         lyricsFetchState = viewModel.lyricsFetchState,
