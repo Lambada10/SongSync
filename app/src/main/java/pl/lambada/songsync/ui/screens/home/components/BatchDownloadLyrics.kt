@@ -20,9 +20,6 @@ import pl.lambada.songsync.ui.screens.home.components.batchDownload.DownloadComp
 import pl.lambada.songsync.ui.screens.home.components.batchDownload.DownloadProgressDialog
 import pl.lambada.songsync.ui.screens.home.components.batchDownload.LegacyPromptDialog
 import pl.lambada.songsync.ui.screens.home.components.batchDownload.RateLimitedDialog
-import pl.lambada.songsync.util.EmptyQueryException
-import pl.lambada.songsync.util.InternalErrorException
-import pl.lambada.songsync.util.NoTrackFoundException
 import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.util.ext.toLrcFile
 import pl.lambada.songsync.util.generateLrcContent
@@ -117,40 +114,21 @@ suspend fun downloadLyrics(
     var failedCount = 0
     var consecutiveNotFound = 0
 
-    for (song in songs) {
-        val file = song.filePath.toLrcFile()
-        val query = SongInfo(song.title, song.artist)
-
-        val queryResult = try {
-            viewModel.getSongInfo(query)
-        } catch (e: Exception) {
-            handleQueryException(e, consecutiveNotFound, failedCount, onRateLimitReached)?.let {
-                consecutiveNotFound = it.first
-                failedCount = it.second
-                if (consecutiveNotFound >= 5) return
-            }
-            continue
-        }
-
-        consecutiveNotFound = 0
-        queryResult?.let { songInfo ->
-            val lyricsResult = try {
-                viewModel.getSyncedLyrics(songInfo.songLink ?: "", context.getVersion())
-            } catch (e: Exception) {
-                handleLyricsException(e, noLyricsCount)?.let { noLyricsCount = it }
-                return@let
-            } ?: return@let
-
-            val lrcContent = generateLrcContent(
-                queryResult,
-                lyricsResult,
-                context.getString(R.string.generated_using)
-            )
-
-            writeLyricsToFile(file, lrcContent, context, song, sdCardPath)
-
-            successCount++
-        }
+    songs.forEach { song ->
+        downloadLyricsForSong(
+            song,
+            viewModel,
+            context,
+            sdCardPath,
+            onSaved = { successCount++ },
+            onNoLyrics = { noLyricsCount++ },
+            onFailed = {
+                failedCount++
+                consecutiveNotFound++
+                if (consecutiveNotFound >= 5) onRateLimitReached()
+            },
+            onProcessingQueryResult = { consecutiveNotFound = 0 }
+        )
 
         onProgressUpdate(successCount, noLyricsCount, failedCount)
     }
@@ -158,40 +136,50 @@ suspend fun downloadLyrics(
     onDownloadComplete()
 }
 
-private fun handleQueryException(
-    e: Exception,
-    consecutiveNotFound: Int,
-    failedCount: Int,
-    onRateLimitReached: () -> Unit
-): Pair<Int, Int>? {
-    var notFoundInARow = consecutiveNotFound
-    var failedCountVar = failedCount
-    when (e) {
-        is FileNotFoundException -> {
-            notFoundInARow++
-            failedCountVar++
-            if (notFoundInARow >= 5) {
-                onRateLimitReached()
-            }
-            return Pair(notFoundInARow, failedCountVar)
-        }
-        is NoTrackFoundException, is EmptyQueryException, is InternalErrorException -> {
-            failedCountVar++
-            return Pair(notFoundInARow, failedCountVar)
-        }
-        else -> throw e
-    }
-}
+private suspend fun downloadLyricsForSong(
+    song: Song,
+    viewModel: HomeViewModel,
+    context: Context,
+    sdCardPath: String?,
+    onSaved: () -> Unit,
+    onNoLyrics: () -> Unit,
+    onFailed: (Throwable) -> Unit,
+    onProcessingQueryResult: () -> Unit
+) {
+    val file = song.filePath.toLrcFile()
 
-private fun handleLyricsException(e: Exception, noLyricsCount: Int): Int? {
-    var noLyricsCountVar = noLyricsCount
-    when (e) {
-        is NullPointerException, is FileNotFoundException -> {
-            noLyricsCountVar++
-            return noLyricsCountVar
-        }
-        else -> throw e
+    runCatching {
+        viewModel.getSongInfo(SongInfo(song.title, song.artist))
+            ?: throw NullPointerException("Song info result is null")
     }
+        .onFailure(onFailed)
+        .onSuccess { queryResult ->
+            onProcessingQueryResult()
+
+            runCatching {
+                viewModel.getSyncedLyrics(
+                    link = queryResult.songLink ?: error("attempted to get lyrics without link"),
+                    version = context.getVersion()
+                ) ?: throw NullPointerException("Lyrics result is null")
+            }
+                .onFailure {
+                    if (it is NullPointerException || it is FileNotFoundException)
+                        onNoLyrics()
+                    else
+                        onFailed(it)
+                }
+                .onSuccess { lyricsResult ->
+                    val lrcContent = generateLrcContent(
+                        queryResult,
+                        lyricsResult,
+                        context.getString(R.string.generated_using)
+                    )
+
+                    writeLyricsToFile(file, lrcContent, context, song, sdCardPath)
+
+                    onSaved()
+                }
+        }
 }
 
 enum class UiState {
