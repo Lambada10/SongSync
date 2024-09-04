@@ -109,8 +109,7 @@ fun HomeScreen(
                             sharedContentState = rememberSharedContentState(key = "fab"),
                             animatedVisibilityScope = animatedVisibilityScope,
                             resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
-                        )
-                        .navigationBarsPadding(),
+                        ),
                     onClick = { navController.navigate(LyricsFetchScreen()) }
                 ) {
                     Icon(
@@ -120,7 +119,7 @@ fun HomeScreen(
                 }
             }
         },
-        bottomBar = { Spacer(Modifier) } // fixing broken edge to edge here
+        bottomBar = { Spacer(Modifier.navigationBarsPadding()) } // fixing broken edge to edge here
     ) { paddingValues ->
         Crossfade(viewModel.allSongs == null, label = "") { loading ->
             if (loading)
@@ -130,7 +129,7 @@ fun HomeScreen(
                     navController = navController,
                     viewModel = viewModel,
                     selected = viewModel.selectedSongs,
-                    paddingValues = paddingValues,
+                    scaffoldPadding = paddingValues,
                     isBatchDownload = isBatchDownload,
                     onBatchDownloadState = { onBatchDownload -> isBatchDownload = onBatchDownload },
                     sharedTransitionScope = sharedTransitionScope,
@@ -160,7 +159,7 @@ fun HomeScreenLoaded(
     selected: SnapshotStateList<String>,
     navController: NavHostController,
     viewModel: HomeViewModel,
-    paddingValues: PaddingValues,
+    scaffoldPadding: PaddingValues,
     isBatchDownload: Boolean,
     onBatchDownloadState: (isBatchDownload: Boolean) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
@@ -176,11 +175,10 @@ fun HomeScreenLoaded(
         }
 
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
+            contentPadding = scaffoldPadding
         ) {
             item {
                 Column(
