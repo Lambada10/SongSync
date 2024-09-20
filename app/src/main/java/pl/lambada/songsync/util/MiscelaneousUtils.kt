@@ -5,8 +5,9 @@ import android.os.Build
 import android.widget.Toast
 
 fun isLegacyFileAccessRequired(filePath: String?): Boolean {
+    // Before Android 11, not in internal storage
     return Build.VERSION.SDK_INT < Build.VERSION_CODES.R
-            || filePath?.contains("/storage/emulated/0/") == true
+            && filePath?.contains("/storage/emulated/0/") == false
 }
 
 fun showToast(context: Context, messageResId: Int, vararg args: Any, long: Boolean = true) {

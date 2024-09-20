@@ -85,7 +85,7 @@ class LyricsFetchViewModel(
         val lrcContent = generateLrcContent(song, lyrics, generatedUsingString)
         val file = newLyricsFilePath(filePath, song)
 
-        if (isLegacyFileAccessRequired(filePath)) {
+        if (!isLegacyFileAccessRequired(filePath)) {
             file.writeText(lrcContent)
         } else {
             saveToExternalPath(
