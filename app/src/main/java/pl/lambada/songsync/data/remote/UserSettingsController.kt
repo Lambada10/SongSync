@@ -25,14 +25,14 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
         dataStore.get(blacklistedFoldersKey, "").split(",")
     )
         private set
-    var hideLyrics by mutableStateOf(false)
+
+    var hideLyrics by mutableStateOf(dataStore.get(hideLyricsKey, false))
         private set
 
-    var includeTranslation by mutableStateOf(
-        dataStore.get(includeTranslationKey, false)
-    )
+    var includeTranslation by mutableStateOf(dataStore.get(includeTranslationKey, false))
+        private set
 
-    var pureBlack by mutableStateOf(false)
+    var pureBlack by mutableStateOf(dataStore.get(pureBlackKey, false))
         private set
 
     var disableMarquee by mutableStateOf(dataStore.get(disableMarqueeKey, false))
