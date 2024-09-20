@@ -27,6 +27,9 @@ data class AppleLyricsResponse(
 data class AppleLyrics(
     val text: List<AppleLyricsLineDetails>,
     val timestamp: Int,
+    val oppositeTurn: Boolean,
+    val background: Boolean,
+    val backgroundText: List<AppleLyricsLineDetails>,
     val endtime: Int
 )
 
@@ -34,5 +37,6 @@ data class AppleLyrics(
 data class AppleLyricsLineDetails(
     val text: String,
     val part: Boolean,
-    val timestamp: Int?
+    val timestamp: Int?,
+    val endtime: Int?
 )

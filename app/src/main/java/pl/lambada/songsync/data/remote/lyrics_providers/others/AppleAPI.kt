@@ -75,6 +75,10 @@ class AppleAPI {
                 for (line in lines) {
                     syncedLyrics.append("[${line.timestamp.toLrcTimestamp()}]")
 
+                    syncedLyrics.append(
+                        if (line.oppositeTurn) "v2: " else "v1: "
+                    )
+
                     for (syllable in line.text) {
                         syncedLyrics.append("<${syllable.timestamp!!.toLrcTimestamp()}>${syllable.text}")
                         if (!syllable.part) {
@@ -82,7 +86,22 @@ class AppleAPI {
                         }
                     }
 
-                    syncedLyrics.append("<${line.endtime.toLrcTimestamp()}>\n")
+                    if (line.background) {
+                        syncedLyrics.append("<${line.text.last().endtime?.toLrcTimestamp()}>\n")
+
+                        syncedLyrics.append("[bg: ")
+
+                        for (syllable in line.backgroundText) {
+                            syncedLyrics.append("<${syllable.timestamp!!.toLrcTimestamp()}>${syllable.text}")
+                            if (!syllable.part) {
+                                syncedLyrics.append(" ")
+                            }
+                        }
+
+                        syncedLyrics.append("<${line.endtime.toLrcTimestamp()}>]\n")
+                    } else {
+                        syncedLyrics.append("<${line.endtime.toLrcTimestamp()}>\n")
+                    }
                 }
             }
 
