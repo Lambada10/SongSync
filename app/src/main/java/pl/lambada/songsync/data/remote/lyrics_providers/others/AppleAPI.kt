@@ -35,7 +35,11 @@ class AppleAPI {
         if (response.status.value !in 200..299)
             return null
 
-        val json = json.decodeFromString<List<AppleSearchResponse>>(responseBody)
+        val json = try {
+            json.decodeFromString<List<AppleSearchResponse>>(responseBody)
+        } catch (e: Exception) {
+            return null
+        }
 
         val result = json[0]
 
