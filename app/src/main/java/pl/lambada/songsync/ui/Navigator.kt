@@ -3,31 +3,32 @@ package pl.lambada.songsync.ui
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import pl.lambada.songsync.data.MainViewModel
-import pl.lambada.songsync.domain.model.Song
-import pl.lambada.songsync.ui.screens.AboutScreen
-import pl.lambada.songsync.ui.screens.HomeScreen
-import pl.lambada.songsync.ui.screens.SearchScreen
+import pl.lambada.songsync.data.remote.UserSettingsController
+import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
+import pl.lambada.songsync.ui.screens.about.AboutScreen
+import pl.lambada.songsync.ui.screens.about.AboutViewModel
+import pl.lambada.songsync.ui.screens.home.HomeScreen
+import pl.lambada.songsync.ui.screens.home.HomeViewModel
+import pl.lambada.songsync.ui.screens.lyricsFetch.LyricsFetchScreen
+import pl.lambada.songsync.ui.screens.lyricsFetch.LyricsFetchViewModel
 
 /**
  * Composable function for handling navigation within the app.
  *
  * @param navController The navigation controller.
- * @param viewModel The main view model.
  */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun Navigator(
     navController: NavHostController,
-    selected: SnapshotStateList<String>,
-    allSongs: List<Song>?,
-    viewModel: MainViewModel
+    userSettingsController: UserSettingsController,
+    lyricsProviderService: LyricsProviderService
 ) {
     SharedTransitionLayout {
         NavHost(
@@ -37,30 +38,33 @@ fun Navigator(
             composable<ScreenHome> {
                 HomeScreen(
                     navController = navController,
-                    selected = selected,
-                    allSongs = allSongs,
-                    viewModel = viewModel,
+                    viewModel = viewModel {
+                        HomeViewModel(userSettingsController, lyricsProviderService)
+                    },
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
                 )
             }
-            composable<ScreenSearch> {
-                val args = it.toRoute<ScreenSearch>()
-                SearchScreen(
-                    id = args.id,
-                    songName = args.songName,
-                    artists = args.artists,
-                    coverUri = args.coverUri,
-                    filePath = args.filePath,
-                    viewModel = viewModel,
+
+            composable<LyricsFetchScreen>() {
+                val args = it.toRoute<LyricsFetchScreen>()
+
+                LyricsFetchScreen(
+                    viewModel = viewModel {
+                        LyricsFetchViewModel(
+                            args.source(),
+                            userSettingsController,
+                            lyricsProviderService
+                        )
+                    },
                     navController = navController,
-                    sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = this,
                 )
             }
             composable<ScreenAbout> {
                 AboutScreen(
-                    viewModel = viewModel,
+                    viewModel = viewModel { AboutViewModel() },
+                    userSettingsController,
                     navController = navController
                 )
             }
@@ -72,12 +76,23 @@ fun Navigator(
 object ScreenHome
 
 @Serializable
-data class ScreenSearch(
-    val id: String? = null,
-    val songName: String? = null,
-    val artists: String? = null,
-    val coverUri: String? = null,
-    val filePath: String? = null,
+data class LyricsFetchScreen(
+    private val songName: String? = null,
+    private val artists: String? = null,
+    private val coverUri: String? = null,
+    private val filePath: String? = null,
+) {
+    fun source() = if (songName != null && artists != null && coverUri != null && filePath != null) {
+        LocalSong(songName, artists, coverUri, filePath)
+    } else null
+}
+
+@Serializable
+data class LocalSong(
+    val songName: String,
+    val artists: String,
+    val coverUri: String,
+    val filePath: String,
 )
 
 @Serializable

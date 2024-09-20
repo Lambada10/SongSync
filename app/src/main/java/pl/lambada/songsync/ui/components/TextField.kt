@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 fun CommonTextField(
     modifier: Modifier = Modifier,
     value: String = "",
-    onValueChange: (Any?) -> Unit = {},
+    onValueChange: (String) -> Unit = {},
     label: String = "",
     singleLine: Boolean = true,
     imeAction: ImeAction = ImeAction.Done,

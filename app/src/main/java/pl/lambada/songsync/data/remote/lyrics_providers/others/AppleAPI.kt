@@ -4,10 +4,10 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import pl.lambada.songsync.data.EmptyQueryException
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.lyrics_providers.others.AppleLyricsResponse
 import pl.lambada.songsync.domain.model.lyrics_providers.others.AppleSearchResponse
+import pl.lambada.songsync.util.EmptyQueryException
 import pl.lambada.songsync.util.ext.toLrcTimestamp
 import pl.lambada.songsync.util.networking.Ktor.client
 import pl.lambada.songsync.util.networking.Ktor.json

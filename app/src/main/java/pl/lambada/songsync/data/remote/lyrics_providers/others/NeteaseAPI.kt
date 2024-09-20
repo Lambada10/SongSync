@@ -6,11 +6,11 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.ExperimentalSerializationApi
-import pl.lambada.songsync.data.EmptyQueryException
-import pl.lambada.songsync.data.InternalErrorException
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.lyrics_providers.others.NeteaseLyricsResponse
 import pl.lambada.songsync.domain.model.lyrics_providers.others.NeteaseResponse
+import pl.lambada.songsync.util.EmptyQueryException
+import pl.lambada.songsync.util.InternalErrorException
 import pl.lambada.songsync.util.networking.Ktor.client
 import pl.lambada.songsync.util.networking.Ktor.json
 

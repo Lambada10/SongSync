@@ -1,6 +1,7 @@
 package pl.lambada.songsync
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -15,7 +16,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
@@ -25,185 +25,92 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import pl.lambada.songsync.data.MainViewModel
-import pl.lambada.songsync.domain.model.Song
+import pl.lambada.songsync.data.remote.UserSettingsController
+import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
 import pl.lambada.songsync.ui.Navigator
 import pl.lambada.songsync.ui.components.dialogs.NoInternetDialog
-import pl.lambada.songsync.ui.screens.LoadingScreen
-import pl.lambada.songsync.ui.screens.Providers
+import pl.lambada.songsync.ui.screens.home.LoadingScreen
 import pl.lambada.songsync.ui.theme.SongSyncTheme
 import pl.lambada.songsync.util.dataStore
-import pl.lambada.songsync.util.get
 import java.io.File
 
 /**
  * The main activity of the SongSync app.
  */
 class MainActivity : ComponentActivity() {
-    val viewModel: MainViewModel by viewModels()
+    private val lyricsProviderService = LyricsProviderService()
 
-    /**
-     * Called when the activity is starting.
-     *
-     * @param savedInstanceState The saved instance state.
-     */
     @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        // fixes weird system bars background upon app loading
+        enableEdgeToEdge()
+
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { view, insets ->
             view.setPadding(0, 0, 0, 0)
             insets
         }
+
         val dataStore = this.dataStore
+        val userSettingsController = UserSettingsController(dataStore)
+
+        checkOrCreateDownloadSubFolder()
+        createNotificationChannel()
+
         setContent {
             val context = LocalContext.current
-            val scope = rememberCoroutineScope()
             val navController = rememberNavController()
             var hasLoadedPermissions by remember { mutableStateOf(false) }
             var hasPermissions by remember { mutableStateOf(false) }
-            var internetConnection by remember { mutableStateOf(true) }
-            var themeDefined by remember { mutableStateOf(false) }
+            var networkError by rememberSaveable { mutableStateOf<Boolean?>(null) }
 
             LaunchedEffect(Unit) {
-                val disableMarquee = dataStore.get(booleanPreferencesKey("marquee_disable"), false)
-                viewModel.disableMarquee.value = disableMarquee
-
-                val pureBlack = dataStore.get(booleanPreferencesKey("pure_black"), false)
-                viewModel.pureBlack.value = pureBlack
-                themeDefined = true
-
-                val sdCardPath = dataStore.get(stringPreferencesKey("sd_card_path"), null)
-                if (sdCardPath != null) {
-                    viewModel.sdCardPath = sdCardPath
-                }
-
-                val includeTranslation =
-                    dataStore.get(booleanPreferencesKey("include_translation"), false)
-                viewModel.includeTranslation = includeTranslation
-
-                val blacklist = dataStore.get(stringPreferencesKey("blacklist"), null)
-                if (blacklist != null) {
-                    viewModel.blacklistedFolders = blacklist.split(",").toMutableList()
-                }
-
-                val hideLyrics = dataStore.get(booleanPreferencesKey("hide_lyrics"), false)
-                viewModel.hideLyrics = hideLyrics
-
-                val provider =
-                    dataStore.get(stringPreferencesKey("provider"), Providers.SPOTIFY.displayName)
-                viewModel.provider = Providers.entries.find { it.displayName == provider }!!
-
-                val embedLyrics = dataStore.get(booleanPreferencesKey("embed_lyrics"), false)
-                viewModel.embedLyricsInFile = embedLyrics
-
-                // Get token upon app start
-                launch(Dispatchers.IO) {
-                    try {
-                        viewModel.refreshToken()
-                    } catch (e: Exception) {
-                        internetConnection = false
-                    }
-                }
-
-                // Create our subdirectory in downloads if it doesn't exist
-                val downloadsDir =
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                val songSyncDir = File(downloadsDir, "SongSync")
-                if (!songSyncDir.exists()) {
-                    songSyncDir.mkdir()
-                }
-
-                createNotificationChannel()
+                if (networkError == null) lyricsProviderService
+                    .refreshSpotifyToken()
+                    .onFailure { networkError = true }
             }
 
-            if (themeDefined)
-                SongSyncTheme(pureBlack = viewModel.pureBlack.value) {
-                    // I'll cry if this crashes due to memory concerns
-                    val selected = rememberSaveable(saver = Saver(
-                        save = { it.toTypedArray() }, restore = { mutableStateListOf(*it) }
-                    )) { mutableStateListOf<String>() }
-                    var allSongs by remember { mutableStateOf<List<Song>?>(null) }
+            SongSyncTheme(pureBlack = userSettingsController.pureBlack) {
+                // Check for permissions and get all songs
+                RequestPermissions(
+                    onGranted = { hasPermissions = true },
+                    context = context,
+                    onDone = { hasLoadedPermissions = true }
+                )
 
-                    // Check for permissions and get all songs
-                    RequestPermissions(
-                        onGranted = { hasPermissions = true },
-                        context = context,
-                        onDone = {
-                            if (hasPermissions) {
-                                // Get all songs
-                                scope.launch(Dispatchers.IO) {
-                                    allSongs = viewModel.getAllSongs(context)
-                                }
-                            }
-                            hasLoadedPermissions = true
-                        }
-                    )
+                if (networkError == true) NoInternetDialog(
+                    onConfirm = ::finishAndRemoveTask,
+                    onIgnore = { networkError = false }
+                )
 
-                    Surface(modifier = Modifier.fillMaxSize()) {
-                        if (!hasLoadedPermissions) {
-                            LoadingScreen()
-                        } else if (!hasPermissions) {
-                            AlertDialog(
-                                onDismissRequest = { /* don't dismiss */ },
-                                confirmButton = {
-                                    OutlinedButton(
-                                        onClick = {
-                                            finishAndRemoveTask()
-                                        }
-                                    ) {
-                                        Text(stringResource(R.string.close_app))
-                                    }
-                                },
-                                title = { Text(stringResource(R.string.permission_denied)) },
-                                text = {
-                                    Column {
-                                        Text(stringResource(R.string.requires_higher_storage_permissions))
-                                    }
-                                }
-                            )
-                        } else {
-                            Navigator(
-                                navController = navController,
-                                selected = selected,
-                                allSongs = allSongs,
-                                viewModel = viewModel
-                            )
-                        }
-                        if (!internetConnection) {
-                            NoInternetDialog(
-                                onConfirm = { finishAndRemoveTask() },
-                                onIgnore = {
-                                    internetConnection =
-                                        true // assume connected (if spotify is down, can use other providers)
-                                }
-                            )
-                        }
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    if (!hasLoadedPermissions) {
+                        LoadingScreen()
+                    } else if (!hasPermissions) {
+                        PermissionsDeniedDialogue(onCloseAppRequest = ::finishAndRemoveTask)
+                    } else {
+                        Navigator(
+                            navController = navController,
+                            userSettingsController = userSettingsController,
+                            lyricsProviderService = lyricsProviderService
+                        )
                     }
                 }
+            }
         }
     }
 
@@ -213,22 +120,50 @@ class MainActivity : ComponentActivity() {
         notificationManager.cancel(2) // "Done" notification
         super.onResume()
     }
+}
 
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+private fun checkOrCreateDownloadSubFolder() {
+    val downloadsDir = Environment.getExternalStoragePublicDirectory(
+        Environment.DIRECTORY_DOWNLOADS
+    )
 
-            val channelId = getString(R.string.batch_download_lyrics)
-            val channelName = getString(R.string.batch_download_lyrics)
-            val channelDescription = getString(R.string.batch_download_lyrics)
-            val importance = NotificationManager.IMPORTANCE_LOW
-            val channel = NotificationChannel(channelId, channelName, importance)
-            channel.description = channelDescription
+    val songSyncDir = File(downloadsDir, "SongSync")
 
-            notificationManager.createNotificationChannel(channel)
-        }
+    if (!songSyncDir.exists()) songSyncDir.mkdir()
+}
+
+private fun Activity.createNotificationChannel() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val channelId = getString(R.string.batch_download_lyrics)
+        val channelName = getString(R.string.batch_download_lyrics)
+        val channelDescription = getString(R.string.batch_download_lyrics)
+        val importance = NotificationManager.IMPORTANCE_LOW
+        val channel = NotificationChannel(channelId, channelName, importance)
+        channel.description = channelDescription
+
+        notificationManager.createNotificationChannel(channel)
     }
+}
+
+@Composable
+fun PermissionsDeniedDialogue(onCloseAppRequest: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = { /* don't dismiss */ },
+        confirmButton = {
+            OutlinedButton(onClick = onCloseAppRequest) {
+                Text(stringResource(R.string.close_app))
+            }
+        },
+        title = { Text(stringResource(R.string.permission_denied)) },
+        text = {
+            Column {
+                Text(stringResource(R.string.requires_higher_storage_permissions))
+            }
+        }
+    )
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
