@@ -63,7 +63,8 @@ fun Navigator(
             }
             composable<ScreenAbout> {
                 AboutScreen(
-                    viewModel = viewModel { AboutViewModel(userSettingsController) },
+                    viewModel = viewModel { AboutViewModel() },
+                    userSettingsController,
                     navController = navController
                 )
             }

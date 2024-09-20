@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.remote.UpdateState
+import pl.lambada.songsync.data.remote.UserSettingsController
 import pl.lambada.songsync.ui.screens.about.components.AboutScreenTopBar
 import pl.lambada.songsync.ui.screens.about.components.AppInfoSection
 import pl.lambada.songsync.ui.screens.about.components.ContributorsSection
@@ -38,6 +39,7 @@ import pl.lambada.songsync.util.ext.getVersion
 @Composable
 fun AboutScreen(
     viewModel: AboutViewModel,
+    userSettingsController: UserSettingsController,
     navController: NavController
 ) {
     val context = LocalContext.current
@@ -60,32 +62,32 @@ fun AboutScreen(
         ) {
             item {
                 if (isSystemInDarkTheme()) PureBlackThemeSwitch(
-                    selected = viewModel.userSettingsController.pureBlack,
-                    onToggle = { viewModel.userSettingsController.updatePureBlack(it) }
+                    selected = userSettingsController.pureBlack,
+                    onToggle = { userSettingsController.updatePureBlack(it) }
                 )
             }
 
             item {
                 MarqueeSwitch(
-                    selected = viewModel.userSettingsController.disableMarquee,
-                    onToggle = { viewModel.userSettingsController.updateDisableMarquee(it) }
+                    selected = userSettingsController.disableMarquee,
+                    onToggle = { userSettingsController.updateDisableMarquee(it) }
                 )
             }
 
             item {
                 TranslationSwitch(
-                    selected = viewModel.userSettingsController.includeTranslation,
-                    onToggle = { viewModel.userSettingsController.updateIncludeTranslation(it) }
+                    selected = userSettingsController.includeTranslation,
+                    onToggle = { userSettingsController.updateIncludeTranslation(it) }
                 )
             }
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                 item {
                     SdCardPathSetting(
-                        sdPath = viewModel.userSettingsController.sdCardPath,
-                        onClearPath = { viewModel.userSettingsController.updateSdCardPath("") },
+                        sdPath = userSettingsController.sdCardPath,
+                        onClearPath = { userSettingsController.updateSdCardPath("") },
                         onUpdatePath = { newPath ->
-                            viewModel.userSettingsController.updateSdCardPath(
+                            userSettingsController.updateSdCardPath(
                                 newPath
                             )
                         }

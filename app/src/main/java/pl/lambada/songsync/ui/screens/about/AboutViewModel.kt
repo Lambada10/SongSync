@@ -12,14 +12,12 @@ import kotlinx.coroutines.withContext
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.remote.UpdateService
 import pl.lambada.songsync.data.remote.UpdateState
-import pl.lambada.songsync.data.remote.UserSettingsController
 import pl.lambada.songsync.util.showToast
 
 /**
  * ViewModel class for the main functionality of the app.
  */
 class AboutViewModel(
-    val userSettingsController: UserSettingsController,
     private val updateService: UpdateService = UpdateService()
 ) : ViewModel() {
     var updateState by mutableStateOf<UpdateState>(UpdateState.Idle)
