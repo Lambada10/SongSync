@@ -42,7 +42,7 @@ class LyricsFetchViewModel(
 
     var lyricsFetchState by mutableStateOf<LyricsFetchState>(LyricsFetchState.NotSubmitted)
 
-    private suspend fun getSyncedLyrics(link: String, version: String): String? =
+    private suspend fun getSyncedLyrics(link: String?, version: String): String? =
         lyricsProviderService.getSyncedLyrics(
             link,
             version,
@@ -106,7 +106,7 @@ class LyricsFetchViewModel(
 
             try {
                 val lyrics = getSyncedLyrics(
-                    link = songLink ?: throw IllegalStateException("Attempted lyrics retrieval with empty URL"),
+                    link = songLink,
                     version = context.getVersion()
                 ) ?: throw NullPointerException("Lyrics result is null")
 

@@ -81,7 +81,7 @@ class LyricsProviderService {
      * @return The synced lyrics as a string.
      */
     suspend fun getSyncedLyrics(
-        songLink: String,
+        songLink: String?,
         version: String,
         provider: Providers,
         // TODO providers could be a sealed interface to include such parameters
@@ -89,7 +89,7 @@ class LyricsProviderService {
     ): String? {
         return try {
             when (provider) {
-                Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink, version)
+                Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink!!, version)
                 Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(lrcLibID)
                 Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(
                     neteaseID,

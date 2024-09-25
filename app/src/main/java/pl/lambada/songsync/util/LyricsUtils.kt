@@ -233,7 +233,7 @@ private suspend fun downloadLyricsForSong(
             runCatching {
                 viewModel
                     .getSyncedLyrics(
-                        link = songInfo.songLink ?: error("attempted to get lyrics without link"),
+                        link = songInfo.songLink,
                         version = context.getVersion()
                     )
                     ?: throw NullPointerException("Lyrics result is null")
