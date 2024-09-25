@@ -277,7 +277,8 @@ class HomeViewModel(
             link,
             version,
             provider = userSettingsController.selectedProvider,
-            includeTranslationNetEase = userSettingsController.includeTranslation
+            includeTranslationNetEase = userSettingsController.includeTranslation,
+            multiPersonWordByWord = userSettingsController.multiPersonWordByWord
         )
     }
 

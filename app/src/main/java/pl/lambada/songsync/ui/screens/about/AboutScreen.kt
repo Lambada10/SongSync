@@ -25,6 +25,7 @@ import pl.lambada.songsync.ui.screens.about.components.ContributorsSection
 import pl.lambada.songsync.ui.screens.about.components.CreditsSection
 import pl.lambada.songsync.ui.screens.about.components.ExternalLinkSection
 import pl.lambada.songsync.ui.screens.about.components.MarqueeSwitch
+import pl.lambada.songsync.ui.screens.about.components.MultiPersonSwitch
 import pl.lambada.songsync.ui.screens.about.components.PureBlackThemeSwitch
 import pl.lambada.songsync.ui.screens.about.components.SdCardPathSetting
 import pl.lambada.songsync.ui.screens.about.components.SupportSection
@@ -78,6 +79,13 @@ fun AboutScreen(
                 TranslationSwitch(
                     selected = userSettingsController.includeTranslation,
                     onToggle = { userSettingsController.updateIncludeTranslation(it) }
+                )
+            }
+
+            item {
+                MultiPersonSwitch(
+                    selected = userSettingsController.multiPersonWordByWord,
+                    onToggle = { userSettingsController.updateMultiPersonWordByWord(it) }
                 )
             }
 

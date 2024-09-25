@@ -85,7 +85,8 @@ class LyricsProviderService {
         version: String,
         provider: Providers,
         // TODO providers could be a sealed interface to include such parameters
-        includeTranslationNetEase: Boolean = false
+        includeTranslationNetEase: Boolean = false,
+        multiPersonWordByWord: Boolean = false
     ): String? {
         return try {
             when (provider) {
@@ -95,7 +96,10 @@ class LyricsProviderService {
                     neteaseID,
                     includeTranslationNetEase
                 )
-                Providers.APPLE -> AppleAPI().getSyncedLyrics(appleID)
+                Providers.APPLE -> AppleAPI().getSyncedLyrics(
+                    appleID,
+                    multiPersonWordByWord
+                )
             }
         } catch (e: Exception) {
             null

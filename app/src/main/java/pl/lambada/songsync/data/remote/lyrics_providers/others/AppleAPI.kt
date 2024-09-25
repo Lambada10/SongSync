@@ -53,7 +53,7 @@ class AppleAPI {
         )
     }
 
-    suspend fun getSyncedLyrics(id: Long): String? {
+    suspend fun getSyncedLyrics(id: Long, multiPersonWordByWord: Boolean): String? {
         val response = client.get(
             baseURL + "getAppleMusicLyrics.php?id=$id"
         )
@@ -75,9 +75,11 @@ class AppleAPI {
                 for (line in lines) {
                     syncedLyrics.append("[${line.timestamp.toLrcTimestamp()}]")
 
-                    syncedLyrics.append(
-                        if (line.oppositeTurn) "v2: " else "v1: "
-                    )
+                    if (multiPersonWordByWord) {
+                        syncedLyrics.append(
+                            if (line.oppositeTurn) "v2: " else "v1: "
+                        )
+                    }
 
                     for (syllable in line.text) {
                         syncedLyrics.append("<${syllable.timestamp!!.toLrcTimestamp()}>${syllable.text}")
@@ -86,7 +88,7 @@ class AppleAPI {
                         }
                     }
 
-                    if (line.background) {
+                    if (line.background && multiPersonWordByWord) {
                         syncedLyrics.append("<${line.text.last().endtime?.toLrcTimestamp()}>\n")
 
                         syncedLyrics.append("[bg: ")

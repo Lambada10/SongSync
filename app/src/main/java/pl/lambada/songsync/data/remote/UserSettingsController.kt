@@ -32,6 +32,9 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
     var includeTranslation by mutableStateOf(dataStore.get(includeTranslationKey, false))
         private set
 
+    var multiPersonWordByWord by mutableStateOf(dataStore.get(multiPersonWordByWordKey, false))
+        private set
+
     var pureBlack by mutableStateOf(dataStore.get(pureBlackKey, false))
         private set
 
@@ -66,6 +69,11 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
         includeTranslation = to
     }
 
+    fun updateMultiPersonWordByWord(to: Boolean) {
+        dataStore.set(multiPersonWordByWordKey, to)
+        multiPersonWordByWord = to
+    }
+
     fun updateDisableMarquee(to: Boolean) {
         dataStore.set(disableMarqueeKey, to)
         disableMarquee = to
@@ -87,6 +95,7 @@ private val selectedProviderKey = stringPreferencesKey("provider")
 private val blacklistedFoldersKey = stringPreferencesKey("blacklist")
 private val hideLyricsKey = booleanPreferencesKey("hide_lyrics")
 private val includeTranslationKey = booleanPreferencesKey("include_translation")
+private val multiPersonWordByWordKey = booleanPreferencesKey("multi_person_word_by_word")
 private val disableMarqueeKey = booleanPreferencesKey("marquee_disable")
 private val pureBlackKey = booleanPreferencesKey("pure_black")
 private val sdCardPathKey = stringPreferencesKey("sd_card_path")
