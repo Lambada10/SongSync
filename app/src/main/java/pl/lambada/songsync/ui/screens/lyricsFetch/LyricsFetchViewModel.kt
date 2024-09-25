@@ -46,7 +46,8 @@ class LyricsFetchViewModel(
         lyricsProviderService.getSyncedLyrics(
             link,
             version,
-            userSettingsController.selectedProvider
+            userSettingsController.selectedProvider,
+            userSettingsController.includeTranslation
         )
 
     fun loadSongInfo(context: Context, tryingAgain: Boolean = false) {
