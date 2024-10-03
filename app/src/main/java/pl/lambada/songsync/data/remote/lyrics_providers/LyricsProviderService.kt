@@ -63,6 +63,11 @@ class LyricsProviderService {
                 Providers.APPLE -> AppleAPI().getSongInfo(query).also {
                     appleID = it?.appleID ?: 0
                 } ?: throw NoTrackFoundException()
+
+                // TODO
+                Providers.MUSIXMATCH -> AppleAPI().getSongInfo(query).also {
+                    appleID = it?.appleID ?: 0
+                } ?: throw NoTrackFoundException()
             }
         } catch (e: InternalErrorException) {
             throw e
@@ -97,6 +102,11 @@ class LyricsProviderService {
                     includeTranslationNetEase
                 )
                 Providers.APPLE -> AppleAPI().getSyncedLyrics(
+                    appleID,
+                    multiPersonWordByWord
+                )
+                // TODO
+                Providers.MUSIXMATCH -> AppleAPI().getSyncedLyrics(
                     appleID,
                     multiPersonWordByWord
                 )
