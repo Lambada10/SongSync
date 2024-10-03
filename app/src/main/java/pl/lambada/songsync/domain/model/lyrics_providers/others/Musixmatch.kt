@@ -4,23 +4,23 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MusixmatchSearchResponse(
-    val commontrack_id: Long,
-    val track_name: String,
-    val artist_name: String,
-    val album_name: String,
-    val album_cover: String,
-    val release_date: String,
-    val track_length: Int,
-    val track_share_url: String,
-    val album_id: Long,
-    val has_lyrics: Boolean
+    val id: Long,
+    val songName: String,
+    val artistName: String,
+    val albumName: String,
+    val artwork: String,
+    val releaseDate: String,
+    val duration: Int,
+    val url: String,
+    val albumId: Long,
+    val hasLyrics: Boolean
 )
 
 @Serializable
 data class MusixmatchLyricsResponse(
-    val subtitle_id: Long,
-    val subtitle_length: Int,
-    val subtitle_language: String,
-    val updated_time: String,
-    val subtitle_body: String,
+    val id: Long,
+    val duration: Int,
+    val language: String,
+    val updatedTime: String,
+    val lyrics: String,
 )

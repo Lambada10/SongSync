@@ -44,11 +44,11 @@ class MusixmatchAPI {
         val result = json[0]
 
         return SongInfo(
-            songName = result.track_name,
-            artistName = result.artist_name,
-            songLink = result.track_share_url,
-            albumCoverLink = result.album_cover,
-            musixmatchID = result.commontrack_id,
+            songName = result.songName,
+            artistName = result.artistName,
+            songLink = result.url,
+            albumCoverLink = result.artwork,
+            musixmatchID = result.id,
         )
     }
 
@@ -67,6 +67,6 @@ class MusixmatchAPI {
             return null
 
         val json = json.decodeFromString<MusixmatchLyricsResponse>(responseBody)
-        return json.subtitle_body
+        return json.lyrics
     }
 }
