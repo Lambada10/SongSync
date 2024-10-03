@@ -12,7 +12,7 @@ data class MusixmatchSearchResponse(
     val release_date: String,
     val track_length: Int,
     val track_share_url: String,
-    val album_id: String,
+    val album_id: Long,
     val has_lyrics: Boolean
 )
 
