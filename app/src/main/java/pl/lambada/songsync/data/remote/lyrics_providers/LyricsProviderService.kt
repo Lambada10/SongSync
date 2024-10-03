@@ -68,9 +68,8 @@ class LyricsProviderService {
                     appleID = it?.appleID ?: 0
                 } ?: throw NoTrackFoundException()
 
-                // TODO
-                Providers.MUSIXMATCH -> AppleAPI().getSongInfo(query).also {
-                    musixmatchID = it?.appleID ?: 0
+                Providers.MUSIXMATCH -> MusixmatchAPI().getSongInfo(query).also {
+                    musixmatchID = it?.musixmatchID ?: 0
                 } ?: throw NoTrackFoundException()
             }
         } catch (e: InternalErrorException) {
@@ -109,11 +108,7 @@ class LyricsProviderService {
                     appleID,
                     multiPersonWordByWord
                 )
-                // TODO
-                Providers.MUSIXMATCH -> AppleAPI().getSyncedLyrics(
-                    musixmatchID,
-                    multiPersonWordByWord
-                )
+                Providers.MUSIXMATCH -> MusixmatchAPI().getSyncedLyrics(musixmatchID)
             }
         } catch (e: Exception) {
             null
