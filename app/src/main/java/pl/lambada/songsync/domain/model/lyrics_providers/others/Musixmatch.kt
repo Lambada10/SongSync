@@ -13,7 +13,8 @@ data class MusixmatchSearchResponse(
     val duration: Int,
     val url: String,
     val albumId: Long,
-    val hasLyrics: Boolean
+    val hasSyncedLyrics: Boolean,
+    val hasUnsyncedLyrics: Boolean
 )
 
 @Serializable
