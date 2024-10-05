@@ -22,4 +22,5 @@ data class SongInfo(
     var lrcLibID: Int? = null, // LRCLib-only
     var neteaseID: Long? = null, // Netease-only
     var appleID: Long? = null, // Apple-only
+    var musixmatchID: Long? = null, // Musixmatch-only
 ) : Parcelable
