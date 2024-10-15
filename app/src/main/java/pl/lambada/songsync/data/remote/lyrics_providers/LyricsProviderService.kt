@@ -3,6 +3,7 @@ package pl.lambada.songsync.data.remote.lyrics_providers
 import android.util.Log
 import pl.lambada.songsync.data.remote.lyrics_providers.others.AppleAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.LRCLibAPI
+import pl.lambada.songsync.data.remote.lyrics_providers.others.MusixmatchAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.NeteaseAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyLyricsAPI
@@ -29,6 +30,9 @@ class LyricsProviderService {
 
     // Apple Track ID
     private var appleID = 0L
+
+    // Musixmatch Track ID
+    private var musixmatchID = 0L
     // TODO: Use values from SongInfo object returned by search instead of storing them here
 
     /**
@@ -62,6 +66,10 @@ class LyricsProviderService {
 
                 Providers.APPLE -> AppleAPI().getSongInfo(query).also {
                     appleID = it?.appleID ?: 0
+                } ?: throw NoTrackFoundException()
+
+                Providers.MUSIXMATCH -> MusixmatchAPI().getSongInfo(query).also {
+                    musixmatchID = it?.musixmatchID ?: 0
                 } ?: throw NoTrackFoundException()
             }
         } catch (e: InternalErrorException) {
@@ -100,6 +108,7 @@ class LyricsProviderService {
                     appleID,
                     multiPersonWordByWord
                 )
+                Providers.MUSIXMATCH -> MusixmatchAPI().getSyncedLyrics(musixmatchID)
             }
         } catch (e: Exception) {
             null

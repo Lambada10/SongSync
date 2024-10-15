@@ -164,7 +164,8 @@ enum class Providers(val displayName: String) {
     SPOTIFY("Spotify (via SpotifyLyricsAPI)"),
     LRCLIB("LRCLib"),
     NETEASE("Netease") { val inf = 0},
-    APPLE("Apple Music")
+    APPLE("Apple Music"),
+    MUSIXMATCH("Musixmatch")
 }
 
 // only for invoking the task and handling and reporting progress
