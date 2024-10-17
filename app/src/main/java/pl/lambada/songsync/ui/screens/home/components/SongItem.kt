@@ -31,6 +31,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import pl.lambada.songsync.R
+import pl.lambada.songsync.data.remote.UserSettingsController
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.ui.components.AnimatedText
 
@@ -46,7 +47,8 @@ fun SongItem(
     song: Song,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    disableMarquee: Boolean = true
+    disableMarquee: Boolean = true,
+    showPath: Boolean,
 ) {
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current).data(data = song.imgUri).apply {
@@ -61,7 +63,7 @@ fun SongItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(76.dp)
+            .height(if (showPath) 100.dp else 80.dp)
             .background(bgColor)
             .combinedClickable(
                 onClick = {
@@ -75,46 +77,65 @@ fun SongItem(
             .padding(vertical = 12.dp, horizontal = 24.dp)
     ) {
         with(sharedTransitionScope) {
-            Image(
-                painter = painter,
-                contentDescription = stringResource(id = R.string.album_cover),
-                modifier = Modifier
-                    .sharedBounds(
-                        sharedContentState = rememberSharedContentState(key = "cover$filePath"),
-                        animatedVisibilityScope = animatedVisibilityScope,
-                        clipInOverlayDuringTransition = sharedTransitionScope.OverlayClip(
-                            RoundedCornerShape(20f)
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxHeight(if (showPath) 0.7f else 1f),
+                ) {
+                    Image(
+                        painter = painter,
+                        contentDescription = stringResource(id = R.string.album_cover),
+                        modifier = Modifier
+                            .sharedBounds(
+                                sharedContentState = rememberSharedContentState(key = "cover$filePath"),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                clipInOverlayDuringTransition = sharedTransitionScope.OverlayClip(
+                                    RoundedCornerShape(20f)
+                                )
+                            )
+                            .fillMaxHeight()
+                            .aspectRatio(1f)
+                            .clip(RoundedCornerShape(20f))
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(
+                        modifier = Modifier.fillMaxHeight(),
+                        verticalArrangement = Arrangement.SpaceAround
+                    ) {
+                        AnimatedText(
+                            animate = !disableMarquee,
+                            text = songName,
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.contentColorFor(bgColor),
+                            modifier = Modifier.sharedBounds(
+                                sharedContentState = rememberSharedContentState(key = "title$filePath"),
+                                animatedVisibilityScope = animatedVisibilityScope
+                            )
+                        )
+                        AnimatedText(
+                            animate = !disableMarquee,
+                            text = artists,
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.contentColorFor(bgColor),
+                            modifier = Modifier.sharedBounds(
+                                sharedContentState = rememberSharedContentState(key = "artist$filePath"),
+                                animatedVisibilityScope = animatedVisibilityScope
+                            )
+                        )
+                    }
+                }
+                if (showPath) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    AnimatedText(
+                        animate = !disableMarquee,
+                        text = filePath,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.contentColorFor(bgColor),
+                        modifier = Modifier.sharedBounds(
+                            sharedContentState = rememberSharedContentState(key = "path$filePath"),
+                            animatedVisibilityScope = animatedVisibilityScope
                         )
                     )
-                    .fillMaxHeight()
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(20f))
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(
-                modifier = Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceAround
-            ) {
-                AnimatedText(
-                    animate = !disableMarquee,
-                    text = songName,
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.contentColorFor(bgColor),
-                    modifier = Modifier.sharedBounds(
-                        sharedContentState = rememberSharedContentState(key = "title$filePath"),
-                        animatedVisibilityScope = animatedVisibilityScope
-                    )
-                )
-                AnimatedText(
-                    animate = !disableMarquee,
-                    text = artists,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.contentColorFor(bgColor),
-                    modifier = Modifier.sharedBounds(
-                        sharedContentState = rememberSharedContentState(key = "artist$filePath"),
-                        animatedVisibilityScope = animatedVisibilityScope
-                    )
-                )
+                }
             }
         }
     }

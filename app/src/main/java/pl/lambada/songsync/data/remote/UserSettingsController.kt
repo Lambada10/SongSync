@@ -44,6 +44,9 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
     var sdCardPath by mutableStateOf(dataStore.get(sdCardPathKey, null))
         private set
 
+    var showPath by mutableStateOf(dataStore.get(showPathKey, false))
+        private set
+
     fun updateEmbedLyrics(to: Boolean) {
         dataStore.set(embedKey, to)
         embedLyricsIntoFiles = to
@@ -88,6 +91,11 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
         dataStore.set(sdCardPathKey, to)
         sdCardPath = to
     }
+
+    fun updateShowPath(to: Boolean) {
+        dataStore.set(showPathKey, to)
+        showPath = to
+    }
 }
 
 private val embedKey = booleanPreferencesKey("embed_lyrics")
@@ -99,3 +107,4 @@ private val multiPersonWordByWordKey = booleanPreferencesKey("multi_person_word_
 private val disableMarqueeKey = booleanPreferencesKey("marquee_disable")
 private val pureBlackKey = booleanPreferencesKey("pure_black")
 private val sdCardPathKey = stringPreferencesKey("sd_card_path")
+private val showPathKey = booleanPreferencesKey("show_path")

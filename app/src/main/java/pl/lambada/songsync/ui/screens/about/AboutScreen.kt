@@ -28,6 +28,7 @@ import pl.lambada.songsync.ui.screens.about.components.MarqueeSwitch
 import pl.lambada.songsync.ui.screens.about.components.MultiPersonSwitch
 import pl.lambada.songsync.ui.screens.about.components.PureBlackThemeSwitch
 import pl.lambada.songsync.ui.screens.about.components.SdCardPathSetting
+import pl.lambada.songsync.ui.screens.about.components.ShowPathSwitch
 import pl.lambada.songsync.ui.screens.about.components.SupportSection
 import pl.lambada.songsync.ui.screens.about.components.TranslationSwitch
 import pl.lambada.songsync.ui.screens.about.components.UpdateAvailableDialog
@@ -72,6 +73,13 @@ fun AboutScreen(
                 MarqueeSwitch(
                     selected = userSettingsController.disableMarquee,
                     onToggle = { userSettingsController.updateDisableMarquee(it) }
+                )
+            }
+
+            item {
+                ShowPathSwitch(
+                    selected = userSettingsController.showPath,
+                    onToggle = { userSettingsController.updateShowPath(it) }
                 )
             }
 
