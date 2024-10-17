@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Exposure
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,11 +36,43 @@ import pl.lambada.songsync.R
 @Composable
 fun LyricsSuccessContent(
     lyrics: String,
+    offset: Int,
+    onSetOffset: (Int) -> Unit,
     onSaveLyrics: () -> Unit,
     onEmbedLyrics: () -> Unit,
     onCopyLyrics: () -> Unit
 ) {
     Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Default.Exposure,
+                contentDescription = null,
+                modifier = Modifier.size(32.dp)
+            )
+            Text(
+                text = stringResource(R.string.offset),
+                modifier = Modifier.padding(start = 6.dp)
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            OutlinedButton(onClick = { onSetOffset(offset - 100) }) {
+                Text(text = "-100")
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = (if (offset >= 0) "+" else "") +
+                    "${offset / 1000.0}s",
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            OutlinedButton(onClick = { onSetOffset(offset + 100) }) {
+                Text(text = "+100")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,

@@ -24,9 +24,16 @@ import java.io.FileNotFoundException
 fun generateLrcContent(
     song: SongInfo,
     lyrics: String,
-    generatedUsingString: String
+    generatedUsingString: String,
+    offset: Int = 0,
 ): String {
-    return "[ti:${song.songName}]\n[ar:${song.artistName}]\n[by:$generatedUsingString]\n$lyrics"
+    val offsetStr = if (offset >= 0) "+$offset" else "$offset"
+
+    return "[ti:${song.songName}]\n" + 
+        "[ar:${song.artistName}]\n" +
+        "[offset:$offsetStr]\n" +
+        "[by:$generatedUsingString]\n" +
+        "$lyrics"
 }
 
 fun newLyricsFilePath(filePath: String?, song: SongInfo): File {
