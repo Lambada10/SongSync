@@ -58,7 +58,7 @@ fun LyricsSuccessContent(
             )
             Spacer(modifier = Modifier.weight(1f))
             OutlinedButton(onClick = { onSetOffset(offset - 100) }) {
-                Text(text = "-100")
+                Text(text = "-0.1s")
             }
             Spacer(modifier = Modifier.width(10.dp))
             Text(
@@ -67,7 +67,7 @@ fun LyricsSuccessContent(
             )
             Spacer(modifier = Modifier.width(10.dp))
             OutlinedButton(onClick = { onSetOffset(offset + 100) }) {
-                Text(text = "+100")
+                Text(text = "+0.1s")
             }
         }
 
