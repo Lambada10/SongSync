@@ -13,7 +13,7 @@ import pl.lambada.songsync.util.networking.Ktor.json
 import java.net.URLEncoder
 
 class MusixmatchAPI {
-    private val baseURL = "https://kerollosy.alwaysdata.net"
+    private val baseURL = "https://kerollosy.vercel.app"
 
     /**
      * Searches for synced lyrics using the song name and artist name.
