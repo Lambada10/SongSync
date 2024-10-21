@@ -94,7 +94,8 @@ class LyricsProviderService {
         provider: Providers,
         // TODO providers could be a sealed interface to include such parameters
         includeTranslationNetEase: Boolean = false,
-        multiPersonWordByWord: Boolean = false
+        multiPersonWordByWord: Boolean = false,
+        syncedMusixmatch: Boolean = true
     ): String? {
         return try {
             when (provider) {
@@ -108,7 +109,10 @@ class LyricsProviderService {
                     appleID,
                     multiPersonWordByWord
                 )
-                Providers.MUSIXMATCH -> MusixmatchAPI().getSyncedLyrics(musixmatchSongInfo)
+                Providers.MUSIXMATCH -> MusixmatchAPI().getLyrics(
+                    musixmatchSongInfo,
+                    syncedMusixmatch
+                )
             }
         } catch (e: Exception) {
             null
