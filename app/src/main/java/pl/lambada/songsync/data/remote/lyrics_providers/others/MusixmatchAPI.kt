@@ -61,11 +61,12 @@ class MusixmatchAPI {
     }
 
     /**
-     * Returns the synced lyrics.
+     * Returns the lyrics.
      * @param songInfo The SongInfo of the song from search results.
-     * @return The synced lyrics as a string or null if the lyrics were not found.
+     * @return The lyrics as a string or null if the lyrics were not found.
      */
-    fun getSyncedLyrics(songInfo: SongInfo?): String? {
-        return songInfo?.syncedLyrics
+    fun getLyrics(songInfo: SongInfo?, synced: Boolean = true): String? {
+        return if(synced) songInfo?.syncedLyrics
+        else songInfo?.unsyncedLyrics
     }
 }
