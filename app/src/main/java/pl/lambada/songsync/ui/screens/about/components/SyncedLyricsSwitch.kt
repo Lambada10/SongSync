@@ -8,9 +8,9 @@ import pl.lambada.songsync.ui.components.SwitchItem
 
 @Composable
 fun SyncedLyricsSwitch(selected: Boolean, onToggle: (Boolean) -> Unit) {
-    AboutItem(label = "Get Synced Lyrics") {
+    AboutItem(label = stringResource(id = R.string.synced_lyrics)) {
         SwitchItem(
-            label = "Toggle to switch between synced and unsynced lyrics from Musixmatch.",
+            label = stringResource(id = R.string.synced_lyrics_summary),
             selected = selected,
             onClick = { onToggle(!selected) }
         )
