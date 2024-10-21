@@ -31,8 +31,8 @@ class LyricsProviderService {
     // Apple Track ID
     private var appleID = 0L
 
-    // Musixmatch Track ID
-    private var musixmatchID = 0L
+    // Musixmatch Song Info
+    private var musixmatchSongInfo: SongInfo? = null
     // TODO: Use values from SongInfo object returned by search instead of storing them here
 
     /**
@@ -69,7 +69,7 @@ class LyricsProviderService {
                 } ?: throw NoTrackFoundException()
 
                 Providers.MUSIXMATCH -> MusixmatchAPI().getSongInfo(query).also {
-                    musixmatchID = it?.musixmatchID ?: 0
+                    musixmatchSongInfo = it
                 } ?: throw NoTrackFoundException()
             }
         } catch (e: InternalErrorException) {
@@ -108,7 +108,7 @@ class LyricsProviderService {
                     appleID,
                     multiPersonWordByWord
                 )
-                Providers.MUSIXMATCH -> MusixmatchAPI().getSyncedLyrics(musixmatchID)
+                Providers.MUSIXMATCH -> MusixmatchAPI().getSyncedLyrics(musixmatchSongInfo)
             }
         } catch (e: Exception) {
             null
