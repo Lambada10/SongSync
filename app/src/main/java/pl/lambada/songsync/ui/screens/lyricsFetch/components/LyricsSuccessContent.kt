@@ -60,8 +60,6 @@ fun LyricsSuccessContent(
     onEmbedLyrics: () -> Unit,
     onCopyLyrics: () -> Unit
 ) {
-
-
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,

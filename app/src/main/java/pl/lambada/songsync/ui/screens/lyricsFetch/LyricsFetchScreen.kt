@@ -144,8 +144,14 @@ fun SharedTransitionScope.LyricsFetchScreen(
 
                     is QueryStatus.Success -> SuccessContent(
                         result = queryState.song,
-                        onTryAgain = { viewModel.loadSongInfo(context, true) },
-                        onEdit = { viewModel.queryState = QueryStatus.NotSubmitted },
+                        onTryAgain = {
+                            viewModel.lrcOffset = 0
+                            viewModel.loadSongInfo(context, true)
+                        },
+                        onEdit = {
+                            viewModel.lrcOffset = 0
+                            viewModel.queryState = QueryStatus.NotSubmitted
+                        },
                         offset = viewModel.lrcOffset,
                         onSetOffset = { viewModel.lrcOffset = it },
                         onSaveLyrics = {

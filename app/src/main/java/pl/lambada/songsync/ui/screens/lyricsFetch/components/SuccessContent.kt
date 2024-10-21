@@ -29,6 +29,7 @@ import pl.lambada.songsync.R
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.components.SongCard
 import pl.lambada.songsync.ui.screens.lyricsFetch.LyricsFetchState
+import pl.lambada.songsync.util.applyOffsetToLyrics
 
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -102,7 +103,7 @@ fun SharedTransitionScope.SuccessContent(
                 LyricsFetchState.NotSubmitted -> { /* nothing */ }
 
                 is LyricsFetchState.Success -> LyricsSuccessContent(
-                    lyrics = it.lyrics,
+                    lyrics = applyOffsetToLyrics(it.lyrics, offset),
                     offset = offset,
                     onSetOffset = onSetOffset,
                     onSaveLyrics = { onSaveLyrics(it.lyrics) },
