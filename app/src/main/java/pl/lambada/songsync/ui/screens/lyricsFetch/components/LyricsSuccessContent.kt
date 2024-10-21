@@ -1,6 +1,13 @@
 package pl.lambada.songsync.ui.screens.lyricsFetch.components
 
+import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,14 +32,25 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
+import pl.lambada.songsync.util.ext.repeatingClickable
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LyricsSuccessContent(
     lyrics: String,
@@ -42,6 +60,8 @@ fun LyricsSuccessContent(
     onEmbedLyrics: () -> Unit,
     onCopyLyrics: () -> Unit
 ) {
+
+
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -57,7 +77,17 @@ fun LyricsSuccessContent(
                 modifier = Modifier.padding(start = 6.dp)
             )
             Spacer(modifier = Modifier.weight(1f))
-            OutlinedButton(onClick = { onSetOffset(offset - 100) }) {
+            OutlinedButton(
+                onClick = { /* handled by repeatingClickable */ },
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp)) // otherwise square ripple
+                    .repeatingClickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        enabled = true,
+                        maxDelayMillis = 500,
+                        onClick = { onSetOffset(offset - 100) }
+                    )
+            ) {
                 Text(text = "-0.1s")
             }
             Spacer(modifier = Modifier.width(10.dp))
@@ -66,7 +96,17 @@ fun LyricsSuccessContent(
                     "${offset / 1000.0}s",
             )
             Spacer(modifier = Modifier.width(10.dp))
-            OutlinedButton(onClick = { onSetOffset(offset + 100) }) {
+            OutlinedButton(
+                onClick = { /* handled by repeatingClickable */ },
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp)) // otherwise square ripple
+                    .repeatingClickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        enabled = true,
+                        maxDelayMillis = 500,
+                        onClick = { onSetOffset(offset + 100) }
+                    )
+            ) {
                 Text(text = "+0.1s")
             }
         }
