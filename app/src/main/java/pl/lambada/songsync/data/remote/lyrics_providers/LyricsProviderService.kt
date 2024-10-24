@@ -52,11 +52,11 @@ class LyricsProviderService {
         UnknownHostException::class, FileNotFoundException::class, NoTrackFoundException::class,
         EmptyQueryException::class, InternalErrorException::class
     )
-    suspend fun getSongInfo(query: SongInfo, offset: Int? = 0, provider: Providers): SongInfo? {
+    suspend fun getSongInfo(query: SongInfo, offset: Int = 0, provider: Providers): SongInfo? {
         return try {
             when (provider) {
                 Providers.SPOTIFY -> spotifyAPI.getSongInfo(query, offset)
-                Providers.LRCLIB -> LRCLibAPI().getSongInfo(query).also {
+                Providers.LRCLIB -> LRCLibAPI().getSongInfo(query, offset).also {
                     lrcLibID = it?.lrcLibID ?: 0
                 } ?: throw NoTrackFoundException()
 
@@ -68,7 +68,7 @@ class LyricsProviderService {
                     appleID = it?.appleID ?: 0
                 } ?: throw NoTrackFoundException()
 
-                Providers.MUSIXMATCH -> MusixmatchAPI().getSongInfo(query).also {
+                Providers.MUSIXMATCH -> MusixmatchAPI().getSongInfo(query, offset).also {
                     musixmatchSongInfo = it
                 } ?: throw NoTrackFoundException()
             }

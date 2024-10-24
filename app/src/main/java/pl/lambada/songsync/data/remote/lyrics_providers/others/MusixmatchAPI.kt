@@ -19,7 +19,7 @@ class MusixmatchAPI {
      * @param query The SongInfo object with songName and artistName fields filled.
      * @return Search result as a SongInfo object.
      */
-    suspend fun getSongInfo(query: SongInfo): SongInfo? {
+    suspend fun getSongInfo(query: SongInfo, offset: Int = 0): SongInfo? {
         val artistName = withContext(Dispatchers.IO) {
             URLEncoder.encode(
                 "${query.artistName}",
@@ -46,7 +46,7 @@ class MusixmatchAPI {
             return null
 
         val result = json.decodeFromString<MusixmatchSearchResponse>(responseBody)
-        
+
         return SongInfo(
             songName = result.songName,
             artistName = result.artistName,
