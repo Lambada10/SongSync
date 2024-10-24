@@ -12,7 +12,7 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.isImeVisible
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -97,7 +97,7 @@ fun Modifier.repeatingClickable(
             }
         }.indication(
             interactionSource = interactionSource,
-            indication = rememberRipple()
+            indication = ripple()
         )
     }
 )
