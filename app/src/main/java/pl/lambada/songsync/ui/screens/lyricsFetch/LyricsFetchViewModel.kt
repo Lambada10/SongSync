@@ -39,6 +39,7 @@ class LyricsFetchViewModel(
         if (source == null) QueryStatus.NotSubmitted else QueryStatus.Pending
     )
     private var queryOffset by mutableIntStateOf(0)
+    var lrcOffset by mutableIntStateOf(0)
 
     var lyricsFetchState by mutableStateOf<LyricsFetchState>(LyricsFetchState.NotSubmitted)
 
@@ -85,7 +86,7 @@ class LyricsFetchViewModel(
         context: Context,
         generatedUsingString: String
     ) {
-        val lrcContent = generateLrcContent(song, lyrics, generatedUsingString)
+        val lrcContent = generateLrcContent(song, lyrics, generatedUsingString, lrcOffset)
         val file = newLyricsFilePath(filePath, song)
 
         if (!isLegacyFileAccessRequired(filePath)) {
@@ -126,7 +127,7 @@ class LyricsFetchViewModel(
         context: Context,
         song: SongInfo
     ) {
-        val lrcContent = generateLrcContent(song, lyrics, context.getString(R.string.generated_using))
+        val lrcContent = generateLrcContent(song, lyrics, context.getString(R.string.generated_using), lrcOffset)
 
         runCatching {
             embedLyricsInFile(

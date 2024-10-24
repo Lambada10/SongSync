@@ -24,9 +24,14 @@ import java.io.FileNotFoundException
 fun generateLrcContent(
     song: SongInfo,
     lyrics: String,
-    generatedUsingString: String
+    generatedUsingString: String,
+    offset: Int = 0,
 ): String {
-    return "[ti:${song.songName}]\n[ar:${song.artistName}]\n[by:$generatedUsingString]\n$lyrics"
+        return ("[ti:${song.songName}]\n" +
+        "[ar:${song.artistName}]\n" +
+        "[by:$generatedUsingString]\n" + lyrics).let {
+            if (offset != 0) applyOffsetToLyrics(it, offset) else it
+        }
 }
 
 fun newLyricsFilePath(filePath: String?, song: SongInfo): File {
@@ -296,5 +301,41 @@ fun saveToExternalPath(
         context.contentResolver.openOutputStream(it.uri)?.use { outputStream ->
             outputStream.write(lrc.toByteArray())
         }
+    }
+}
+
+/**
+ * "Legacy" way to apply an offset to lyrics, modifies the lyrics string directly
+ * as most players do not support the offset tag in LRC files
+ * @param lyrics the lyrics to apply the offset to
+ * @param offset the offset to apply to the lyrics
+ * @return the lyrics with the offset applied
+ */
+fun applyOffsetToLyrics(lyrics: String, offset: Int): String {
+    val timestampRegex = Regex("""[\[<](\d+):(\d+)\.(\d+)[]>]""")
+
+    fun applyOffset(minute: Int, second: Int, millisecond: Int): String {
+        val totalMilliseconds = (minute * 60 * 1000) + (second * 1000) + (millisecond * 10) + offset
+        if (totalMilliseconds < 0) return "[00:00.000]" // Prevent negative times
+
+        val newMinutes = (totalMilliseconds / 60000) % 60
+        val newSeconds = (totalMilliseconds / 1000) % 60
+        val newMilliseconds = (totalMilliseconds % 1000)
+
+        return "${newMinutes.toString().padStart(2, '0')}:" +
+                "${newSeconds.toString().padStart(2, '0')}." +
+                newMilliseconds.toString().padStart(3, '0')
+    }
+
+    return lyrics.replace(timestampRegex) { matchResult ->
+        val (minuteStr, secondStr, millisecondStr) = matchResult.destructured
+        val minute = minuteStr.toInt()
+        val second = secondStr.toInt()
+        val millisecond = millisecondStr.toInt()
+
+        val startChar = matchResult.value[0]
+        val endChar = if (startChar == '[') ']' else '>'
+
+        "${startChar}${applyOffset(minute, second, millisecond)}$endChar"
     }
 }

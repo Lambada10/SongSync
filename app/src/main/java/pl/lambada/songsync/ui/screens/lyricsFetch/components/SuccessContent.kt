@@ -23,11 +23,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import pl.lambada.songsync.R
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.components.SongCard
 import pl.lambada.songsync.ui.screens.lyricsFetch.LyricsFetchState
+import pl.lambada.songsync.util.applyOffsetToLyrics
 
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -36,6 +38,8 @@ fun SharedTransitionScope.SuccessContent(
     result: SongInfo,
     onTryAgain: () -> Unit,
     onEdit: () -> Unit,
+    offset: Int,
+    onSetOffset: (Int) -> Unit,
     onSaveLyrics: (String) -> Unit,
     onEmbedLyrics: (String) -> Unit,
     onCopyLyrics: (String) -> Unit,
@@ -99,7 +103,9 @@ fun SharedTransitionScope.SuccessContent(
                 LyricsFetchState.NotSubmitted -> { /* nothing */ }
 
                 is LyricsFetchState.Success -> LyricsSuccessContent(
-                    lyrics = it.lyrics,
+                    lyrics = applyOffsetToLyrics(it.lyrics, offset),
+                    offset = offset,
+                    onSetOffset = onSetOffset,
                     onSaveLyrics = { onSaveLyrics(it.lyrics) },
                     onEmbedLyrics = { onEmbedLyrics(it.lyrics) },
                     onCopyLyrics = { onCopyLyrics(it.lyrics) }
