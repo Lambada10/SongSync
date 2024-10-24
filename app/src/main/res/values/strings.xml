@@ -125,6 +125,8 @@
     <string name="embed_non_local_song_error">You tried to embed the lyrics to a non-local file. Aborting operation.</string>
     <string name="multi_person_word_by_word">Multi-person word by word lyrics</string>
     <string name="multi_person_word_by_word_summary">Use multi-person lyrics format when getting lyrics from Apple Music</string>
+    <string name="song_path">Show song path</string>
+    <string name="song_path_description">Show the path of a song file on song list</string>
     <string name="synced_lyrics">Get Synced Lyrics</string>
     <string name="synced_lyrics_summary">Toggle to switch between synced and unsynced lyrics from Musixmatch.</string>
 </resources>

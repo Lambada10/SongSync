@@ -255,7 +255,8 @@ fun HomeScreenLoaded(
                     song = song,
                     sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope,
-                    disableMarquee = viewModel.userSettingsController.disableMarquee
+                    disableMarquee = viewModel.userSettingsController.disableMarquee,
+                    showPath = viewModel.userSettingsController.showPath
                 )
             }
 
