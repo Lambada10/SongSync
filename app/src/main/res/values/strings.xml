@@ -130,4 +130,12 @@
     <string name="song_path_description">Show the path of a song file on song list</string>
     <string name="synced_lyrics">Get Synced Lyrics</string>
     <string name="synced_lyrics_summary">Toggle to switch between synced and unsynced lyrics from Musixmatch.</string>
+    <string name="title">Title</string>
+    <string name="artist">Artist</string>
+    <string name="album">Album</string>
+    <string name="year">Year</string>
+    <string name="duration">Duration</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
+    <string name="sort">Sort</string>
 </resources>

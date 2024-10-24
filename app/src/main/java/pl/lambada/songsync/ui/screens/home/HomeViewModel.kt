@@ -25,6 +25,8 @@ import pl.lambada.songsync.data.remote.UserSettingsController
 import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
+import pl.lambada.songsync.domain.model.SortOrders
+import pl.lambada.songsync.domain.model.SortValues
 import pl.lambada.songsync.util.downloadLyrics
 import pl.lambada.songsync.util.ext.toLrcFile
 
@@ -35,7 +37,7 @@ class HomeViewModel(
     val userSettingsController: UserSettingsController,
     private val lyricsProviderService: LyricsProviderService
 ) : ViewModel() {
-    private var cachedSongs: List<Song>? = null
+    var cachedSongs: List<Song>? = null
     val selectedSongs = mutableStateListOf<String>()
     var allSongs by mutableStateOf<List<Song>?>(null)
 
@@ -60,6 +62,7 @@ class HomeViewModel(
     )
 
     var showFilters by mutableStateOf(false)
+    var showSort by mutableStateOf(false)
     var showingSearch by  mutableStateOf(false)
     var showSearch by mutableStateOf(showingSearch)
 
@@ -90,8 +93,8 @@ class HomeViewModel(
             }
     }
 
-    fun updateAllSongs(context: Context) = viewModelScope.launch(Dispatchers.IO) {
-        allSongs = getAllSongs(context)
+    fun updateAllSongs(context: Context, sortBy: SortValues, sortOrder: SortOrders) = viewModelScope.launch(Dispatchers.IO) {
+        allSongs = getAllSongs(context, sortBy, sortOrder)
     }
 
     /**
@@ -99,7 +102,7 @@ class HomeViewModel(
      * @param context The application context.
      * @return A list of Song objects representing the songs.
      */
-    private fun getAllSongs(context: Context): List<Song> {
+    private fun getAllSongs(context: Context, sortBy: SortValues, sortOrder: SortOrders): List<Song> {
         return cachedSongs ?: run {
             val selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
             val projection = arrayOf(
@@ -109,7 +112,7 @@ class HomeViewModel(
                 MediaStore.Audio.Media.DATA,
                 MediaStore.Audio.Media.ALBUM_ID,
             )
-            val sortOrder = MediaStore.Audio.Media.TITLE + " ASC"
+            val sortOrder = sortBy.name + " " + sortOrder.queryName
 
             val songs = mutableListOf<Song>()
             val cursor = context.contentResolver.query(
@@ -189,7 +192,7 @@ class HomeViewModel(
         return cachedFolders ?: run {
             val folders = mutableListOf<String>()
 
-            for (song in getAllSongs(context)) {
+            for (song in getAllSongs(context, SortValues.TITLE, SortOrders.ASCENDING)) {
                 val path = song.filePath
                 val folder = path?.substring(0, path.lastIndexOf("/"))
                 if (folder != null && !folders.contains(folder))
