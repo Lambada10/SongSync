@@ -48,7 +48,8 @@ class LyricsFetchViewModel(
             version,
             userSettingsController.selectedProvider,
             userSettingsController.includeTranslation,
-            userSettingsController.multiPersonWordByWord
+            userSettingsController.multiPersonWordByWord,
+            userSettingsController.syncedMusixmatch
         )
 
     fun loadSongInfo(context: Context, tryingAgain: Boolean = false) {
