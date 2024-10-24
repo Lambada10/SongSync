@@ -30,6 +30,7 @@ import pl.lambada.songsync.ui.screens.about.components.PureBlackThemeSwitch
 import pl.lambada.songsync.ui.screens.about.components.SdCardPathSetting
 import pl.lambada.songsync.ui.screens.about.components.ShowPathSwitch
 import pl.lambada.songsync.ui.screens.about.components.SupportSection
+import pl.lambada.songsync.ui.screens.about.components.SyncedLyricsSwitch
 import pl.lambada.songsync.ui.screens.about.components.TranslationSwitch
 import pl.lambada.songsync.ui.screens.about.components.UpdateAvailableDialog
 import pl.lambada.songsync.util.ext.getVersion
@@ -94,6 +95,13 @@ fun AboutScreen(
                 MultiPersonSwitch(
                     selected = userSettingsController.multiPersonWordByWord,
                     onToggle = { userSettingsController.updateMultiPersonWordByWord(it) }
+                )
+            }
+
+            item {
+                SyncedLyricsSwitch(
+                    selected = userSettingsController.syncedMusixmatch,
+                    onToggle = { userSettingsController.updateSyncedMusixmatch(it) }
                 )
             }
 
