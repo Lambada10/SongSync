@@ -7,6 +7,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import pl.lambada.songsync.domain.model.SortOrders
+import pl.lambada.songsync.domain.model.SortValues
 import pl.lambada.songsync.util.Providers
 import pl.lambada.songsync.util.get
 import pl.lambada.songsync.util.set
@@ -48,6 +50,18 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
         private set
 
     var showPath by mutableStateOf(dataStore.get(showPathKey, false))
+        private set
+
+    var sortOrder by mutableStateOf(
+        SortOrders.entries
+            .find { it.queryName == dataStore.get(sortOrderKey, SortOrders.ASCENDING.queryName) }!!
+    )
+        private set
+
+    var sortBy by mutableStateOf(
+        SortValues.entries
+            .find { it.name == dataStore.get(sortByKey, SortValues.TITLE.name) }!!
+    )
         private set
 
     fun updateEmbedLyrics(to: Boolean) {
@@ -104,6 +118,16 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
         dataStore.set(showPathKey, to)
         showPath = to
     }
+
+    fun updateSortOrder(to: SortOrders) {
+        dataStore.set(sortOrderKey, to.queryName)
+        sortOrder = to
+    }
+
+    fun updateSortBy(to: SortValues) {
+        dataStore.set(sortByKey, to.name)
+        sortBy = to
+    }
 }
 
 private val embedKey = booleanPreferencesKey("embed_lyrics")
@@ -117,3 +141,5 @@ private val disableMarqueeKey = booleanPreferencesKey("marquee_disable")
 private val pureBlackKey = booleanPreferencesKey("pure_black")
 private val sdCardPathKey = stringPreferencesKey("sd_card_path")
 private val showPathKey = booleanPreferencesKey("show_path")
+private val sortOrderKey = stringPreferencesKey("sort_order")
+private val sortByKey = stringPreferencesKey("sort_by")

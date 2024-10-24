@@ -15,13 +15,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -36,6 +39,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import pl.lambada.songsync.domain.model.SortOrders
+import pl.lambada.songsync.domain.model.SortValues
 import pl.lambada.songsync.ui.LyricsFetchScreen
 import pl.lambada.songsync.ui.ScreenAbout
 import pl.lambada.songsync.ui.screens.home.components.BatchDownloadLyrics
@@ -45,6 +50,7 @@ import pl.lambada.songsync.ui.screens.home.components.HomeAppBar
 import pl.lambada.songsync.ui.screens.home.components.HomeSearchBar
 import pl.lambada.songsync.ui.screens.home.components.HomeSearchThing
 import pl.lambada.songsync.ui.screens.home.components.SongItem
+import pl.lambada.songsync.ui.screens.home.components.SortDialog
 import pl.lambada.songsync.util.ext.BackPressHandler
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
 
@@ -65,7 +71,10 @@ fun HomeScreen(
     var isBatchDownload by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    SideEffect { viewModel.updateAllSongs(context) }
+    LaunchedEffect(viewModel.userSettingsController.sortBy to viewModel.userSettingsController.sortOrder) {
+        viewModel.cachedSongs = null
+        viewModel.updateAllSongs(context, viewModel.userSettingsController.sortBy, viewModel.userSettingsController.sortOrder)
+    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -209,6 +218,7 @@ fun HomeScreenLoaded(
                             FilterAndSongCount(
                                 displaySongsCount = viewModel.displaySongs.size,
                                 onFilterClick = { viewModel.showFilters = true },
+                                onSortClick = { viewModel.showSort = true },
                                 onSearchClick = {
                                     viewModel.showSearch = true
                                     viewModel.showingSearch = true
@@ -216,6 +226,16 @@ fun HomeScreenLoaded(
                             )
                         }
                     )
+
+                    if (viewModel.showSort) {
+                        SortDialog(
+                            sortBy = viewModel.userSettingsController.sortBy,
+                            sortOrder = viewModel.userSettingsController.sortOrder,
+                            onDismiss = { viewModel.showSort = false },
+                            onSortOrderChange = { viewModel.userSettingsController.updateSortOrder(it) },
+                            onSortByChange = { viewModel.userSettingsController.updateSortBy(it) }
+                        )
+                    }
 
                     if (viewModel.showFilters) {
                         FiltersDialog(
@@ -230,6 +250,7 @@ fun HomeScreenLoaded(
                     }
                 }
             }
+
 
             items(viewModel.displaySongs.size) { index ->
                 val song = viewModel.displaySongs[index]
