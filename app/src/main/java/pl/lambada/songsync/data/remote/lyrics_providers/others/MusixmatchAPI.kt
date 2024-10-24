@@ -45,13 +45,7 @@ class MusixmatchAPI {
         if (response.status.value !in 200..299)
             return null
 
-        val json = json.decodeFromString<MusixmatchSearchResponse>(responseBody)
-
-        val result = try {
-            json[offset]
-        } catch (e: IndexOutOfBoundsException) {
-            return null
-        }
+        val result = json.decodeFromString<MusixmatchSearchResponse>(responseBody)
 
         return SongInfo(
             songName = result.songName,
