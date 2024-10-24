@@ -23,4 +23,8 @@ data class SongInfo(
     var neteaseID: Long? = null, // Netease-only
     var appleID: Long? = null, // Apple-only
     var musixmatchID: Long? = null, // Musixmatch-only
+    var hasSyncedLyrics: Boolean? = null, // Musixmatch-only
+    var hasUnsyncedLyrics: Boolean? = null, // Musixmatch-only
+    var syncedLyrics: String? = null, // Musixmatch-only
+    var unsyncedLyrics: String? = null, // Musixmatch-only
 ) : Parcelable

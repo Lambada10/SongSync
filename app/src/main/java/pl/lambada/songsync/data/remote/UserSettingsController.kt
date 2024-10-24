@@ -35,6 +35,9 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
     var multiPersonWordByWord by mutableStateOf(dataStore.get(multiPersonWordByWordKey, false))
         private set
 
+    var syncedMusixmatch by mutableStateOf(dataStore.get(syncedMusixmatchKey, true))
+        private set
+
     var pureBlack by mutableStateOf(dataStore.get(pureBlackKey, false))
         private set
 
@@ -74,6 +77,11 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
         multiPersonWordByWord = to
     }
 
+    fun updateSyncedMusixmatch(to: Boolean) {
+        dataStore.set(syncedMusixmatchKey, to)
+        syncedMusixmatch = to
+    }
+
     fun updateDisableMarquee(to: Boolean) {
         dataStore.set(disableMarqueeKey, to)
         disableMarquee = to
@@ -96,6 +104,7 @@ private val blacklistedFoldersKey = stringPreferencesKey("blacklist")
 private val hideLyricsKey = booleanPreferencesKey("hide_lyrics")
 private val includeTranslationKey = booleanPreferencesKey("include_translation")
 private val multiPersonWordByWordKey = booleanPreferencesKey("multi_person_word_by_word")
+private val syncedMusixmatchKey = booleanPreferencesKey("synced_lyrics")
 private val disableMarqueeKey = booleanPreferencesKey("marquee_disable")
 private val pureBlackKey = booleanPreferencesKey("pure_black")
 private val sdCardPathKey = stringPreferencesKey("sd_card_path")

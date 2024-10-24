@@ -5,7 +5,6 @@ import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import pl.lambada.songsync.domain.model.SongInfo
-import pl.lambada.songsync.domain.model.lyrics_providers.others.MusixmatchLyricsResponse
 import pl.lambada.songsync.domain.model.lyrics_providers.others.MusixmatchSearchResponse
 import pl.lambada.songsync.util.EmptyQueryException
 import pl.lambada.songsync.util.networking.Ktor.client
@@ -21,52 +20,53 @@ class MusixmatchAPI {
      * @return Search result as a SongInfo object.
      */
     suspend fun getSongInfo(query: SongInfo): SongInfo? {
-        val search = withContext(Dispatchers.IO) {
+        val artistName = withContext(Dispatchers.IO) {
             URLEncoder.encode(
-                "${query.songName} ${query.artistName}",
+                "${query.artistName}",
                 Charsets.UTF_8.toString()
             )
         }
 
-        if (search == " ")
+        val songName = withContext(Dispatchers.IO) {
+            URLEncoder.encode(
+                "${query.songName}",
+                Charsets.UTF_8.toString()
+            )
+        }
+
+        if (artistName == "" || songName == "")
             throw EmptyQueryException()
 
         val response = client.get(
-            "$baseURL/search?q=$search"
-        )
-        val responseBody = response.bodyAsText(Charsets.UTF_8)
-
-        if (response.status.value !in 200..299 || responseBody == "[]")
-            return null
-
-        val json = json.decodeFromString<List<MusixmatchSearchResponse>>(responseBody)
-
-        val result = json[0]
-
-        return SongInfo(
-            songName = result.songName,
-            artistName = result.artistName,
-            songLink = result.url,
-            albumCoverLink = result.artwork,
-            musixmatchID = result.id,
-        )
-    }
-
-    /**
-     * Searches for synced lyrics using the song name and artist name.
-     * @param id The ID of the song from search results.
-     * @return The synced lyrics as a string.
-     */
-    suspend fun getSyncedLyrics(id: Long): String? {
-        val response = client.get(
-            "$baseURL/lyrics?id=$id"
+            "$baseURL/full?artist=$artistName&track=$songName"
         )
         val responseBody = response.bodyAsText(Charsets.UTF_8)
 
         if (response.status.value !in 200..299)
             return null
 
-        val json = json.decodeFromString<MusixmatchLyricsResponse>(responseBody)
-        return json.lyrics
+        val result = json.decodeFromString<MusixmatchSearchResponse>(responseBody)
+        
+        return SongInfo(
+            songName = result.songName,
+            artistName = result.artistName,
+            songLink = result.url,
+            albumCoverLink = result.artwork,
+            musixmatchID = result.id,
+            hasSyncedLyrics = result.hasSyncedLyrics,
+            hasUnsyncedLyrics = result.hasSyncedLyrics,
+            syncedLyrics = result.syncedLyrics?.lyrics,
+            unsyncedLyrics = result.unsyncedLyrics?.lyrics
+        )
+    }
+
+    /**
+     * Returns the lyrics.
+     * @param songInfo The SongInfo of the song from search results.
+     * @return The lyrics as a string or null if the lyrics were not found.
+     */
+    fun getLyrics(songInfo: SongInfo?, synced: Boolean = true): String? {
+        return if(synced) songInfo?.syncedLyrics
+        else songInfo?.unsyncedLyrics
     }
 }

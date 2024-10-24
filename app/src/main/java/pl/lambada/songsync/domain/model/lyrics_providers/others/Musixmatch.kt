@@ -14,13 +14,23 @@ data class MusixmatchSearchResponse(
     val url: String,
     val albumId: Long,
     val hasSyncedLyrics: Boolean,
-    val hasUnsyncedLyrics: Boolean
+    val hasUnsyncedLyrics: Boolean,
+    val syncedLyrics: SyncedLyricsResponse? = null,
+    val unsyncedLyrics: UnsyncedLyricsResponse? = null
 )
 
 @Serializable
-data class MusixmatchLyricsResponse(
+data class SyncedLyricsResponse(
     val id: Long,
     val duration: Int,
+    val language: String,
+    val updatedTime: String,
+    val lyrics: String
+)
+
+@Serializable
+data class UnsyncedLyricsResponse(
+    val id: Long,
     val language: String,
     val updatedTime: String,
     val lyrics: String,
