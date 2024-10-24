@@ -7,6 +7,7 @@ import android.os.Build
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import java.io.File
+import java.nio.file.Files
 
 fun isLegacyFileAccessRequired(filePath: String?): Boolean {
     // Before Android 11, not in internal storage
@@ -27,8 +28,16 @@ fun openFileFromPath(context: Context, filePath: String) {
         Uri.fromFile(file)
     }
 
+    val mime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        Files.probeContentType(file.toPath())
+    } else run {
+        val extension = file.extension
+        val mimeTypeMap = android.webkit.MimeTypeMap.getSingleton()
+        mimeTypeMap.getMimeTypeFromExtension(extension)
+    }
+
     val intent = Intent(Intent.ACTION_VIEW)
-        .setDataAndType(uri, "audio/mp3")
+        .setDataAndType(uri, mime)
         .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
     if (intent.resolveActivity(context.packageManager) != null) {
