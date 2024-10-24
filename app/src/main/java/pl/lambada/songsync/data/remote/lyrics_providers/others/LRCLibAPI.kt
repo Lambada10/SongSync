@@ -20,7 +20,7 @@ class LRCLibAPI {
      * @param query The SongInfo object with songName and artistName fields filled.
      * @return Search result as a SongInfo object.
      */
-    suspend fun getSongInfo(query: SongInfo): SongInfo? {
+    suspend fun getSongInfo(query: SongInfo, offset: Int = 0): SongInfo? {
         val search = withContext(Dispatchers.IO) {
             URLEncoder.encode(
                 "${query.songName}", // it doesn't work with artist name and song name together
@@ -41,10 +41,16 @@ class LRCLibAPI {
 
         val json = json.decodeFromString<List<LRCLibResponse>>(responseBody)
 
+        val song = try {
+            json[offset]
+        } catch (e: IndexOutOfBoundsException) {
+            return null
+        }
+
         return SongInfo(
-            songName = json[0].trackName,
-            artistName = json[0].artistName,
-            lrcLibID = json[0].id
+            songName = song.trackName,
+            artistName = song.artistName,
+            lrcLibID = song.id
         )
     }
 

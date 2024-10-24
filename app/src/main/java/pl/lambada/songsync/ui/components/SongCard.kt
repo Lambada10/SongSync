@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +29,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import pl.lambada.songsync.R
+import pl.lambada.songsync.util.openFileFromPath
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -41,11 +43,16 @@ fun SharedTransitionScope.SongCard(
     animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val unknownArtistString = stringResource(R.string.unknown)
+    val context = LocalContext.current
 
     OutlinedCard(
         shape = RoundedCornerShape(10.dp),
         modifier = CombinedModifier(
-            outer = Modifier.fillMaxWidth(),
+            outer = Modifier
+                .fillMaxWidth()
+                .clickable(filePath != null) {
+                    openFileFromPath(context, filePath!!)
+                },
             inner = modifier
         )
     ) {

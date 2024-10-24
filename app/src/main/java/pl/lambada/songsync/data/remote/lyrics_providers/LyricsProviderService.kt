@@ -31,8 +31,8 @@ class LyricsProviderService {
     // Apple Track ID
     private var appleID = 0L
 
-    // Musixmatch Track ID
-    private var musixmatchID = 0L
+    // Musixmatch Song Info
+    private var musixmatchSongInfo: SongInfo? = null
     // TODO: Use values from SongInfo object returned by search instead of storing them here
 
     /**
@@ -52,11 +52,11 @@ class LyricsProviderService {
         UnknownHostException::class, FileNotFoundException::class, NoTrackFoundException::class,
         EmptyQueryException::class, InternalErrorException::class
     )
-    suspend fun getSongInfo(query: SongInfo, offset: Int? = 0, provider: Providers): SongInfo? {
+    suspend fun getSongInfo(query: SongInfo, offset: Int = 0, provider: Providers): SongInfo? {
         return try {
             when (provider) {
                 Providers.SPOTIFY -> spotifyAPI.getSongInfo(query, offset)
-                Providers.LRCLIB -> LRCLibAPI().getSongInfo(query).also {
+                Providers.LRCLIB -> LRCLibAPI().getSongInfo(query, offset).also {
                     lrcLibID = it?.lrcLibID ?: 0
                 } ?: throw NoTrackFoundException()
 
@@ -68,8 +68,8 @@ class LyricsProviderService {
                     appleID = it?.appleID ?: 0
                 } ?: throw NoTrackFoundException()
 
-                Providers.MUSIXMATCH -> MusixmatchAPI().getSongInfo(query).also {
-                    musixmatchID = it?.musixmatchID ?: 0
+                Providers.MUSIXMATCH -> MusixmatchAPI().getSongInfo(query, offset).also {
+                    musixmatchSongInfo = it
                 } ?: throw NoTrackFoundException()
             }
         } catch (e: InternalErrorException) {
@@ -94,7 +94,8 @@ class LyricsProviderService {
         provider: Providers,
         // TODO providers could be a sealed interface to include such parameters
         includeTranslationNetEase: Boolean = false,
-        multiPersonWordByWord: Boolean = false
+        multiPersonWordByWord: Boolean = false,
+        syncedMusixmatch: Boolean = true
     ): String? {
         return try {
             when (provider) {
@@ -108,7 +109,10 @@ class LyricsProviderService {
                     appleID,
                     multiPersonWordByWord
                 )
-                Providers.MUSIXMATCH -> MusixmatchAPI().getSyncedLyrics(musixmatchID)
+                Providers.MUSIXMATCH -> MusixmatchAPI().getLyrics(
+                    musixmatchSongInfo,
+                    syncedMusixmatch
+                )
             }
         } catch (e: Exception) {
             null
