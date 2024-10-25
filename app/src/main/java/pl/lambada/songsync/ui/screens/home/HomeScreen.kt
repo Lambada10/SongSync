@@ -229,8 +229,7 @@ fun HomeScreenLoaded(
 
                     if (viewModel.showSort) {
                         SortDialog(
-                            sortBy = viewModel.userSettingsController.sortBy,
-                            sortOrder = viewModel.userSettingsController.sortOrder,
+                            userSettingsController = viewModel.userSettingsController,
                             onDismiss = { viewModel.showSort = false },
                             onSortOrderChange = { viewModel.userSettingsController.updateSortOrder(it) },
                             onSortByChange = { viewModel.userSettingsController.updateSortBy(it) }
