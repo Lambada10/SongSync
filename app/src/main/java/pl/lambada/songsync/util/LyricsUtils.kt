@@ -26,12 +26,17 @@ fun generateLrcContent(
     lyrics: String,
     generatedUsingString: String,
     offset: Int = 0,
+    directOffset: Boolean
 ): String {
-        return ("[ti:${song.songName}]\n" +
+    val offsetSign = if (offset >= 0) "+" else ""
+    val offsetStr = if (!directOffset) "[offset:${offsetSign}${offset}]\n" else ""
+    val lyrics = if (directOffset && offset != 0) applyOffsetToLyrics(lyrics, offset) else lyrics
+
+    return "[ti:${song.songName}]\n" +
         "[ar:${song.artistName}]\n" +
-        "[by:$generatedUsingString]\n" + lyrics).let {
-            if (offset != 0) applyOffsetToLyrics(it, offset) else it
-        }
+        offsetStr +
+        "[by:$generatedUsingString]\n" +
+        lyrics
 }
 
 fun newLyricsFilePath(filePath: String?, song: SongInfo): File {
@@ -251,7 +256,8 @@ private suspend fun downloadLyricsForSong(
                         context,
                         viewModel.userSettingsController.sdCardPath,
                         songInfo,
-                        it
+                        it,
+                        viewModel.userSettingsController.directlyModifyTimestamps
                     )
 
                     onLyricsSaved()
@@ -265,13 +271,15 @@ private fun formatAndSaveLyricsForSong(
     sdCardPath: String?,
     songInfo: SongInfo,
     lyrics: String,
+    directOffset: Boolean
 ) {
     val targetFile = song.filePath.toLrcFile()
 
     val lrcContent = generateLrcContent(
         songInfo,
         lyrics,
-        context.getString(R.string.generated_using)
+        context.getString(R.string.generated_using),
+        directOffset = directOffset
     )
 
     writeLyricsToFile(targetFile, lrcContent, context, song, sdCardPath)

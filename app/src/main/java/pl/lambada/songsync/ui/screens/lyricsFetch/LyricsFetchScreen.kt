@@ -152,6 +152,7 @@ fun SharedTransitionScope.LyricsFetchScreen(
                             viewModel.lrcOffset = 0
                             viewModel.queryState = QueryStatus.NotSubmitted
                         },
+                        directOffset = viewModel.userSettingsController.directlyModifyTimestamps,
                         offset = viewModel.lrcOffset,
                         onSetOffset = { viewModel.lrcOffset = it },
                         onSaveLyrics = {

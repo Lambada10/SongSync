@@ -86,7 +86,7 @@ class LyricsFetchViewModel(
         context: Context,
         generatedUsingString: String
     ) {
-        val lrcContent = generateLrcContent(song, lyrics, generatedUsingString, lrcOffset)
+        val lrcContent = generateLrcContent(song, lyrics, generatedUsingString, lrcOffset, userSettingsController.directlyModifyTimestamps)
         val file = newLyricsFilePath(filePath, song)
 
         if (!isLegacyFileAccessRequired(filePath)) {
@@ -127,7 +127,7 @@ class LyricsFetchViewModel(
         context: Context,
         song: SongInfo
     ) {
-        val lrcContent = generateLrcContent(song, lyrics, context.getString(R.string.generated_using), lrcOffset)
+        val lrcContent = generateLrcContent(song, lyrics, context.getString(R.string.generated_using), lrcOffset, userSettingsController.directlyModifyTimestamps)
 
         runCatching {
             embedLyricsInFile(

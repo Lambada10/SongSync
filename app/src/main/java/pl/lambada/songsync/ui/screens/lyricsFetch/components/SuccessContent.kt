@@ -38,6 +38,7 @@ fun SharedTransitionScope.SuccessContent(
     result: SongInfo,
     onTryAgain: () -> Unit,
     onEdit: () -> Unit,
+    directOffset: Boolean,
     offset: Int,
     onSetOffset: (Int) -> Unit,
     onSaveLyrics: (String) -> Unit,
@@ -103,7 +104,13 @@ fun SharedTransitionScope.SuccessContent(
                 LyricsFetchState.NotSubmitted -> { /* nothing */ }
 
                 is LyricsFetchState.Success -> LyricsSuccessContent(
-                    lyrics = applyOffsetToLyrics(it.lyrics, offset),
+                    lyrics = it.lyrics.let {
+                        if (offset != 0 && directOffset) {
+                            applyOffsetToLyrics(it, offset)
+                        } else {
+                            it
+                        }
+                    },
                     offset = offset,
                     onSetOffset = onSetOffset,
                     onSaveLyrics = { onSaveLyrics(it.lyrics) },

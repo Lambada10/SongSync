@@ -52,6 +52,9 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
     var showPath by mutableStateOf(dataStore.get(showPathKey, false))
         private set
 
+    var directlyModifyTimestamps by mutableStateOf(dataStore.get(directlyModifyTimestampsKey, false))
+        private set
+
     var sortOrder by mutableStateOf(
         SortOrders.entries
             .find { it.queryName == dataStore.get(sortOrderKey, SortOrders.ASCENDING.queryName) }!!
@@ -119,6 +122,11 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
         showPath = to
     }
 
+    fun updateDirectlyModifyTimestamps(to: Boolean) {
+        dataStore.set(directlyModifyTimestampsKey, to)
+        directlyModifyTimestamps = to
+    }
+
     fun updateSortOrder(to: SortOrders) {
         dataStore.set(sortOrderKey, to.queryName)
         sortOrder = to
@@ -143,3 +151,4 @@ private val sdCardPathKey = stringPreferencesKey("sd_card_path")
 private val showPathKey = booleanPreferencesKey("show_path")
 private val sortOrderKey = stringPreferencesKey("sort_order")
 private val sortByKey = stringPreferencesKey("sort_by")
+private val directlyModifyTimestampsKey = booleanPreferencesKey("directly_modify_timestamps")

@@ -138,4 +138,6 @@
     <string name="ascending">Ascending</string>
     <string name="descending">Descending</string>
     <string name="sort">Sort</string>
+    <string name="offset_mode">Offset mode</string>
+    <string name="offset_mode_summary">Directly modify the lyrics timestamps instead of using offset LRC tag</string>
 </resources>
