@@ -16,7 +16,7 @@ import java.net.URLEncoder
 class AppleAPI {
     private val baseURL = "https://paxsenix.alwaysdata.net/"
 
-    suspend fun getSongInfo(query: SongInfo): SongInfo? {
+    suspend fun getSongInfo(query: SongInfo, offset: Int = 0): SongInfo? {
         val search = withContext(Dispatchers.IO) {
             URLEncoder.encode(
                 "${query.songName} ${query.artistName}",
@@ -41,7 +41,11 @@ class AppleAPI {
             return null
         }
 
-        val result = json[0]
+        val result = try {
+            json[offset]
+        } catch (e: IndexOutOfBoundsException) {
+            return null
+        }
 
         return SongInfo(
             songName = result.songName,

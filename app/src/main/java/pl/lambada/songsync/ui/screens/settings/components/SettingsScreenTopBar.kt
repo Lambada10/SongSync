@@ -1,4 +1,4 @@
-package pl.lambada.songsync.ui.screens.about.components
+package pl.lambada.songsync.ui.screens.settings.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -18,7 +18,7 @@ import pl.lambada.songsync.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutScreenTopBar(navController: NavController, scrollBehavior: TopAppBarScrollBehavior) {
+fun SettingsScreenTopBar(navController: NavController, scrollBehavior: TopAppBarScrollBehavior) {
     MediumTopAppBar(
         navigationIcon = {
             IconButton(
@@ -35,7 +35,7 @@ fun AboutScreenTopBar(navController: NavController, scrollBehavior: TopAppBarScr
         title = {
             Text(
                 modifier = Modifier.padding(start = 6.dp),
-                text = stringResource(id = R.string.about)
+                text = stringResource(id = R.string.settings)
             )
         },
         scrollBehavior = scrollBehavior

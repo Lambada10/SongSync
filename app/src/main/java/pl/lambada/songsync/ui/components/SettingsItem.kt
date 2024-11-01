@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AboutItem(
+fun SettingsItem(
     label: String,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,

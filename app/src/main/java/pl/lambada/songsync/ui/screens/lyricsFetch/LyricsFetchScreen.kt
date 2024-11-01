@@ -185,7 +185,6 @@ fun SharedTransitionScope.LyricsFetchScreen(
                         animatedVisibilityScope = animatedVisibilityScope,
                         disableMarquee = viewModel.userSettingsController.disableMarquee,
                         allowTryingAgain =
-                            viewModel.userSettingsController.selectedProvider != Providers.APPLE &&
                             viewModel.userSettingsController.selectedProvider != Providers.MUSIXMATCH
                     )
 

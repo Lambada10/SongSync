@@ -1,4 +1,4 @@
-package pl.lambada.songsync.ui.screens.about.components
+package pl.lambada.songsync.ui.screens.settings.components
 
 import android.net.Uri
 import android.os.Environment
@@ -24,13 +24,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pl.lambada.songsync.R
-import pl.lambada.songsync.ui.components.AboutItem
+import pl.lambada.songsync.ui.components.SettingsItem
 
 
 @Composable
 fun SdCardPathSetting(sdPath: String?, onClearPath: () -> Unit, onUpdatePath: (String) -> Unit) {
     var picker by remember { mutableStateOf(false) }
-    AboutItem(
+    SettingsItem(
         label = stringResource(R.string.sd_card),
         modifier = Modifier.padding(horizontal = 22.dp, vertical = 16.dp)
     ) {

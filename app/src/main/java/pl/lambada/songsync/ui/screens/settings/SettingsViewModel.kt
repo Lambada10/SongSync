@@ -1,4 +1,4 @@
-package pl.lambada.songsync.ui.screens.about
+package pl.lambada.songsync.ui.screens.settings
 
 import android.content.Context
 import androidx.compose.runtime.getValue
@@ -17,7 +17,7 @@ import pl.lambada.songsync.util.showToast
 /**
  * ViewModel class for the main functionality of the app.
  */
-class AboutViewModel(
+class SettingsViewModel(
     private val updateService: UpdateService = UpdateService()
 ) : ViewModel() {
     var updateState by mutableStateOf<UpdateState>(UpdateState.Idle)

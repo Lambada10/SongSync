@@ -15,17 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -39,10 +36,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import pl.lambada.songsync.domain.model.SortOrders
-import pl.lambada.songsync.domain.model.SortValues
 import pl.lambada.songsync.ui.LyricsFetchScreen
-import pl.lambada.songsync.ui.ScreenAbout
+import pl.lambada.songsync.ui.ScreenSettings
 import pl.lambada.songsync.ui.screens.home.components.BatchDownloadLyrics
 import pl.lambada.songsync.ui.screens.home.components.FilterAndSongCount
 import pl.lambada.songsync.ui.screens.home.components.FiltersDialog
@@ -98,7 +93,7 @@ fun HomeScreen(
                     showing = showing,
                     scrollBehavior = scrollBehavior,
                     onSelectedClearAction = viewModel.selectedSongs::clear,
-                    onNavigateToAboutSectionRequest = { navController.navigate(ScreenAbout) },
+                    onNavigateToSettingsSectionRequest = { navController.navigate(ScreenSettings) },
                     onProviderSelectRequest = viewModel.userSettingsController::updateSelectedProviders,
                     onBatchDownloadRequest = { isBatchDownload = true },
                     selectedProvider = viewModel.userSettingsController.selectedProvider,

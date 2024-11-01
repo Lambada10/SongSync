@@ -1,4 +1,4 @@
-package pl.lambada.songsync.ui.screens.about.components
+package pl.lambada.songsync.ui.screens.settings.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState

@@ -11,8 +11,8 @@ import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import pl.lambada.songsync.data.remote.UserSettingsController
 import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
-import pl.lambada.songsync.ui.screens.about.AboutScreen
-import pl.lambada.songsync.ui.screens.about.AboutViewModel
+import pl.lambada.songsync.ui.screens.settings.SettingsScreen
+import pl.lambada.songsync.ui.screens.settings.SettingsViewModel
 import pl.lambada.songsync.ui.screens.home.HomeScreen
 import pl.lambada.songsync.ui.screens.home.HomeViewModel
 import pl.lambada.songsync.ui.screens.lyricsFetch.LyricsFetchScreen
@@ -61,9 +61,9 @@ fun Navigator(
                     animatedVisibilityScope = this,
                 )
             }
-            composable<ScreenAbout> {
-                AboutScreen(
-                    viewModel = viewModel { AboutViewModel() },
+            composable<ScreenSettings> {
+                SettingsScreen(
+                    viewModel = viewModel { SettingsViewModel() },
                     userSettingsController,
                     navController = navController
                 )
@@ -96,4 +96,4 @@ data class LocalSong(
 )
 
 @Serializable
-object ScreenAbout
+object ScreenSettings
