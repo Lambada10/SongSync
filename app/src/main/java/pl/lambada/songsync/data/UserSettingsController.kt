@@ -34,7 +34,7 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
     var includeTranslation by mutableStateOf(dataStore.get(includeTranslationKey, false))
         private set
 
-    var multiPersonWordByWord by mutableStateOf(dataStore.get(multiPersonWordByWordKey, false))
+    var multiPersonWordByWord by mutableStateOf(dataStore.get(multiPersonWordByWordKey, true))
         private set
 
     var syncedMusixmatch by mutableStateOf(dataStore.get(syncedMusixmatchKey, true))
