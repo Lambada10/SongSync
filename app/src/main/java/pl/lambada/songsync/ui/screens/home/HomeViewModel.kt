@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import pl.lambada.songsync.data.remote.UserSettingsController
+import pl.lambada.songsync.data.UserSettingsController
 import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo

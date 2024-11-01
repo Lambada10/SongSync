@@ -31,7 +31,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import pl.lambada.songsync.R
-import pl.lambada.songsync.data.remote.UserSettingsController
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.ui.components.AnimatedText
 

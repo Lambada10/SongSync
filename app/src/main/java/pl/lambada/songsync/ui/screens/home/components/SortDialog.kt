@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import pl.lambada.songsync.R
-import pl.lambada.songsync.data.remote.UserSettingsController
+import pl.lambada.songsync.data.UserSettingsController
 import pl.lambada.songsync.domain.model.SortOrders
 import pl.lambada.songsync.domain.model.SortValues
 

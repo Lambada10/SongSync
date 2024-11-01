@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import pl.lambada.songsync.data.remote.UserSettingsController
+import pl.lambada.songsync.data.UserSettingsController
 import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
 import pl.lambada.songsync.ui.screens.settings.SettingsScreen
 import pl.lambada.songsync.ui.screens.settings.SettingsViewModel

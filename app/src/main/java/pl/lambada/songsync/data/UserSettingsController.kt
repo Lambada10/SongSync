@@ -1,4 +1,4 @@
-package pl.lambada.songsync.data.remote
+package pl.lambada.songsync.data
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
