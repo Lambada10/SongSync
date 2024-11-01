@@ -324,7 +324,7 @@ fun applyOffsetToLyrics(lyrics: String, offset: Int): String {
 
     fun applyOffset(minute: Int, second: Int, millisecond: Int): String {
         val totalMilliseconds = (minute * 60 * 1000) + (second * 1000) + (millisecond * 10) + offset
-        if (totalMilliseconds < 0) return "[00:00.000]" // Prevent negative times
+        if (totalMilliseconds < 0) return "00:00.000" // Prevent negative times
 
         val newMinutes = (totalMilliseconds / 60000) % 60
         val newSeconds = (totalMilliseconds / 1000) % 60
