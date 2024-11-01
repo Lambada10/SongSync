@@ -141,4 +141,6 @@
     <string name="offset_mode">Offset mode</string>
     <string name="offset_mode_summary">Directly modify the lyrics timestamps instead of using offset LRC tag</string>
     <string name="settings">Settings</string>
+    <string name="date_added">Date added</string>
+    <string name="date_modified">Date modified</string>
 </resources>

@@ -14,4 +14,6 @@ enum class SortValues(@StringRes val displayName: Int) {
     ALBUM(R.string.album),
     YEAR(R.string.year),
     DURATION(R.string.duration),
+    DATE_ADDED(R.string.date_added),
+    DATE_MODIFIED(R.string.date_modified),
 }
