@@ -64,7 +64,7 @@ class LyricsProviderService {
                     neteaseID = it?.neteaseID ?: 0
                 } ?: throw NoTrackFoundException()
 
-                Providers.APPLE -> AppleAPI().getSongInfo(query).also {
+                Providers.APPLE -> AppleAPI().getSongInfo(query, offset).also {
                     appleID = it?.appleID ?: 0
                 } ?: throw NoTrackFoundException()
 
