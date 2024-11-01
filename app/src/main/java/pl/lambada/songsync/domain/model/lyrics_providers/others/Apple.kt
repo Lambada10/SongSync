@@ -9,7 +9,7 @@ data class AppleSearchResponse(
     val artistName: String,
     val albumName: String,
     val artwork: String,
-    val releaseDate: String,
+    val releaseDate: String?,
     val duration: Int,
     val isrc: String,
     val url: String,
