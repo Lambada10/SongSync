@@ -143,4 +143,7 @@
     <string name="settings">Settings</string>
     <string name="date_added">Date added</string>
     <string name="date_modified">Date modified</string>
+    <string name="translation">Translation</string>
+    <string name="help_us_translate">Help us translate the app to your language!</string>
+    <string name="translation_website">Open Weblate</string>
 </resources>

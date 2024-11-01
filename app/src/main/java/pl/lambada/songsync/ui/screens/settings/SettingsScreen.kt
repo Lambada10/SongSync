@@ -32,6 +32,7 @@ import pl.lambada.songsync.ui.screens.settings.components.SdCardPathSetting
 import pl.lambada.songsync.ui.screens.settings.components.ShowPathSwitch
 import pl.lambada.songsync.ui.screens.settings.components.SupportSection
 import pl.lambada.songsync.ui.screens.settings.components.SyncedLyricsSwitch
+import pl.lambada.songsync.ui.screens.settings.components.TranslationSection
 import pl.lambada.songsync.ui.screens.settings.components.TranslationSwitch
 import pl.lambada.songsync.ui.screens.settings.components.UpdateAvailableDialog
 import pl.lambada.songsync.util.ext.getVersion
@@ -144,6 +145,8 @@ fun SettingsScreen(
             }
 
             item { SupportSection(uriHandler = uriHandler) }
+
+            item { TranslationSection(uriHandler = uriHandler) }
 
             item { ContributorsSection(uriHandler = uriHandler) }
 
