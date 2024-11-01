@@ -19,7 +19,7 @@ import androidx.navigation.NavController
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.remote.UpdateState
 import pl.lambada.songsync.data.remote.UserSettingsController
-import pl.lambada.songsync.ui.screens.about.components.OffsetModeSwitch
+import pl.lambada.songsync.ui.screens.settings.components.OffsetModeSwitch
 import pl.lambada.songsync.ui.screens.settings.components.SettingsScreenTopBar
 import pl.lambada.songsync.ui.screens.settings.components.AppInfoSection
 import pl.lambada.songsync.ui.screens.settings.components.ContributorsSection
