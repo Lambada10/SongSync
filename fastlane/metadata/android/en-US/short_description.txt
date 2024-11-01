@@ -1,1 +1,1 @@
-download lyrics (.lrc files) for songs in your music library
+Android app to download lyrics for songs in your music library.
