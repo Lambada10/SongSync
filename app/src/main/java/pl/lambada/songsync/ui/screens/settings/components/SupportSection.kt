@@ -1,4 +1,4 @@
-package pl.lambada.songsync.ui.screens.about.components
+package pl.lambada.songsync.ui.screens.settings.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -12,12 +12,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pl.lambada.songsync.R
-import pl.lambada.songsync.ui.components.AboutItem
+import pl.lambada.songsync.ui.components.SettingsItem
 
 
 @Composable
 fun SupportSection(uriHandler: UriHandler) {
-    AboutItem(
+    SettingsItem(
         stringResource(R.string.support),
     ) {
         Column(

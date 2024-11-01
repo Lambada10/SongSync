@@ -138,4 +138,5 @@
     <string name="ascending">Ascending</string>
     <string name="descending">Descending</string>
     <string name="sort">Sort</string>
+    <string name="settings">Settings</string>
 </resources>

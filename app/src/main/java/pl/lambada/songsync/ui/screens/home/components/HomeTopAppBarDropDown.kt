@@ -31,7 +31,7 @@ import pl.lambada.songsync.util.set
 
 @Composable
 fun HomeTopAppBarDropDown(
-    onNavigateToAboutSectionRequest: () -> Unit,
+    onNavigateToSettingsSectionRequest: () -> Unit,
     selectedProvider: Providers,
     onProviderSelectRequest: (Providers) -> Unit,
     embedLyrics: Boolean,
@@ -98,12 +98,12 @@ fun HomeTopAppBarDropDown(
         DropdownMenuItem(
             text = {
                 Text(
-                    text = stringResource(id = R.string.about),
+                    text = stringResource(id = R.string.settings),
                     modifier = Modifier.padding(horizontal = 6.dp),
                 )
             },
             onClick = {
-                onNavigateToAboutSectionRequest()
+                onNavigateToSettingsSectionRequest()
                 expanded = false
             }
         )

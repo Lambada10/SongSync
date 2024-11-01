@@ -1,4 +1,4 @@
-package pl.lambada.songsync.ui.screens.about.components
+package pl.lambada.songsync.ui.screens.settings.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,11 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import pl.lambada.songsync.R
-import pl.lambada.songsync.ui.components.AboutItem
+import pl.lambada.songsync.ui.components.SettingsItem
 
 @Composable
 fun AppInfoSection(version: String, onCheckForUpdates: () -> Unit) {
-    AboutItem(
+    SettingsItem(
         label = stringResource(R.string.about_songsync),
         modifier = Modifier.padding(horizontal = 22.dp, vertical = 16.dp)
     ) {

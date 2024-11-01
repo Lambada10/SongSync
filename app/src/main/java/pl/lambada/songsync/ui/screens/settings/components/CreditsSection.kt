@@ -1,4 +1,4 @@
-package pl.lambada.songsync.ui.screens.about.components
+package pl.lambada.songsync.ui.screens.settings.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -18,12 +18,12 @@ import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import pl.lambada.songsync.R
-import pl.lambada.songsync.ui.components.AboutItem
+import pl.lambada.songsync.ui.components.SettingsItem
 
 
 @Composable
 fun CreditsSection(uriHandler: UriHandler) {
-    AboutItem(label = stringResource(id = R.string.thanks_to)) {
+    SettingsItem(label = stringResource(id = R.string.thanks_to)) {
         val credits = mapOf(
             stringResource(R.string.spotify_api) to "https://developer.spotify.com/documentation/web-api",
             stringResource(R.string.spotifylyrics_api) to "https://github.com/akashrchandran/spotify-lyrics-api",

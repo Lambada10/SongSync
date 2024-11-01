@@ -35,7 +35,7 @@ fun HomeAppBar(
     scrollBehavior: TopAppBarScrollBehavior,
     selectedProvider: Providers,
     onSelectedClearAction: () -> Unit,
-    onNavigateToAboutSectionRequest: () -> Unit,
+    onNavigateToSettingsSectionRequest: () -> Unit,
     onProviderSelectRequest: (Providers) -> Unit,
     onBatchDownloadRequest: () -> Unit,
     onSelectAllSongsRequest: () -> Unit,
@@ -120,7 +120,7 @@ fun HomeAppBar(
                 }
             } else {
                 HomeTopAppBarDropDown(
-                    onNavigateToAboutSectionRequest = onNavigateToAboutSectionRequest,
+                    onNavigateToSettingsSectionRequest = onNavigateToSettingsSectionRequest,
                     selectedProvider = selectedProvider,
                     onProviderSelectRequest = onProviderSelectRequest,
                     onBatchDownloadRequest = onBatchDownloadRequest,

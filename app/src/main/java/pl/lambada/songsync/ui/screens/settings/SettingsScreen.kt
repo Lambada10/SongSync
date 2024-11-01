@@ -1,6 +1,6 @@
 @file:Suppress("SpellCheckingInspection")
 
-package pl.lambada.songsync.ui.screens.about
+package pl.lambada.songsync.ui.screens.settings
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -19,20 +19,20 @@ import androidx.navigation.NavController
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.remote.UpdateState
 import pl.lambada.songsync.data.remote.UserSettingsController
-import pl.lambada.songsync.ui.screens.about.components.AboutScreenTopBar
-import pl.lambada.songsync.ui.screens.about.components.AppInfoSection
-import pl.lambada.songsync.ui.screens.about.components.ContributorsSection
-import pl.lambada.songsync.ui.screens.about.components.CreditsSection
-import pl.lambada.songsync.ui.screens.about.components.ExternalLinkSection
-import pl.lambada.songsync.ui.screens.about.components.MarqueeSwitch
-import pl.lambada.songsync.ui.screens.about.components.MultiPersonSwitch
-import pl.lambada.songsync.ui.screens.about.components.PureBlackThemeSwitch
-import pl.lambada.songsync.ui.screens.about.components.SdCardPathSetting
-import pl.lambada.songsync.ui.screens.about.components.ShowPathSwitch
-import pl.lambada.songsync.ui.screens.about.components.SupportSection
-import pl.lambada.songsync.ui.screens.about.components.SyncedLyricsSwitch
-import pl.lambada.songsync.ui.screens.about.components.TranslationSwitch
-import pl.lambada.songsync.ui.screens.about.components.UpdateAvailableDialog
+import pl.lambada.songsync.ui.screens.settings.components.SettingsScreenTopBar
+import pl.lambada.songsync.ui.screens.settings.components.AppInfoSection
+import pl.lambada.songsync.ui.screens.settings.components.ContributorsSection
+import pl.lambada.songsync.ui.screens.settings.components.CreditsSection
+import pl.lambada.songsync.ui.screens.settings.components.ExternalLinkSection
+import pl.lambada.songsync.ui.screens.settings.components.MarqueeSwitch
+import pl.lambada.songsync.ui.screens.settings.components.MultiPersonSwitch
+import pl.lambada.songsync.ui.screens.settings.components.PureBlackThemeSwitch
+import pl.lambada.songsync.ui.screens.settings.components.SdCardPathSetting
+import pl.lambada.songsync.ui.screens.settings.components.ShowPathSwitch
+import pl.lambada.songsync.ui.screens.settings.components.SupportSection
+import pl.lambada.songsync.ui.screens.settings.components.SyncedLyricsSwitch
+import pl.lambada.songsync.ui.screens.settings.components.TranslationSwitch
+import pl.lambada.songsync.ui.screens.settings.components.UpdateAvailableDialog
 import pl.lambada.songsync.util.ext.getVersion
 
 /**
@@ -40,8 +40,8 @@ import pl.lambada.songsync.util.ext.getVersion
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutScreen(
-    viewModel: AboutViewModel,
+fun SettingsScreen(
+    viewModel: SettingsViewModel,
     userSettingsController: UserSettingsController,
     navController: NavController
 ) {
@@ -53,7 +53,7 @@ fun AboutScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            AboutScreenTopBar(
+            SettingsScreenTopBar(
                 navController = navController,
                 scrollBehavior = scrollBehavior
             )
