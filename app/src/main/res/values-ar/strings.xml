@@ -108,4 +108,36 @@
         <item quantity="many">سيؤدي هذا إلى تنزيل كلمات الأغاني لـ%1$d اغان. سيتم استبدال كلمات الأغاني الحالية بكلمات جديدة. قد يكون هذا أقل دقة من تنزيل كلمات الأغاني واحدة تلو الأخرى. هل أنت متأكد من أنك تريد المتابعة؟</item>
         <item quantity="other">سيؤدي هذا إلى تنزيل كلمات الأغاني لـ%1$d اغان. سيتم استبدال كلمات الأغاني الحالية بكلمات جديدة. قد يكون هذا أقل دقة من تنزيل كلمات الأغاني واحدة تلو الأخرى. هل أنت متأكد من أنك تريد المتابعة؟</item>
     </plurals>
+    <string name="syncedlyrics_py">Syncedlyrics (لترويسات NetEase وLrcLib)</string>
+    <string name="open_website">افتح الموقع</string>
+    <string name="provider">مُزوِّد الكلمات</string>
+    <string name="provider_summary">اختر مُزوِّد كلمات من القائمة أدناه رجاءً</string>
+    <string name="ignore">تجاهل</string>
+    <string name="internal_error">خطأٌ داخليّ: %s</string>
+    <string name="disable_marquee_summary">ألغِ هيئة حركة النص في التطبيق</string>
+    <string name="include_translation">ضمِّن التَّرجمات</string>
+    <string name="embed_lyrics_in_file">اِدمُج الكلمات بالملف</string>
+    <string name="embedded_lyrics_in_file">تمَّ دمج الكلمات بملفّ الأغنية</string>
+    <string name="multi_person_word_by_word">كلمات مزمّنة كلمةً كلمة لعدّة أشخاص</string>
+    <string name="multi_person_word_by_word_summary">استعمل صيغة الكلمات متعدّدة الأشخاص عند أخذ الكلمات من Apple Music</string>
+    <string name="offset">التأخير</string>
+    <string name="song_path">أظهِر مسار الأغنية</string>
+    <string name="synced_lyrics">استورد كلماتٍ مُزمَّنة</string>
+    <string name="title">العنوان</string>
+    <string name="artist">الفنان</string>
+    <string name="album">الألبوم</string>
+    <string name="year">”السنة</string>
+    <string name="duration">المدة</string>
+    <string name="ascending">تصاعديّاً</string>
+    <string name="descending">تنازليّاً</string>
+    <string name="offset_mode">وضع التأخير</string>
+    <string name="offset_mode_summary">عدّل أزمنة الكلمات مباشرةً بدلاً من استعمال علامات LRC المؤخِّرة</string>
+    <string name="thanks_to">شكراً إلى</string>
+    <string name="statusbar_lyrics_ext">امتداد كلمات على شريط الحالة (من أجل NetEase)</string>
+    <string name="disable_marquee">ألغِ تعليم النَّصّ</string>
+    <string name="include_translation_summary">ضمِّن الكلمات المُترجَمة عند أخذ كلمات الأغنية من مُزوِّد NetEase</string>
+    <string name="embed_non_local_song_error">لقد حاولتَ دمج الكلمات بملفٍّ غير محلّي. جارٍ إجهاض العمليّة.</string>
+    <string name="song_path_description">أظهِر مسار ملف أغنية بين قائمة أغانٍ</string>
+    <string name="synced_lyrics_summary">مفتاح تبديل بين الكلمات المُزمَّنة وغير المُزمَّنة من Musixmatch</string>
+    <string name="sort">الفرز</string>
 </resources>
