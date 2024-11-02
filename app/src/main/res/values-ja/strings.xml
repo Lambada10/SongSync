@@ -10,11 +10,11 @@
     <string name="no">いいえ</string>
     <string name="song">曲: %1$s</string>
     <string name="progress">進捗: %1$d/%2$d (%3$d%%)</string>
-    <string name="success_failed">成功: %1$d,歌詞なし: %2$d,失敗: %3$d</string>
+    <string name="success_failed">成功: %1$d - 歌詞なし: %2$d - 失敗: %3$d</string>
     <string name="download_complete">ダウンロードが完了しました</string>
     <string name="success">成功: %1$d</string>
     <string name="failed">失敗: %1$d</string>
-    <string name="spotify_api_rate_limit_reached">Spotify API レートの上限に到達</string>
+    <string name="spotify_api_rate_limit_reached">Spotify API レートの上限に到達しました</string>
     <string name="please_try_again_later">後でもう一度お試しください</string>
     <string name="save_lrc_file">.lrc ファイルを保存</string>
     <string name="no_results">結果なし</string>
@@ -24,7 +24,7 @@
     <string name="spotify_for_developers">Spotify for Developers</string>
     <string name="about_songsync">SongSync について</string>
     <string name="view_on_github">GitHub を表示</string>
-    <string name="we_are_open_source">SongSync は、オープンソースプロジェクトです。ソースコードはGitHubにあります。</string>
+    <string name="we_are_open_source">SongSync は、オープンソースプロジェクトです。ソースコードは GitHub にあります。</string>
     <string name="contributors">貢献者</string>
     <string name="telegram_group">Telegram グループ</string>
     <string name="source_code">ソースコード</string>
@@ -79,10 +79,10 @@
     <string name="batch_download_lyrics">歌詞を一括でダウンロード</string>
     <string name="downloading_lyrics">歌詞をダウンロード中</string>
     <string name="please_do_not_close_the_app_this_may_take_a_while">アプリを閉じずにしばらくお待ちください</string>
-    <string name="no_internet_server">インターネットが接続できません。またはサーバーがダウンしているかもしれません</string>
-    <string name="extra_what_is_songsync">特定の曲名を入力するだけでも歌詞を入手できます(ダウンロードに保存もできます)</string>
-    <string name="how_we_get_lyrics">SongSync は、SpotifyLyrics API を使用して歌詞を取得しています。SpotifyLyricsAPI の詳細は GitHub ページで確認ができます。</string>
-    <string name="bugs_or_suggestions_contact_us">バグを見つけましたか？提案がありますか？貢献をしたいですか？Telegramグループでお気軽にご連絡ください。</string>
+    <string name="no_internet_server">インターネットが未接続またはサーバーがダウンしています</string>
+    <string name="extra_what_is_songsync">特定の曲名を入力するだけでも歌詞を入手できます (ダウンロードに保存もできます)。</string>
+    <string name="how_we_get_lyrics">SongSync は SpotifyLyrics API を使用して歌詞を取得します。SpotifyLyrics API の詳細については、GitHub ページをご確認ください。</string>
+    <string name="bugs_or_suggestions_contact_us">バグを見つけましたか？それとも提案や貢献をしたいですか？お気軽に Telegram グループまでご連絡ください。</string>
     <string name="create_issue">GitHub (上記リンク) で Issue を作成する事もできます。</string>
     <string name="requires_higher_storage_permissions">このアプリは、音楽ライブラリをスキャンして歌詞を保存するためにストレージアクセスの許可が必要です。</string>
     <string name="artist_name_no_args">アーティスト名</string>
