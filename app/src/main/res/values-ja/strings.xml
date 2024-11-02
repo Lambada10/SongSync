@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="get_lyrics">歌詞を入手</string>
+    <string name="get_lyrics">歌詞を取得</string>
     <string name="try_again">再試行</string>
     <string name="cancel">キャンセル</string>
     <string name="error">エラー</string>
@@ -19,7 +19,7 @@
     <string name="save_lrc_file">.lrc ファイルを保存</string>
     <string name="no_results">結果なし</string>
     <string name="unknown">不明</string>
-    <string name="what_is_songsync">SongSync は同期可能な歌詞ファイル (.lrc ファイル)をローカルに保存するアプリです。</string>
+    <string name="what_is_songsync">SongSync は同期可能な歌詞ファイル (.lrc ファイル) をローカルに保存するアプリです。</string>
     <string name="app_version">アプリのバージョン: %1$s</string>
     <string name="spotify_for_developers">Spotify for Developers</string>
     <string name="about_songsync">SongSync について</string>
@@ -52,16 +52,15 @@
     <string name="select_all">すべて選択</string>
     <string name="invert_selection">選択を反転</string>
     <string name="no_lyrics">歌詞なし: %1$d</string>
-    <string name="set_sd_card_path">SD カードのパスを設定</string>
-    <string name="clear_sd_card_path">SD カードのパスをクリア</string>
+    <string name="set_sd_card_path">設定</string>
+    <string name="clear_sd_card_path">消去</string>
     <string name="sd_card">SD カード</string>
     <string name="invalid_query">無効なクエリ</string>
-    <string name="clear">クリア</string>
-    <string name="check_for_updates">アップデートを確認</string>
-    <string name="checking_for_updates">アップデートを確認中です</string>
-    <string name="update_available">アップデートがあります</string>
-    <string name="changelog">更新履歴:
-\n%1$s</string>
+    <string name="clear">消去</string>
+    <string name="check_for_updates">更新を確認</string>
+    <string name="checking_for_updates">更新を確認中です</string>
+    <string name="update_available">最新のバージョンがあります</string>
+    <string name="changelog">更新履歴:\n%1$s</string>
     <string name="download">ダウンロード</string>
     <string name="up_to_date">最新のバージョンを使用しています</string>
     <string name="error_checking_for_updates">アップデートの確認に失敗しました</string>
@@ -80,7 +79,7 @@
     <string name="downloading_lyrics">歌詞をダウンロード中</string>
     <string name="please_do_not_close_the_app_this_may_take_a_while">アプリを閉じずにしばらくお待ちください</string>
     <string name="no_internet_server">インターネットが未接続またはサーバーがダウンしています</string>
-    <string name="extra_what_is_songsync">特定の曲名を入力するだけでも歌詞を入手できます (ダウンロードに保存もできます)。</string>
+    <string name="extra_what_is_songsync">特定の曲名を入力するだけでも歌詞を取得できます (ダウンロードして保存も可能)。</string>
     <string name="how_we_get_lyrics">SongSync は SpotifyLyrics API を使用して歌詞を取得します。SpotifyLyrics API の詳細については、GitHub ページをご確認ください。</string>
     <string name="bugs_or_suggestions_contact_us">バグを見つけましたか？それとも提案や貢献をしたいですか？お気軽に Telegram グループまでご連絡ください。</string>
     <string name="create_issue">GitHub (上記リンク) で Issue を作成する事もできます。</string>
@@ -89,7 +88,56 @@
     <string name="copy_lyrics_to_clipboard">歌詞をクリップボードにコピー</string>
     <string name="local_song">ローカルの曲</string>
     <plurals name="this_will_download_lyrics_for_all_songs">
-        <item quantity="other">これは1曲の歌詞をダウンロードします。既存の歌詞は新しいもので上書きされます。これにより、1曲ずつダウンロードするよりも正確性が低くなる可能性があります。続行してもよろしいですか？</item>
+        <item quantity="other">%1$d 曲の歌詞をダウンロードします。既存の歌詞は新しい歌詞に上書きされます。歌詞を 1 つずつダウンロードを行うよりも正確性が低下する可能性があります。続行しますか？</item>
     </plurals>
     <string name="if_connected_spotify_down">インターネットに接続されていますが、Spotify がダウンしている可能性があります。しばらくしてから再度お試しください。</string>
+    <string name="invalid_credentials">無効な認証情報</string>
+    <string name="set_sd_path">SD カードのパスを設定します。これは Android 10 とそれ以下で必要です。</string>
+    <string name="set_sd_path_warn">古いバージョンの Android を使用しています。設定で SD カードのパスが設定済みであることを確認してください。未設定の場合は、このダイアログをキャンセルして設定してください。</string>
+    <string name="embed_lyrics_in_file">ファイルに歌詞を埋め込む</string>
+    <string name="embedded_lyrics_in_file">歌詞が曲のファイルに埋め込まれています</string>
+    <string name="multi_person_word_by_word_summary">Apple Music から歌詞を取得時に複数人の歌詞形式を使用します</string>
+    <string name="synced_lyrics_summary">Musixmatch で同期の歌詞と非同期の歌詞を切り替えます。</string>
+    <string name="title">タイトル</string>
+    <string name="date_added">追加した日時</string>
+    <string name="translation">翻訳</string>
+    <string name="no_lyrics_only">歌詞のない曲のみ表示</string>
+    <string name="credentials_saved">認証情報が保存されました</string>
+    <string name="way_to_get_token">Spotify トークンの取得方法</string>
+    <string name="default_keys">デフォルトの API 認証情報</string>
+    <string name="web_player_keys">Web Player API</string>
+    <string name="custom_keys">カスタム API 認証情報</string>
+    <string name="change_api_strategy">設定で Spotify のネットワークに接続する別の方法を試すこともできます。</string>
+    <string name="restart_the_app">変更を有効化するにはアプリを再起動してください</string>
+    <string name="thanks_to">感謝</string>
+    <string name="syncedlyrics_py">Syncedlyrics (for Netease headers and LrcLib)</string>
+    <string name="statusbar_lyrics_ext">Statusbar lyrics ext (For Netease)</string>
+    <string name="open_website">Web サイトを開く</string>
+    <string name="provider">歌詞のプロバイダー</string>
+    <string name="provider_summary">下記にある歌詞のプロバイダーを選択してください</string>
+    <string name="ignore">無視</string>
+    <string name="internal_error">内部エラー: %s</string>
+    <string name="disable_marquee">マーキーテキストを無効化する</string>
+    <string name="disable_marquee_summary">アプリ内のアニメーション遷移を無効化します</string>
+    <string name="include_translation">翻訳を含める</string>
+    <string name="include_translation_summary">Netease プロバイダーから歌詞を取得時に翻訳された歌詞を含めます</string>
+    <string name="embed_non_local_song_error">歌詞をローカル以外のファイルに埋め込もうとしました。操作を中止します。</string>
+    <string name="multi_person_word_by_word">多人数による単語ごとの歌詞</string>
+    <string name="offset">オフセット</string>
+    <string name="song_path">曲のパスを表示</string>
+    <string name="song_path_description">曲の一覧にファイルのパスを表示する</string>
+    <string name="synced_lyrics">同期された歌詞を取得</string>
+    <string name="artist">アーティスト</string>
+    <string name="album">アルバム</string>
+    <string name="year">年</string>
+    <string name="duration">再生時間</string>
+    <string name="ascending">昇順</string>
+    <string name="descending">降順</string>
+    <string name="sort">並べ替え</string>
+    <string name="offset_mode">オフセットモード</string>
+    <string name="offset_mode_summary">オフセット LRC タグを使用する代わりに歌詞のタイムスタンプを直接的に変更します</string>
+    <string name="settings">設定</string>
+    <string name="date_modified">変更した日時</string>
+    <string name="help_us_translate">アプリをあなたの母国語に翻訳してくれませんか！</string>
+    <string name="translation_website">Weblate を開く</string>
 </resources>
