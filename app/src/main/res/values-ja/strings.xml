@@ -91,5 +91,5 @@
     <plurals name="this_will_download_lyrics_for_all_songs">
         <item quantity="other">これは1曲の歌詞をダウンロードします。既存の歌詞は新しいもので上書きされます。これにより、1曲ずつダウンロードするよりも正確性が低くなる可能性があります。続行してもよろしいですか？</item>
     </plurals>
-    <string name="if_connected_spotify_down">接続されていますが、Spotifyがダウンしている可能性があります。後でもう一度お試しください。</string>
+    <string name="if_connected_spotify_down">インターネットに接続されていますが、Spotify がダウンしている可能性があります。しばらくしてから再度お試しください。</string>
 </resources>
