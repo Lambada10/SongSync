@@ -14,8 +14,8 @@
     <string name="success">نجح: %1$d</string>
     <string name="failed">فشل: %1$d</string>
     <string name="spotify_api_rate_limit_reached">تم الوصول إلى حد معدل واجهة برمجة تطبيقات Spotify</string>
-    <string name="please_try_again_later">يرجى إعادة المحاولة لاحقا</string>
-    <string name="save_lrc_file">حفظ ملف lrc.</string>
+    <string name="please_try_again_later">حاول لاحقاً رجاءً</string>
+    <string name="save_lrc_file">حفظ ملف .lrc</string>
     <string name="no_results">لا توجد نتائج</string>
     <string name="unknown">مجهول</string>
     <string name="extra_what_is_songsync">يمكنك أيضا البحث عن أغان محددة للحصول على كلماتها (وحفظها في التنزيلات).</string>
@@ -23,7 +23,7 @@
     <string name="spotify_for_developers">سبوتيفاي للمطورين</string>
     <string name="about_songsync">حول SongSync</string>
     <string name="how_we_get_lyrics">يستخدم SongSync واجهة برمجة تطبيقات SpotifyLyrics للحصول على كلمات الأغاني. يمكنك العثور على مزيد من المعلومات حول واجهة برمجة تطبيقات SpotifyLyrics على صفحة GitHub الخاصة بهم.</string>
-    <string name="view_on_github">عرض على جيتثب</string>
+    <string name="view_on_github">عرض على GitHub</string>
     <string name="contributors">المساهمون</string>
     <string name="bugs_or_suggestions_contact_us">وجدت خطأ؟ هل لديك اقتراح؟ هل تريد المساهمة؟ لا تتردد في الاتصال بي في مجموعة Telegram الخاصة بي.</string>
     <string name="telegram_group">مجموعة تيليجرام</string>
@@ -138,6 +138,12 @@
     <string name="include_translation_summary">ضمِّن الكلمات المُترجَمة عند أخذ كلمات الأغنية من مُزوِّد NetEase</string>
     <string name="embed_non_local_song_error">لقد حاولتَ دمج الكلمات بملفٍّ غير محلّي. جارٍ إجهاض العمليّة.</string>
     <string name="song_path_description">أظهِر مسار ملف أغنية بين قائمة أغانٍ</string>
-    <string name="synced_lyrics_summary">مفتاح تبديل بين الكلمات المُزمَّنة وغير المُزمَّنة من Musixmatch</string>
+    <string name="synced_lyrics_summary">شغِّل للتبديل بين الكلمات المُزمَّنة وغير المُزمَّنة من Musixmatch</string>
     <string name="sort">الفرز</string>
+    <string name="settings">الإعدادات</string>
+    <string name="date_added">تاريخ الإضافة</string>
+    <string name="date_modified">تاريخ التعديل</string>
+    <string name="translation">الترجمة</string>
+    <string name="translation_website">افتح Weblate</string>
+    <string name="help_us_translate">ساعِدنا بترجمة التطبيق إلى لغتك!</string>
 </resources>
