@@ -63,7 +63,7 @@
     <string name="changelog">更新履歴:\n%1$s</string>
     <string name="download">ダウンロード</string>
     <string name="up_to_date">最新のバージョンを使用しています</string>
-    <string name="error_checking_for_updates">アップデートの確認に失敗しました</string>
+    <string name="error_checking_for_updates">更新の確認に失敗しました</string>
     <string name="close">閉じる</string>
     <string name="filters">絞り込み</string>
     <string name="ignore_folders">フォルダを無視</string>
