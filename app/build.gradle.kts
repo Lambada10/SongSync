@@ -15,11 +15,11 @@ android {
         minSdk = 21
         //noinspection OldTargetApi
         targetSdk = 34
-        versionCode = 420
-        versionName = "4.2.0"
+        versionCode = 421
+        versionName = "4.2.1"
 
         resourceConfigurations += arrayOf(
-            "ar", "de", "en", "es", "in", "ja", "pt", "pt-rBR", "ro", "vi", "zh-rCN", "tr"
+            "ar", "de", "es", "en", "fa", "fil", "in", "ja", "pl", "pt", "pt-rBR", "ro", "tr", "vi", "zh-rCN", "zh-rTW"
         )
 
         vectorDrawables {
