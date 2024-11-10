@@ -86,4 +86,21 @@
     <string name="no_internet_connection">Walang internet connection</string>
     <string name="you_need_internet_connection">Kailangan mo ng internet connection para magamit ang app</string>
     <string name="clear">Clear</string>
+    <string name="spotify_client_id">Spotify Client ID</string>
+    <string name="way_to_get_token">Paraan para makuha ang Spotify token</string>
+    <string name="cant_be_empty">Hindi pwedeng walang laman</string>
+    <string name="default_keys">Default API credentials</string>
+    <string name="change_api_strategy">Maaari mo ring subukan ang mga alternatibong paraan upang kumonekta sa Spotify network sa mga settings.</string>
+    <string name="web_player_keys">API ng Web Player</string>
+    <string name="custom_keys">Custom API credentials</string>
+    <string name="theme">Tema</string>
+    <string name="pure_black_theme">Pure black theme</string>
+    <string name="restart_the_app">I-restart ang app upang magkabisa ang mga pagbabago</string>
+    <string name="sd_card">SD Card</string>
+    <string name="sd_card_path_set_successfully">Matagumpay na naitakda ang landas ng SD card!</string>
+    <string name="clear_sd_card_path">Linisin</string>
+    <string name="set_sd_path">I-set ang landas patungo sa iyong SD card dito. Ito ay kinakailangan para sa Android 10 pababa.</string>
+    <string name="no_sd_card_path_set">Walang nakatakdang landas ng SD card!</string>
+    <string name="set_sd_card_path">Set</string>
+    <string name="set_sd_path_warn">Ikaw ay gumagamit ng mas lumang bersyon ng Android. Tiyaking naitakda mo ang landas ng SD card sa mga setting. Kung hindi mo pa ito nagawa, mangyaring kanselahin ang dialog na ito at itakda ito</string>
 </resources>
