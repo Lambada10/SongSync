@@ -124,4 +124,9 @@
     <string name="translation">翻译</string>
     <string name="help_us_translate">帮助我们将应用翻译成你的语言！</string>
     <string name="translation_website">打开Weblate翻译</string>
+    <string name="way_to_get_token">如何获取Spotify密钥</string>
+    <string name="cant_be_empty">不能为空</string>
+    <string name="web_player_keys">Web播放器接口</string>
+    <string name="set_sd_path">在此设置 SD 卡路径，安卓 10 及以下系统需要这样做。</string>
+    <string name="set_sd_path_warn">您使用的是旧版本的 Android 系统。请确保已在设置中设置 SD 卡路径。如果没有，请取消此对话框并进行设置。</string>
 </resources>
