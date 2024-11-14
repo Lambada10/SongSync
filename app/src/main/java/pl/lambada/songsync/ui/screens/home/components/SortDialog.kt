@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -50,10 +51,12 @@ fun SortDialog(
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(top = 24.dp, start = 24.dp, bottom = 16.dp)
                 )
+                HorizontalDivider(modifier = Modifier.padding(bottom = 6.dp))
                 SortByRadioGroup(userSettingsController, onSortByChange)
-                HorizontalDivider()
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp))
                 SortOrderRadioGroup(userSettingsController, onSortOrderChange)
-                Row(modifier = Modifier.padding(16.dp)) {
+                HorizontalDivider(modifier = Modifier.padding(top = 6.dp))
+                Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                     Spacer(modifier = Modifier.weight(1f))
                     TextButton(onDismiss) {
                         Text(stringResource(R.string.close))
@@ -65,44 +68,54 @@ fun SortDialog(
 }
 
 @Composable
-fun SortOrderRadioGroup(userSettingsController: UserSettingsController, onSortOrderChange: (SortOrders) -> Unit) {
+fun SortOrderRadioGroup(
+    userSettingsController: UserSettingsController,
+    onSortOrderChange: (SortOrders) -> Unit
+) {
     Column {
         SortOrders.entries.forEach {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(
+                        onClick = { onSortOrderChange(it) }
+                    )
+                    .padding(horizontal = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 RadioButton(
                     selected = userSettingsController.sortOrder == it,
                     onClick = {
                         onSortOrderChange(it)
                     }
                 )
-                Text(
-                    stringResource(it.displayName),
-                    modifier = Modifier.clickable {
-                        onSortOrderChange(it)
-                    }
-                )
+                Text(stringResource(it.displayName))
             }
         }
     }
 }
 
 @Composable
-fun SortByRadioGroup(userSettingsController: UserSettingsController, onSortByChange: (SortValues) -> Unit) {
+fun SortByRadioGroup(
+    userSettingsController: UserSettingsController,
+    onSortByChange: (SortValues) -> Unit
+) {
     Column {
         SortValues.entries.forEach {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = { onSortByChange(it) })
+                    .padding(horizontal = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 RadioButton(
                     selected = userSettingsController.sortBy == it,
                     onClick = {
                         onSortByChange(it)
                     }
                 )
-                Text(
-                    stringResource(it.displayName),
-                    modifier = Modifier.clickable {
-                        onSortByChange(it)
-                    }
-                )
+                Text(stringResource(it.displayName))
             }
         }
     }
