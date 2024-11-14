@@ -41,6 +41,8 @@ class HomeViewModel(
     val selectedSongs = mutableStateListOf<String>()
     var allSongs by mutableStateOf<List<Song>?>(null)
 
+    var isRefreshing by mutableStateOf(false)
+
     var searchQuery by mutableStateOf("")
 
     // Filter settings

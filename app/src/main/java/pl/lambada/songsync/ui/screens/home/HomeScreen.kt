@@ -1,5 +1,6 @@
 package pl.lambada.songsync.ui.screens.home
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -21,12 +22,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -36,6 +39,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import pl.lambada.songsync.ui.LyricsFetchScreen
 import pl.lambada.songsync.ui.ScreenSettings
 import pl.lambada.songsync.ui.screens.home.components.BatchDownloadLyrics
@@ -157,7 +162,7 @@ fun LoadingScreen() {
     }
 }
 
-@OptIn(ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenLoaded(
     selected: SnapshotStateList<String>,
@@ -170,6 +175,7 @@ fun HomeScreenLoaded(
     animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     Column {
         if (isBatchDownload) {
@@ -178,104 +184,123 @@ fun HomeScreenLoaded(
                 onDone = { onBatchDownloadState(false) })
         }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = scaffoldPadding
-        ) {
-            item {
-                Column(
-                    modifier = Modifier.padding(
-                        top = 5.dp,
-                        bottom = 5.dp,
-                        start = 22.dp,
-                        end = 4.dp
-                    ),
-                ) {
-                    HomeSearchThing(
-                        showingSearch = viewModel.showingSearch,
-                        searchBar = {
-                            HomeSearchBar(
-                                query = viewModel.searchQuery,
-                                onQueryChange = { newQuery ->
-                                    viewModel.searchQuery = newQuery
-                                    viewModel.updateSearchResults(newQuery.lowercaseWithLocale())
-                                    viewModel.showingSearch = true
-                                },
-                                showSearch = viewModel.showSearch,
-                                onShowSearchChange = { viewModel.showSearch = it },
-                                showingSearch = viewModel.showingSearch,
-                                onShowingSearchChange = { viewModel.showingSearch = it }
-                            )
-                        },
-                        filterBar = {
-                            FilterAndSongCount(
-                                displaySongsCount = viewModel.displaySongs.size,
-                                onFilterClick = { viewModel.showFilters = true },
-                                onSortClick = { viewModel.showSort = true },
-                                onSearchClick = {
-                                    viewModel.showSearch = true
-                                    viewModel.showingSearch = true
-                                }
-                            )
-                        }
-                    )
-
-                    if (viewModel.showSort) {
-                        SortDialog(
-                            userSettingsController = viewModel.userSettingsController,
-                            onDismiss = { viewModel.showSort = false },
-                            onSortOrderChange = { viewModel.userSettingsController.updateSortOrder(it) },
-                            onSortByChange = { viewModel.userSettingsController.updateSortBy(it) }
-                        )
-                    }
-
-                    if (viewModel.showFilters) {
-                        FiltersDialog(
-                            hideLyrics = viewModel.userSettingsController.hideLyrics,
-                            folders = viewModel.getSongFolders(context),
-                            blacklistedFolders = viewModel.userSettingsController.blacklistedFolders,
-                            onDismiss = { viewModel.showFilters = false },
-                            onFilterChange = { viewModel.filterSongs() },
-                            onHideLyricsChange = viewModel::onHideLyricsChange,
-                            onToggleFolderBlacklist = viewModel::onToggleFolderBlacklist
-                        )
-                    }
+        PullToRefreshBox( // TODO: fix no spinner on refresh
+            isRefreshing = viewModel.isRefreshing,
+            onRefresh = {
+                viewModel.isRefreshing = true
+                scope.launch {
+                    Toast.makeText(context, "Refreshing...", Toast.LENGTH_SHORT).show()
+                    viewModel.cachedSongs = null
+                    viewModel.updateAllSongs(context, viewModel.userSettingsController.sortBy, viewModel.userSettingsController.sortOrder)
+                    delay(1000) // spinner
+                    Toast.makeText(context, "Refreshed", Toast.LENGTH_SHORT).show()
+                    viewModel.isRefreshing = false
                 }
             }
-
-
-            items(viewModel.displaySongs.size) { index ->
-                val song = viewModel.displaySongs[index]
-
-                SongItem(
-                    filePath = song.filePath
-                        ?: error("a song in the list of files did not have a file path"),
-                    selected = selected.contains(song.filePath),
-                    quickSelect = selected.size > 0,
-                    onSelectionChanged = { newValue ->
-                        viewModel.selectSong(song, newValue)
-                    },
-                    onNavigateToSongRequest = {
-                        navController.navigate(
-                            LyricsFetchScreen(
-                                songName = song.title ?: error("song.title was null"),
-                                artists = song.artist ?: "",
-                                coverUri = song.imgUri.toString(),
-                                filePath = song.filePath
-                            )
+        ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                contentPadding = scaffoldPadding
+            ) {
+                item {
+                    Column(
+                        modifier = Modifier.padding(
+                            top = 5.dp,
+                            bottom = 5.dp,
+                            start = 22.dp,
+                            end = 4.dp
+                        ),
+                    ) {
+                        HomeSearchThing(
+                            showingSearch = viewModel.showingSearch,
+                            searchBar = {
+                                HomeSearchBar(
+                                    query = viewModel.searchQuery,
+                                    onQueryChange = { newQuery ->
+                                        viewModel.searchQuery = newQuery
+                                        viewModel.updateSearchResults(newQuery.lowercaseWithLocale())
+                                        viewModel.showingSearch = true
+                                    },
+                                    showSearch = viewModel.showSearch,
+                                    onShowSearchChange = { viewModel.showSearch = it },
+                                    showingSearch = viewModel.showingSearch,
+                                    onShowingSearchChange = { viewModel.showingSearch = it }
+                                )
+                            },
+                            filterBar = {
+                                FilterAndSongCount(
+                                    displaySongsCount = viewModel.displaySongs.size,
+                                    onFilterClick = { viewModel.showFilters = true },
+                                    onSortClick = { viewModel.showSort = true },
+                                    onSearchClick = {
+                                        viewModel.showSearch = true
+                                        viewModel.showingSearch = true
+                                    }
+                                )
+                            }
                         )
-                    },
-                    song = song,
-                    sharedTransitionScope = sharedTransitionScope,
-                    animatedVisibilityScope = animatedVisibilityScope,
-                    disableMarquee = viewModel.userSettingsController.disableMarquee,
-                    showPath = viewModel.userSettingsController.showPath
-                )
-            }
 
-            item { Spacer(modifier = Modifier.height(4.dp)) }
+                        if (viewModel.showSort) {
+                            SortDialog(
+                                userSettingsController = viewModel.userSettingsController,
+                                onDismiss = { viewModel.showSort = false },
+                                onSortOrderChange = {
+                                    viewModel.userSettingsController.updateSortOrder(
+                                        it
+                                    )
+                                },
+                                onSortByChange = { viewModel.userSettingsController.updateSortBy(it) }
+                            )
+                        }
+
+                        if (viewModel.showFilters) {
+                            FiltersDialog(
+                                hideLyrics = viewModel.userSettingsController.hideLyrics,
+                                folders = viewModel.getSongFolders(context),
+                                blacklistedFolders = viewModel.userSettingsController.blacklistedFolders,
+                                onDismiss = { viewModel.showFilters = false },
+                                onFilterChange = { viewModel.filterSongs() },
+                                onHideLyricsChange = viewModel::onHideLyricsChange,
+                                onToggleFolderBlacklist = viewModel::onToggleFolderBlacklist
+                            )
+                        }
+                    }
+                }
+
+
+                items(viewModel.displaySongs.size) { index ->
+                    val song = viewModel.displaySongs[index]
+
+                    SongItem(
+                        filePath = song.filePath
+                            ?: error("a song in the list of files did not have a file path"),
+                        selected = selected.contains(song.filePath),
+                        quickSelect = selected.size > 0,
+                        onSelectionChanged = { newValue ->
+                            viewModel.selectSong(song, newValue)
+                        },
+                        onNavigateToSongRequest = {
+                            navController.navigate(
+                                LyricsFetchScreen(
+                                    songName = song.title ?: error("song.title was null"),
+                                    artists = song.artist ?: "",
+                                    coverUri = song.imgUri.toString(),
+                                    filePath = song.filePath
+                                )
+                            )
+                        },
+                        song = song,
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        disableMarquee = viewModel.userSettingsController.disableMarquee,
+                        showPath = viewModel.userSettingsController.showPath
+                    )
+                }
+
+                item { Spacer(modifier = Modifier.height(4.dp)) }
+            }
         }
     }
 }
