@@ -15,9 +15,11 @@ import androidx.compose.material.icons.outlined.PermDeviceInformation
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -86,7 +88,10 @@ fun ExpandableOutlinedCard(
             }
             FilledTonalIconButton(
                 modifier = Modifier.size(24.dp),
-                onClick = { expanded = !expanded }
+                onClick = { expanded = !expanded },
+                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
+                )
             ) {
                 Icon(
                     imageVector = Icons.Outlined.ExpandLess,

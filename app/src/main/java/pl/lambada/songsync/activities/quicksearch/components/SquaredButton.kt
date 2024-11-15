@@ -1,6 +1,7 @@
 package pl.lambada.songsync.activities.quicksearch.components
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,6 +62,7 @@ fun ButtonWithIconAndText(
     icon: ImageVector,
     text: String,
     enabled: Boolean = true,
+    border: Boolean = false,
     backgroundColor: Color = MaterialTheme.colorScheme.secondaryContainer,
     shape: CornerBasedShape = MaterialTheme.shapes.small,
     onClick: () -> Unit = {}
@@ -77,6 +79,7 @@ fun ButtonWithIconAndText(
         onClick = onClick,
         enabled = enabled,
         shape = shape,
+        border = if (border) BorderStroke(1.dp, MaterialTheme.colorScheme.outline) else null,
         color = backgroundColor
     ) {
         Column(
