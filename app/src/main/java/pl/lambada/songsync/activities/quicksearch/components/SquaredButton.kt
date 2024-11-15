@@ -1,5 +1,6 @@
 package pl.lambada.songsync.activities.quicksearch.components
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -63,10 +65,15 @@ fun ButtonWithIconAndText(
     shape: CornerBasedShape = MaterialTheme.shapes.small,
     onClick: () -> Unit = {}
 ) {
+
+    val animatedAlpha by animateFloatAsState(
+        targetValue = if (enabled) 1f else 0.4f
+    )
+
     Surface(
         modifier = modifier
             .semantics { role = Role.Button }
-            .alpha(if (enabled) 1f else 0.4f),
+            .alpha(animatedAlpha),
         onClick = onClick,
         enabled = enabled,
         shape = shape,

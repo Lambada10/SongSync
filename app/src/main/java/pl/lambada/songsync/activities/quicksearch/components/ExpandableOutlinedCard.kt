@@ -27,9 +27,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import pl.lambada.songsync.R
 
 @Composable
 fun ExpandableOutlinedCard(
@@ -62,7 +64,7 @@ fun ExpandableOutlinedCard(
             Icon(
                 modifier = Modifier.weight(0.1f),
                 imageVector = icon,
-                contentDescription = null,
+                contentDescription = stringResource(R.string.song_lyrics),
             )
             Column(
                 modifier = Modifier
@@ -87,8 +89,8 @@ fun ExpandableOutlinedCard(
                 onClick = { expanded = !expanded }
             ) {
                 Icon(
-                    Icons.Outlined.ExpandLess,
-                    null,
+                    imageVector = Icons.Outlined.ExpandLess,
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.rotate(animatedDegree.value)
                 )

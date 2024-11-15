@@ -48,154 +48,152 @@ fun QuickLyricsSearchPage(
             .padding(16.dp)
     ) {
         Crossfade(state.value.screenState) { pageState ->
-            Row {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth()
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.showing_lyrics_for).uppercase(),
-                                style = MaterialTheme.typography.labelLarge.copy(
-                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                                    letterSpacing = 2.sp
-                                )
+                        Text(
+                            text = stringResource(R.string.showing_lyrics_for).uppercase(),
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                letterSpacing = 2.sp
                             )
+                        )
 
-                            state.value.song?.let { song ->
-                                Text(
-                                    text = song.first,
-                                    style = MaterialTheme.typography.headlineSmall
-                                )
-                                Text(
-                                    text = buildAnnotatedString {
-                                        append(stringResource(R.string.by))
-                                        append(" ")
-                                        withStyle(MaterialTheme.typography.titleMedium.toSpanStyle()) {
-                                            append(song.second)
-                                        }
-                                    },
-                                )
-                            }
-                        }
-                        Row(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(8.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            ButtonWithIconAndText(
-                                icon = Icons.AutoMirrored.Rounded.Send,
-                                text = stringResource(R.string.accept),
-                                modifier = Modifier
-                                    .weight(1f),
-                                onClick = { onSendLyrics(state.value.lyricsState.data!!) },
-                                enabled = state.value.lyricsState is ResourceState.Success,
-                                shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)
+                        state.value.song?.let { song ->
+                            Text(
+                                text = song.first,
+                                style = MaterialTheme.typography.headlineSmall
                             )
-                            ButtonWithIconAndText(
-                                icon = Icons.Filled.Settings,
-                                text = stringResource(R.string.settings),
-                                modifier = Modifier
-                                    .weight(1f),
-                                shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp)
+                            Text(
+                                text = buildAnnotatedString {
+                                    append(stringResource(R.string.by))
+                                    append(" ")
+                                    withStyle(MaterialTheme.typography.titleMedium.toSpanStyle()) {
+                                        append(song.second)
+                                    }
+                                },
                             )
                         }
                     }
+                    Row(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ButtonWithIconAndText(
+                            icon = Icons.AutoMirrored.Rounded.Send,
+                            text = stringResource(R.string.accept),
+                            modifier = Modifier
+                                .weight(1f),
+                            onClick = { onSendLyrics(state.value.lyricsState.data!!) },
+                            enabled = state.value.lyricsState is ResourceState.Success,
+                            shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)
+                        )
+                        ButtonWithIconAndText(
+                            icon = Icons.Filled.Settings,
+                            text = stringResource(R.string.settings),
+                            modifier = Modifier
+                                .weight(1f),
+                            shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp)
+                        )
+                    }
+                }
 
-                    HorizontalDivider()
+                HorizontalDivider()
 
-                    when (pageState) {
-                        is ScreenState.Loading -> {
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
-                            }
+                when (pageState) {
+                    is ScreenState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
                         }
+                    }
 
-                        is ScreenState.Success -> {
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                pageState.data?.let {
-                                    Column(
+                    is ScreenState.Success -> {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            pageState.data?.let {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Row(
                                         modifier = Modifier.fillMaxWidth(),
-                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
                                     ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Filled.Cloud,
-                                                contentDescription = null,
+                                        Icon(
+                                            imageVector = Icons.Filled.Cloud,
+                                            contentDescription = null,
+                                        )
+                                        Text(
+                                            text = stringResource(R.string.cloud_song).uppercase(),
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                letterSpacing = 1.sp,
+                                                fontWeight = FontWeight.SemiBold
                                             )
-                                            Text(
-                                                text = stringResource(R.string.cloud_song).uppercase(),
-                                                style = MaterialTheme.typography.bodyMedium.copy(
-                                                    letterSpacing = 1.sp,
-                                                    fontWeight = FontWeight.SemiBold
-                                                )
-                                            )
-                                        }
-
-                                        QuickLyricsSongInfo(
-                                            songInfo = pageState.data,
-                                            modifier = Modifier.fillMaxWidth()
                                         )
                                     }
-                                    when (state.value.lyricsState) {
-                                        is ResourceState.Loading<*> -> {
-                                            Box(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                CircularProgressIndicator()
-                                            }
-                                        }
 
-                                        is ResourceState.Success<*> -> {
-                                            state.value.lyricsState.data?.let { _ -> //This crunches the animation lol
-                                                ExpandableOutlinedCard(
-                                                    title = stringResource(R.string.song_lyrics),
-                                                    subtitle = stringResource(R.string.lyrics_subtitle),
-                                                    icon = Icons.Rounded.Subtitles,
-                                                    isExpanded = false,
-                                                    modifier = Modifier.fillMaxWidth()
-                                                ) {
-                                                    SyncedLyricsColumn(
-                                                        lyricsList = state.value.parsedLyrics,
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .padding(8.dp)
-                                                    )
-                                                }
-                                            }
-                                        }
-
-                                        is ResourceState.Error<*> -> {
-                                            Text("Error: ${state.value.lyricsState.message}")
+                                    QuickLyricsSongInfo(
+                                        songInfo = pageState.data,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                                when (state.value.lyricsState) {
+                                    is ResourceState.Loading<*> -> {
+                                        Box(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            CircularProgressIndicator()
                                         }
                                     }
+
+                                    is ResourceState.Success<*> -> {
+                                        state.value.lyricsState.data?.let { _ -> //This crunches the animation lol
+                                            ExpandableOutlinedCard(
+                                                title = stringResource(R.string.song_lyrics),
+                                                subtitle = stringResource(R.string.lyrics_subtitle),
+                                                icon = Icons.Rounded.Subtitles,
+                                                isExpanded = false,
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                SyncedLyricsColumn(
+                                                    lyricsList = state.value.parsedLyrics,
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(8.dp)
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    is ResourceState.Error<*> -> {
+                                        Text("Error: ${state.value.lyricsState.message}")
+                                    }
                                 }
-
                             }
-                        }
 
-                        is ScreenState.Error -> {
-                            Text("Error: ${pageState.exception.message}")
                         }
+                    }
+
+                    is ScreenState.Error -> {
+                        Text("Error: ${pageState.exception.message}")
                     }
                 }
             }

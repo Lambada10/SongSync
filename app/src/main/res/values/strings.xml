@@ -151,4 +151,5 @@
     <string name="accept">Accept</string>
     <string name="song_lyrics">Song lyrics</string>
     <string name="lyrics_subtitle">"Retrieved song lyrics that will be sent to the application "</string>
+    <string name="song_name_not_provided">The song name has not been provided</string>
 </resources>

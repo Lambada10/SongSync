@@ -2,6 +2,7 @@ package pl.lambada.songsync.activities.quicksearch
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -15,6 +16,7 @@ import coil.ImageLoader
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import kotlinx.coroutines.Dispatchers
+import pl.lambada.songsync.R
 import pl.lambada.songsync.activities.quicksearch.viewmodel.QuickLyricsSearchViewModel
 import pl.lambada.songsync.activities.quicksearch.viewmodel.QuickLyricsSearchViewModelFactory
 import pl.lambada.songsync.data.UserSettingsController
@@ -54,7 +56,6 @@ class QuickLyricsSearchActivity : AppCompatActivity() {
             .dispatcher(Dispatchers.IO)
             .build()
 
-
         enableEdgeToEdge()
         handleShareIntent(intent)
 
@@ -65,7 +66,7 @@ class QuickLyricsSearchActivity : AppCompatActivity() {
                 ModalBottomSheet(
                     sheetState = sheetState,
                     properties = ModalBottomSheetDefaults.properties,
-                    onDismissRequest = { this.finish() }
+                    onDismissRequest = { finish() }
                 ) {
                     QuickLyricsSearchPage(
                         state = viewModelState,
@@ -89,14 +90,24 @@ class QuickLyricsSearchActivity : AppCompatActivity() {
         when (intent.action) {
             Intent.ACTION_SEND -> {
                 val songName =
-                    intent.getStringExtra("songName") ?: "" //TODO: Change to a exception in the VM
+                    intent.getStringExtra("songName")
                 val artistName = intent.getStringExtra("artistName")
-                    ?: "" //TODO: Change to a exception in the VM
+                    ?: "" // Artist name is optional. This may be misleading sometimes.
+
+                if (songName.isNullOrBlank()) {
+                    Toast.makeText(
+                        this,
+                        this.getString(R.string.song_name_not_provided),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    finish()
+                    return
+                }
 
                 viewModel.onEvent(
                     QuickLyricsSearchViewModel.Event.Fetch(
-                        songName to artistName,
-                        this
+                        song = songName to artistName,
+                        context = this
                     )
                 )
             }
