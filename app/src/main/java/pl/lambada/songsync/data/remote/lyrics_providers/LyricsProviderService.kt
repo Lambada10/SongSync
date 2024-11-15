@@ -75,14 +75,11 @@ class LyricsProviderService {
                     musixmatchSongInfo = it
                 } ?: throw NoTrackFoundException()
             }
-        } catch (e: InternalErrorException) {
-            throw e
-        } catch (e: NoTrackFoundException) {
-            throw e
-        } catch (e: EmptyQueryException) {
-            throw e
         } catch (e: Exception) {
-            throw InternalErrorException(Log.getStackTraceString(e))
+            when (e) {
+                is InternalErrorException, is NoTrackFoundException, is EmptyQueryException -> throw e
+                else -> throw InternalErrorException(Log.getStackTraceString(e))
+            }
         }
     }
 

@@ -25,18 +25,17 @@ import pl.lambada.songsync.ui.theme.SongSyncTheme
 import pl.lambada.songsync.util.dataStore
 
 class QuickLyricsSearchActivity : AppCompatActivity() {
-
-    val userSettingsController = UserSettingsController(dataStore)
     private val lyricsProviderService = LyricsProviderService()
 
-    private val viewModel: QuickLyricsSearchViewModel by viewModels {
-        QuickLyricsSearchViewModelFactory(userSettingsController, lyricsProviderService)
-    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val userSettingsController = UserSettingsController(dataStore)
+        val viewModel: QuickLyricsSearchViewModel by viewModels {
+            QuickLyricsSearchViewModelFactory(userSettingsController, lyricsProviderService)
+        }
         activityImageLoader = ImageLoader.Builder(this)
             .memoryCache {
                 MemoryCache.Builder(this)
@@ -57,7 +56,7 @@ class QuickLyricsSearchActivity : AppCompatActivity() {
             .build()
 
         enableEdgeToEdge()
-        handleShareIntent(intent)
+        handleShareIntent(intent, sendEvent = viewModel::onEvent)
 
         setContent {
             val sheetState = rememberModalBottomSheetState()
@@ -86,7 +85,10 @@ class QuickLyricsSearchActivity : AppCompatActivity() {
     }
 
 
-    private fun handleShareIntent(intent: Intent) {
+    private fun handleShareIntent(
+        intent: Intent,
+        sendEvent: (QuickLyricsSearchViewModel.Event) -> Unit
+    ) {
         when (intent.action) {
             Intent.ACTION_SEND -> {
                 val songName =
@@ -104,7 +106,7 @@ class QuickLyricsSearchActivity : AppCompatActivity() {
                     return
                 }
 
-                viewModel.onEvent(
+                sendEvent(
                     QuickLyricsSearchViewModel.Event.Fetch(
                         song = songName to artistName,
                         context = this
@@ -116,5 +118,6 @@ class QuickLyricsSearchActivity : AppCompatActivity() {
 
     companion object {
         lateinit var activityImageLoader: ImageLoader
+        lateinit var userSettingsController: UserSettingsController
     }
 }

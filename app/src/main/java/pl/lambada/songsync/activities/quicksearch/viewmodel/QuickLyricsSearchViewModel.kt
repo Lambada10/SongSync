@@ -81,7 +81,6 @@ class QuickLyricsSearchViewModel(
             }
 
             if (lyricsCall.isSuccess) {
-
                 val syncedLyrics = lyricsCall.getOrNull()
 
                 if (syncedLyrics == null) updateLyricsState(
