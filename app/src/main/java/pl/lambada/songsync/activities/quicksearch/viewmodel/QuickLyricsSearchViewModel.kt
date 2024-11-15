@@ -20,7 +20,7 @@ import pl.lambada.songsync.util.parseLyrics
 class QuickLyricsSearchViewModel(
     val userSettingsController: UserSettingsController,
     private val lyricsProviderService: LyricsProviderService
-): ViewModel() {
+) : ViewModel() {
     private val mutableState = MutableStateFlow(QuickSearchViewState())
     val state = mutableState.asStateFlow()
 
@@ -55,7 +55,7 @@ class QuickLyricsSearchViewModel(
                 version = context.getVersion()
             )
 
-            if(syncedLyrics != null) {
+            if (syncedLyrics != null) {
                 updateLyricsState(ResourceState.Success(syncedLyrics))
                 parseLyrics(syncedLyrics).let { parsedLyrics ->
                     Log.d("QuickLyricsSearchVM", "Parsed lyrics: $parsedLyrics")
@@ -80,7 +80,7 @@ class QuickLyricsSearchViewModel(
         )
 
     private fun updateScreenState(screenState: ScreenState<SongInfo>) {
-        if(screenState != mutableState.value.screenState) {
+        if (screenState != mutableState.value.screenState) {
             mutableState.update {
                 it.copy(screenState = screenState)
             }
@@ -88,7 +88,7 @@ class QuickLyricsSearchViewModel(
     }
 
     private fun updateLyricsState(lyricsState: ResourceState<String>) {
-        if(lyricsState != mutableState.value.lyricsState) {
+        if (lyricsState != mutableState.value.lyricsState) {
             mutableState.update {
                 it.copy(lyricsState = lyricsState)
             }
@@ -96,7 +96,7 @@ class QuickLyricsSearchViewModel(
     }
 
     fun onEvent(event: Event) {
-        when(event) {
+        when (event) {
             is Event.Fetch -> {
                 mutableState.update {
                     it.copy(song = event.song)
@@ -107,6 +107,6 @@ class QuickLyricsSearchViewModel(
     }
 
     interface Event {
-        data class Fetch(val song: Pair<String, String>, val context: Context): Event
+        data class Fetch(val song: Pair<String, String>, val context: Context) : Event
     }
 }

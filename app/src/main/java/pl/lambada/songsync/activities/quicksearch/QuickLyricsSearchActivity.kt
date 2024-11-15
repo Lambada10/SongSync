@@ -1,11 +1,7 @@
 package pl.lambada.songsync.activities.quicksearch
 
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.os.Bundle
-import android.view.WindowManager
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -14,13 +10,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
-import coil.ImageLoaderFactory
 import coil.disk.DiskCache
-import coil.imageLoader
 import coil.memory.MemoryCache
 import kotlinx.coroutines.Dispatchers
 import pl.lambada.songsync.activities.quicksearch.viewmodel.QuickLyricsSearchViewModel
@@ -96,10 +88,17 @@ class QuickLyricsSearchActivity : AppCompatActivity() {
     private fun handleShareIntent(intent: Intent) {
         when (intent.action) {
             Intent.ACTION_SEND -> {
-                val songName = intent.getStringExtra("songName") ?: "" //TODO: Change to a exception in the VM
-                val artistName = intent.getStringExtra("artistName") ?: "" //TODO: Change to a exception in the VM
+                val songName =
+                    intent.getStringExtra("songName") ?: "" //TODO: Change to a exception in the VM
+                val artistName = intent.getStringExtra("artistName")
+                    ?: "" //TODO: Change to a exception in the VM
 
-                viewModel.onEvent(QuickLyricsSearchViewModel.Event.Fetch(songName to artistName, this))
+                viewModel.onEvent(
+                    QuickLyricsSearchViewModel.Event.Fetch(
+                        songName to artistName,
+                        this
+                    )
+                )
             }
         }
     }

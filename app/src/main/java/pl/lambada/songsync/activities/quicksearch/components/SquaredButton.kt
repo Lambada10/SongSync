@@ -61,10 +61,12 @@ fun ButtonWithIconAndText(
     enabled: Boolean = true,
     backgroundColor: Color = MaterialTheme.colorScheme.secondaryContainer,
     shape: CornerBasedShape = MaterialTheme.shapes.small,
-    onClick : () -> Unit = {}
+    onClick: () -> Unit = {}
 ) {
     Surface(
-        modifier = modifier.semantics { role = Role.Button }.alpha(if (enabled) 1f else 0.4f),
+        modifier = modifier
+            .semantics { role = Role.Button }
+            .alpha(if (enabled) 1f else 0.4f),
         onClick = onClick,
         enabled = enabled,
         shape = shape,
