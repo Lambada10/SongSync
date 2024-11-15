@@ -1,6 +1,7 @@
 package pl.lambada.songsync.activities.quicksearch.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -14,19 +15,20 @@ import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.util.ResourceState
 import pl.lambada.songsync.util.ScreenState
 import pl.lambada.songsync.util.ext.getVersion
+import pl.lambada.songsync.util.parseLyrics
 
 class QuickLyricsSearchViewModel(
     val userSettingsController: UserSettingsController,
     private val lyricsProviderService: LyricsProviderService
 ): ViewModel() {
-
     private val mutableState = MutableStateFlow(QuickSearchViewState())
     val state = mutableState.asStateFlow()
 
     data class QuickSearchViewState(
         val song: Pair<String, String>? = null, // Pair of song title and artist's name
         val screenState: ScreenState<SongInfo> = ScreenState.Loading,
-        val lyricsState: ResourceState<String> = ResourceState.Loading()
+        val lyricsState: ResourceState<String> = ResourceState.Loading(),
+        val parsedLyrics: List<Pair<String, String>> = emptyList()
     )
 
     private fun fetchSongData(song: Pair<String, String>, context: Context) {
@@ -55,6 +57,12 @@ class QuickLyricsSearchViewModel(
 
             if(syncedLyrics != null) {
                 updateLyricsState(ResourceState.Success(syncedLyrics))
+                parseLyrics(syncedLyrics).let { parsedLyrics ->
+                    Log.d("QuickLyricsSearchVM", "Parsed lyrics: $parsedLyrics")
+                    mutableState.update {
+                        it.copy(parsedLyrics = parsedLyrics)
+                    }
+                }
             } else {
                 updateLyricsState(ResourceState.Error("Error fetching lyrics for the song."))
             }

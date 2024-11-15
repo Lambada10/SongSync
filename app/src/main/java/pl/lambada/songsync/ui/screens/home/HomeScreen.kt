@@ -194,35 +194,35 @@ fun HomeScreenLoaded(
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = scaffoldPadding
         ) {
-//            item {
-//                val launcher = rememberLauncherForActivityResult(
-//                    contract = ActivityResultContracts.StartActivityForResult()
-//                ) { result ->
-//                    if (result.resultCode == Activity.RESULT_OK) {
-//                        val receivedLyrics = result.data?.getStringExtra("lyrics")
-//                        if (receivedLyrics != null) {
-//                            lyrics = receivedLyrics
-//                        }
-//                    }
-//                }
-//                Button(
-//                    onClick = {
-//                        val intent = Intent("android.intent.action.SEND").apply {
-//                            putExtra("songName", "Faded")
-//                            putExtra("artistName", "Alan Walker")
-//                            type = "text/plain"
-//                            setPackage("pl.lambada.songsync")
-//                        }
-//                        launcher.launch(intent)
-//                    }
-//                ) {
-//                    Text("Launch intent")
-//                }
-//            }
-//
-//            item {
-//                Text(lyrics)
-//            }
+            item {
+                val launcher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.StartActivityForResult()
+                ) { result ->
+                    if (result.resultCode == Activity.RESULT_OK) {
+                        val receivedLyrics = result.data?.getStringExtra("lyrics")
+                        if (receivedLyrics != null) {
+                            lyrics = receivedLyrics
+                        }
+                    }
+                }
+                Button(
+                    onClick = {
+                        val intent = Intent("android.intent.action.SEND").apply {
+                            putExtra("songName", "Around the World")
+                            putExtra("artistName", "Niklas Dee")
+                            type = "text/plain"
+                            setPackage("pl.lambada.songsync")
+                        }
+                        launcher.launch(intent)
+                    }
+                ) {
+                    Text("Launch intent")
+                }
+            }
+
+            item {
+                Text(lyrics)
+            }
 
             item {
                 Column(

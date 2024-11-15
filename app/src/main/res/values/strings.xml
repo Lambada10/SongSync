@@ -146,4 +146,9 @@
     <string name="translation">Translation</string>
     <string name="help_us_translate">Help us translate the app to your language!</string>
     <string name="translation_website">Open Weblate</string>
+    <string name="showing_lyrics_for">Showing lyrics for</string>
+    <string name="by">by</string>
+    <string name="accept">Accept</string>
+    <string name="song_lyrics">Song lyrics</string>
+    <string name="lyrics_subtitle">"Retrieved song lyrics that will be sent to the application "</string>
 </resources>

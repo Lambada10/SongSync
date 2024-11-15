@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetDefaults
@@ -16,6 +17,12 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.disk.DiskCache
+import coil.imageLoader
+import coil.memory.MemoryCache
+import kotlinx.coroutines.Dispatchers
 import pl.lambada.songsync.activities.quicksearch.viewmodel.QuickLyricsSearchViewModel
 import pl.lambada.songsync.activities.quicksearch.viewmodel.QuickLyricsSearchViewModelFactory
 import pl.lambada.songsync.data.UserSettingsController
@@ -23,7 +30,7 @@ import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
 import pl.lambada.songsync.ui.theme.SongSyncTheme
 import pl.lambada.songsync.util.dataStore
 
-class QuickLyricsSearchActivity : ComponentActivity() {
+class QuickLyricsSearchActivity : AppCompatActivity() {
 
     val userSettingsController = UserSettingsController(dataStore)
     private val lyricsProviderService = LyricsProviderService()
@@ -35,6 +42,26 @@ class QuickLyricsSearchActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        activityImageLoader = ImageLoader.Builder(this)
+            .memoryCache {
+                MemoryCache.Builder(this)
+                    .maxSizePercent(0.35)
+                    .build()
+            }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(this.cacheDir.resolve("image_cache"))
+                    .maxSizeBytes(7 * 1024 * 1024)
+                    .build()
+            }
+            .respectCacheHeaders(false)
+            .allowHardware(true)
+            .crossfade(true)
+            .bitmapFactoryMaxParallelism(12)
+            .dispatcher(Dispatchers.IO)
+            .build()
+
 
         enableEdgeToEdge()
         handleShareIntent(intent)
@@ -75,5 +102,9 @@ class QuickLyricsSearchActivity : ComponentActivity() {
                 viewModel.onEvent(QuickLyricsSearchViewModel.Event.Fetch(songName to artistName, this))
             }
         }
+    }
+
+    companion object {
+        lateinit var activityImageLoader: ImageLoader
     }
 }
