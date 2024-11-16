@@ -140,4 +140,5 @@
     <string name="translation">Traducción</string>
     <string name="help_us_translate">¡Ayúdanos a traducir la aplicación a tu idioma!</string>
     <string name="translation_website">Abrir Weblate</string>
+    <string name="statusbar_lyrics_ext">Extensión de letras en la barra de estado (para NetEase)</string>
 </resources>
