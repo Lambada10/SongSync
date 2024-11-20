@@ -4,11 +4,15 @@ import android.graphics.Path
 import android.view.animation.PathInterpolator
 import androidx.compose.animation.BoundsTransform
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.core.ArcMode
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.ExperimentalAnimationSpecApi
+import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
 import pl.lambada.songsync.util.ui.MotionConstants.DURATION
 import pl.lambada.songsync.util.ui.MotionConstants.DURATION_ENTER
+import pl.lambada.songsync.util.ui.MotionConstants.DURATION_ENTER_SHORT
 import pl.lambada.songsync.util.ui.MotionConstants.DURATION_EXIT
 import pl.lambada.songsync.util.ui.MotionConstants.DURATION_EXIT_SHORT
 
@@ -56,5 +60,14 @@ fun <T> tweenExit(
 @OptIn(ExperimentalSharedTransitionApi::class)
 val DefaultBoundsTransform = BoundsTransform { _, _ ->
     tween(easing = EmphasizedEasing, durationMillis = DURATION)
+}
+
+@OptIn(ExperimentalAnimationSpecApi::class, ExperimentalSharedTransitionApi::class)
+val SearchFABBoundsTransform = BoundsTransform { initialBounds, targetBounds ->
+    keyframes {
+        durationMillis = DURATION_ENTER_SHORT
+        initialBounds at 0 using ArcMode.ArcBelow using MotionEasingStandard
+        targetBounds at DURATION_ENTER_SHORT using ArcMode.ArcAbove using MotionEasingStandard
+    }
 }
 

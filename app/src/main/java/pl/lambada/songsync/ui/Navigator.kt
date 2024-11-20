@@ -6,17 +6,17 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import pl.lambada.songsync.data.UserSettingsController
 import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
-import pl.lambada.songsync.ui.screens.settings.SettingsScreen
-import pl.lambada.songsync.ui.screens.settings.SettingsViewModel
+import pl.lambada.songsync.ui.common.animatedComposable
 import pl.lambada.songsync.ui.screens.home.HomeScreen
 import pl.lambada.songsync.ui.screens.home.HomeViewModel
 import pl.lambada.songsync.ui.screens.lyricsFetch.LyricsFetchScreen
 import pl.lambada.songsync.ui.screens.lyricsFetch.LyricsFetchViewModel
+import pl.lambada.songsync.ui.screens.settings.SettingsScreen
+import pl.lambada.songsync.ui.screens.settings.SettingsViewModel
 
 /**
  * Composable function for handling navigation within the app.
@@ -35,7 +35,7 @@ fun Navigator(
             navController = navController,
             startDestination = ScreenHome
         ) {
-            composable<ScreenHome> {
+            animatedComposable<ScreenHome> {
                 HomeScreen(
                     navController = navController,
                     viewModel = viewModel {
@@ -46,7 +46,7 @@ fun Navigator(
                 )
             }
 
-            composable<LyricsFetchScreen>() {
+            animatedComposable<LyricsFetchScreen>() {
                 val args = it.toRoute<LyricsFetchScreen>()
 
                 LyricsFetchScreen(
@@ -61,7 +61,7 @@ fun Navigator(
                     animatedVisibilityScope = this,
                 )
             }
-            composable<ScreenSettings> {
+            animatedComposable<ScreenSettings> {
                 SettingsScreen(
                     viewModel = viewModel { SettingsViewModel() },
                     userSettingsController,

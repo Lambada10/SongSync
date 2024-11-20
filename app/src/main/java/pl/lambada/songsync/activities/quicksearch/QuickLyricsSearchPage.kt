@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pl.lambada.songsync.R
 import pl.lambada.songsync.activities.quicksearch.components.ButtonWithIconAndText
+import pl.lambada.songsync.activities.quicksearch.components.ErrorCard
 import pl.lambada.songsync.activities.quicksearch.components.ExpandableOutlinedCard
 import pl.lambada.songsync.activities.quicksearch.components.QuickLyricsSongInfo
 import pl.lambada.songsync.activities.quicksearch.components.SyncedLyricsColumn
@@ -154,8 +155,7 @@ fun QuickLyricsSearchPage(
                                                                 lyricsList = parsedLyrics,
                                                                 modifier = Modifier
                                                                     .heightIn(
-                                                                        min = 200.dp,
-                                                                        max = 600.dp
+                                                                        min = 200.dp, max = 600.dp
                                                                     )
                                                                     .fillMaxWidth()
                                                                     .padding(8.dp)
@@ -165,7 +165,12 @@ fun QuickLyricsSearchPage(
                                                 }
 
                                                 is ResourceState.Error<*> -> {
-                                                    Text("Error: ${lyricsState.message}")
+                                                    ErrorCard(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .heightIn(max = 300.dp),
+                                                        stacktrace = lyricsState.message ?: ""
+                                                    )
                                                 }
                                             }
                                         }
@@ -174,7 +179,13 @@ fun QuickLyricsSearchPage(
                             }
 
                             is ScreenState.Error -> {
-                                Text("Error: ${animatedPageState.exception.message}")
+                                ErrorCard(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .heightIn(max = 300.dp),
+                                    stacktrace = animatedPageState.exception.message
+                                        ?: animatedPageState.exception.stackTrace.toString()
+                                )
                             }
                         }
                     }

@@ -1,9 +1,5 @@
 package pl.lambada.songsync.ui.screens.home
 
-import android.app.Activity
-import android.content.Intent
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -19,13 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import pl.lambada.songsync.ui.LyricsFetchScreen
@@ -55,6 +48,7 @@ import pl.lambada.songsync.ui.screens.home.components.SongItem
 import pl.lambada.songsync.ui.screens.home.components.SortDialog
 import pl.lambada.songsync.util.ext.BackPressHandler
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
+import pl.lambada.songsync.util.ui.SearchFABBoundsTransform
 
 /**
  * Composable function representing the home screen.
@@ -116,9 +110,11 @@ fun HomeScreen(
             with(sharedTransitionScope) {
                 FloatingActionButton(
                     modifier = Modifier
+                        .skipToLookaheadSize()
                         .sharedBounds(
                             sharedContentState = rememberSharedContentState(key = "fab"),
                             animatedVisibilityScope = animatedVisibilityScope,
+                            boundsTransform = SearchFABBoundsTransform,
                             resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
                         ),
                     onClick = { navController.navigate(LyricsFetchScreen()) }
@@ -177,9 +173,6 @@ fun HomeScreenLoaded(
     animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val context = LocalContext.current
-    var lyrics by remember {
-        mutableStateOf("Awaiting lyrics...")
-    }
 
     Column {
         if (isBatchDownload) {
@@ -194,36 +187,6 @@ fun HomeScreenLoaded(
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = scaffoldPadding
         ) {
-            item {
-                val launcher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.StartActivityForResult()
-                ) { result ->
-                    if (result.resultCode == Activity.RESULT_OK) {
-                        val receivedLyrics = result.data?.getStringExtra("lyrics")
-                        if (receivedLyrics != null) {
-                            lyrics = receivedLyrics
-                        }
-                    }
-                }
-                Button(
-                    onClick = {
-                        val intent = Intent("android.intent.action.SEND").apply {
-                            putExtra("songName", "Around the World")
-                            putExtra("artistName", "Niklas Dee")
-                            type = "text/plain"
-                            setPackage("pl.lambada.songsync")
-                        }
-                        launcher.launch(intent)
-                    }
-                ) {
-                    Text("Launch intent")
-                }
-            }
-
-            item {
-                Text(lyrics)
-            }
-
             item {
                 Column(
                     modifier = Modifier.padding(
