@@ -81,7 +81,7 @@ class AppleAPI {
 
                     if (multiPersonWordByWord) {
                         syncedLyrics.append(
-                            if (line.oppositeTurn) "v2: " else "v1: "
+                            if (line.oppositeTurn) "v2:" else "v1:"
                         )
                     }
 
@@ -90,18 +90,20 @@ class AppleAPI {
                         if (!syllable.part) {
                             syncedLyrics.append(" ")
                         }
+                        syncedLyrics.append("<${syllable.endtime?.toLrcTimestamp()}>")
                     }
 
                     if (line.background && multiPersonWordByWord) {
                         syncedLyrics.append("<${line.text.last().endtime?.toLrcTimestamp()}>\n")
 
-                        syncedLyrics.append("[bg: ")
+                        syncedLyrics.append("[bg:")
 
                         for (syllable in line.backgroundText) {
                             syncedLyrics.append("<${syllable.timestamp!!.toLrcTimestamp()}>${syllable.text}")
                             if (!syllable.part) {
                                 syncedLyrics.append(" ")
                             }
+                            syncedLyrics.append("<${syllable.endtime?.toLrcTimestamp()}>")
                         }
 
                         syncedLyrics.append("<${line.endtime.toLrcTimestamp()}>]\n")

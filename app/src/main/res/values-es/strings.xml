@@ -140,4 +140,12 @@
     <string name="translation">Traducción</string>
     <string name="help_us_translate">¡Ayúdanos a traducir la aplicación a tu idioma!</string>
     <string name="translation_website">Abrir Weblate</string>
+    <string name="statusbar_lyrics_ext">Extensión de letras en la barra de estado (para NetEase)</string>
+    <string name="multi_person_word_by_word">Letra multipersonal palabra por palabra</string>
+    <string name="multi_person_word_by_word_summary">Utilizar el formato de letras multipersona al obtener letras de Apple Music</string>
+    <string name="offset">Compensar</string>
+    <string name="synced_lyrics">Obtener letras sincronizadas</string>
+    <string name="synced_lyrics_summary">Activa o desactiva las letras sincronizadas o no sincronizadas de Musixmatch.</string>
+    <string name="offset_mode">Modo de compensación</string>
+    <string name="offset_mode_summary">Modificar directamente las marcas de tiempo de las letras en lugar de utilizar la etiqueta LRC de desplazamiento</string>
 </resources>
