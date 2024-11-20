@@ -11,5 +11,5 @@ fun Context.getVersion(): String {
     } else {
         @Suppress("deprecation") packageManager.getPackageInfo(packageName, 0)
     }
-    return pInfo.versionName
+    return pInfo.versionName.toString()
 }

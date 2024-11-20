@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.filled.Cloud
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.rounded.Subtitles
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -242,14 +241,14 @@ private fun Heading(
                     modifier = Modifier.weight(1f),
                     onClick = { onSendLyrics(this.data ?: "") },
                     enabled = this is ResourceState.Success<*>,
-                    shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)
+                    shape = RoundedCornerShape(8.dp) //RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)
                 )
-                ButtonWithIconAndText(
-                    icon = Icons.Filled.Settings,
-                    text = stringResource(R.string.settings),
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp)
-                )
+//                ButtonWithIconAndText(
+//                    icon = Icons.Filled.Settings,
+//                    text = stringResource(R.string.settings),
+//                    modifier = Modifier.weight(1f),
+//                    shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp)
+//                )
             }
         }
     }
