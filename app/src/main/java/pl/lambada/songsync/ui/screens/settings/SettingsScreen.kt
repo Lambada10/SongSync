@@ -102,8 +102,8 @@ fun SettingsScreen(
 
             item {
                 SyncedLyricsSwitch(
-                    selected = userSettingsController.syncedMusixmatch,
-                    onToggle = { userSettingsController.updateSyncedMusixmatch(it) }
+                    selected = userSettingsController.unsyncedFallbackMusixmatch,
+                    onToggle = { userSettingsController.updateUnsyncedFallbackMusixmatch(it) }
                 )
             }
 

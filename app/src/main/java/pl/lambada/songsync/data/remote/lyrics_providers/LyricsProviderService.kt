@@ -95,7 +95,7 @@ class LyricsProviderService {
         // TODO providers could be a sealed interface to include such parameters
         includeTranslationNetEase: Boolean = false,
         multiPersonWordByWord: Boolean = false,
-        syncedMusixmatch: Boolean = true
+        unsyncedFallbackMusixmatch: Boolean = true
     ): String? {
         return try {
             when (provider) {
@@ -111,7 +111,7 @@ class LyricsProviderService {
                 )
                 Providers.MUSIXMATCH -> MusixmatchAPI().getLyrics(
                     musixmatchSongInfo,
-                    syncedMusixmatch
+                    unsyncedFallbackMusixmatch
                 )
             }
         } catch (e: Exception) {
