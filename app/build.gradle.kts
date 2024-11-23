@@ -18,13 +18,12 @@ android {
         versionCode = 421
         versionName = "4.2.1"
 
-        resourceConfigurations += arrayOf(
-            "ar", "de", "es", "en", "fa", "fil", "in", "ja", "pl", "pt", "pt-rBR", "ro", "tr", "vi", "zh-rCN", "zh-rTW"
-        )
-
         vectorDrawables {
             useSupportLibrary = true
         }
+    }
+    androidResources {
+        generateLocaleConfig = true
     }
     signingConfigs {
         create("release") {
