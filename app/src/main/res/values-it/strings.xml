@@ -131,7 +131,7 @@
     <plurals name="this_will_download_lyrics_for_all_songs">
         <item quantity="one">Questo scaricherà i testi per una canzone. I testi esistenti per le canzoni saranno sovrascritti con quelli nuovi. Questo potrebbe essere meno accurato che scaricare i testi uno per uno. Sei sicuro di voler continuare?</item>
         <item quantity="many">Questo scaricherà i testi per le canzoni %1$d. I testi esistenti per le canzoni saranno sovrascritti con quelli nuovi. Questo potrebbe essere meno accurato che scaricare i testi uno per uno. Sei sicuro di voler continuare?</item>
-        <item quantity="other"></item>
+        <item quantity="other"/>
     </plurals>
     <string name="sd_card_path_set_successfully">Percorso della scheda SD impostato correttamente!</string>
     <string name="provider">Fornitore di testi</string>
