@@ -113,7 +113,7 @@ class QuickLyricsSearchViewModel(
             userSettingsController.selectedProvider,
             userSettingsController.includeTranslation,
             userSettingsController.multiPersonWordByWord,
-            userSettingsController.syncedMusixmatch
+            userSettingsController.unsyncedFallbackMusixmatch
         )
 
     private fun updateScreenState(screenState: ScreenState<SongInfo>) {
