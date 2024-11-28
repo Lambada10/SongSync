@@ -129,7 +129,7 @@
     <string name="song_path">Show song path</string>
     <string name="song_path_description">Show the path of a song file on song list</string>
     <string name="synced_lyrics">Get Unsynced Lyrics</string>
-    <string name="synced_lyrics_summary">Toggle to get unsynced lyrics from Musixmatch when synced lyrics aren't found.</string>
+    <string name="synced_lyrics_summary">Toggle to get unsynced lyrics from Musixmatch when synced lyrics aren\'t found.</string>
     <string name="title">Title</string>
     <string name="artist">Artist</string>
     <string name="album">Album</string>
