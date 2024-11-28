@@ -347,3 +347,21 @@ fun applyOffsetToLyrics(lyrics: String, offset: Int): String {
         "${startChar}${applyOffset(minute, second, millisecond)}$endChar"
     }
 }
+
+fun parseLyrics(lyrics: String): List<Pair<String, String>> {
+    val timestampRegex = Regex("""[\[<](\d+):(\d+)\.(\d+)[]>]""")
+    val lines = lyrics.lines()
+
+    return lines.mapNotNull { line ->
+        val match = timestampRegex.find(line) ?: return@mapNotNull null
+        val (minute, second, millisecond) = match.destructured
+
+        val startChar = line[0]
+        val endChar = if (startChar == '[') ']' else '>'
+
+        val timestamp = "${minute}:${second}.${millisecond.padStart(3, '0')}"
+        val text = line.substringAfter(endChar).trim()
+
+        timestamp to text
+    }
+}

@@ -49,8 +49,11 @@ class LyricsProviderService {
      * @return The SongInfo object containing the song information.
      */
     @Throws(
-        UnknownHostException::class, FileNotFoundException::class, NoTrackFoundException::class,
-        EmptyQueryException::class, InternalErrorException::class
+        UnknownHostException::class,
+        FileNotFoundException::class,
+        NoTrackFoundException::class,
+        EmptyQueryException::class,
+        InternalErrorException::class
     )
     suspend fun getSongInfo(query: SongInfo, offset: Int = 0, provider: Providers): SongInfo? {
         return try {
@@ -72,14 +75,11 @@ class LyricsProviderService {
                     musixmatchSongInfo = it
                 } ?: throw NoTrackFoundException()
             }
-        } catch (e: InternalErrorException) {
-            throw e
-        } catch (e: NoTrackFoundException) {
-            throw e
-        } catch (e: EmptyQueryException) {
-            throw e
         } catch (e: Exception) {
-            throw InternalErrorException(Log.getStackTraceString(e))
+            when (e) {
+                is InternalErrorException, is NoTrackFoundException, is EmptyQueryException -> throw e
+                else -> throw InternalErrorException(Log.getStackTraceString(e))
+            }
         }
     }
 
@@ -97,25 +97,20 @@ class LyricsProviderService {
         multiPersonWordByWord: Boolean = false,
         syncedMusixmatch: Boolean = true
     ): String? {
-        return try {
-            when (provider) {
-                Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink!!, version)
-                Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(lrcLibID)
-                Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(
-                    neteaseID,
-                    includeTranslationNetEase
-                )
-                Providers.APPLE -> AppleAPI().getSyncedLyrics(
-                    appleID,
-                    multiPersonWordByWord
-                )
-                Providers.MUSIXMATCH -> MusixmatchAPI().getLyrics(
-                    musixmatchSongInfo,
-                    syncedMusixmatch
-                )
-            }
-        } catch (e: Exception) {
-            null
+        return when (provider) {
+            Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink!!, version)
+            Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(lrcLibID)
+            Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(
+                neteaseID, includeTranslationNetEase
+            )
+
+            Providers.APPLE -> AppleAPI().getSyncedLyrics(
+                appleID, multiPersonWordByWord
+            )
+
+            Providers.MUSIXMATCH -> MusixmatchAPI().getLyrics(
+                musixmatchSongInfo, syncedMusixmatch
+            )
         }
     }
 }
