@@ -95,7 +95,7 @@ class LyricsProviderService {
         // TODO providers could be a sealed interface to include such parameters
         includeTranslationNetEase: Boolean = false,
         multiPersonWordByWord: Boolean = false,
-        syncedMusixmatch: Boolean = true
+        unsyncedFallbackMusixmatch: Boolean = true
     ): String? {
         return when (provider) {
             Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink!!, version)
@@ -109,7 +109,8 @@ class LyricsProviderService {
             )
 
             Providers.MUSIXMATCH -> MusixmatchAPI().getLyrics(
-                musixmatchSongInfo, syncedMusixmatch
+                musixmatchSongInfo,
+                unsyncedFallbackMusixmatch
             )
         }
     }

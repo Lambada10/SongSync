@@ -283,7 +283,7 @@ class HomeViewModel(
                 provider = userSettingsController.selectedProvider,
                 includeTranslationNetEase = userSettingsController.includeTranslation,
                 multiPersonWordByWord = userSettingsController.multiPersonWordByWord,
-                syncedMusixmatch = userSettingsController.syncedMusixmatch
+                unsyncedFallbackMusixmatch = userSettingsController.unsyncedFallbackMusixmatch
             )
         } catch (e: Exception) {
             null

@@ -37,7 +37,7 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
     var multiPersonWordByWord by mutableStateOf(dataStore.get(multiPersonWordByWordKey, true))
         private set
 
-    var syncedMusixmatch by mutableStateOf(dataStore.get(syncedMusixmatchKey, true))
+    var unsyncedFallbackMusixmatch by mutableStateOf(dataStore.get(unsyncedFallbackMusixmatchKey, true))
         private set
 
     var pureBlack by mutableStateOf(dataStore.get(pureBlackKey, false))
@@ -97,9 +97,9 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
         multiPersonWordByWord = to
     }
 
-    fun updateSyncedMusixmatch(to: Boolean) {
-        dataStore.set(syncedMusixmatchKey, to)
-        syncedMusixmatch = to
+    fun updateUnsyncedFallbackMusixmatch(to: Boolean) {
+        dataStore.set(unsyncedFallbackMusixmatchKey, to)
+        unsyncedFallbackMusixmatch = to
     }
 
     fun updateDisableMarquee(to: Boolean) {
@@ -144,7 +144,7 @@ private val blacklistedFoldersKey = stringPreferencesKey("blacklist")
 private val hideLyricsKey = booleanPreferencesKey("hide_lyrics")
 private val includeTranslationKey = booleanPreferencesKey("include_translation")
 private val multiPersonWordByWordKey = booleanPreferencesKey("multi_person_word_by_word")
-private val syncedMusixmatchKey = booleanPreferencesKey("synced_lyrics")
+private val unsyncedFallbackMusixmatchKey = booleanPreferencesKey("unsynced_lyrics_fallback")
 private val disableMarqueeKey = booleanPreferencesKey("marquee_disable")
 private val pureBlackKey = booleanPreferencesKey("pure_black")
 private val sdCardPathKey = stringPreferencesKey("sd_card_path")
