@@ -48,6 +48,7 @@ import pl.lambada.songsync.ui.screens.home.components.SongItem
 import pl.lambada.songsync.ui.screens.home.components.SortDialog
 import pl.lambada.songsync.util.ext.BackPressHandler
 import pl.lambada.songsync.util.ext.lowercaseWithLocale
+import pl.lambada.songsync.util.ui.SearchFABBoundsTransform
 
 /**
  * Composable function representing the home screen.
@@ -109,9 +110,11 @@ fun HomeScreen(
             with(sharedTransitionScope) {
                 FloatingActionButton(
                     modifier = Modifier
+                        .skipToLookaheadSize()
                         .sharedBounds(
                             sharedContentState = rememberSharedContentState(key = "fab"),
                             animatedVisibilityScope = animatedVisibilityScope,
+                            boundsTransform = SearchFABBoundsTransform,
                             resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
                         ),
                     onClick = { navController.navigate(LyricsFetchScreen()) }

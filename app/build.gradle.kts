@@ -8,23 +8,22 @@ plugins {
 
 android {
     namespace = "pl.lambada.songsync"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "pl.lambada.songsync"
         minSdk = 21
         //noinspection OldTargetApi
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 421
         versionName = "4.2.1"
-
-        resourceConfigurations += arrayOf(
-            "ar", "de", "es", "en", "fa", "fil", "in", "ja", "pl", "pt", "pt-rBR", "ro", "tr", "vi", "zh-rCN", "zh-rTW"
-        )
 
         vectorDrawables {
             useSupportLibrary = true
         }
+    }
+    androidResources {
+        generateLocaleConfig = true
     }
     signingConfigs {
         create("release") {
@@ -89,6 +88,6 @@ dependencies {
     implementation(libs.ktor.cio)
     implementation(libs.taglib)
     implementation(libs.datastore.preferences)
-    debugImplementation(libs.ui.tooling)
-    debugImplementation(libs.ui.tooling.preview)
+    implementation(libs.ui.tooling) //NOT RECOMMENDED
+    implementation(libs.ui.tooling.preview) //NOT RECOMMENDED
 }
