@@ -7,7 +7,7 @@
     <string name="cancel">Cancelar</string>
     <string name="error">Error</string>
     <string name="this_track_has_no_lyrics">Esta pista no tiene letras</string>
-    <string name="ok">Aceptar</string>
+    <string name="ok">De acuerdo</string>
     <string name="yes">Sí</string>
     <string name="no">No</string>
     <string name="downloading_lyrics">Descargando letras</string>
@@ -144,8 +144,15 @@
     <string name="multi_person_word_by_word">Letra multipersonal palabra por palabra</string>
     <string name="multi_person_word_by_word_summary">Utilizar el formato de letras multipersona al obtener letras de Apple Music</string>
     <string name="offset">Compensar</string>
-    <string name="synced_lyrics">Obtener letras sincronizadas</string>
-    <string name="synced_lyrics_summary">Activa o desactiva las letras sincronizadas o no sincronizadas de Musixmatch.</string>
+    <string name="synced_lyrics">Obtener letras no sincronizadas</string>
+    <string name="synced_lyrics_summary">Activa o desactiva la obtención de letras no sincronizadas de Musixmatch cuando no se encuentran letras sincronizadas.</string>
     <string name="offset_mode">Modo de compensación</string>
     <string name="offset_mode_summary">Modificar directamente las marcas de tiempo de las letras en lugar de utilizar la etiqueta LRC de desplazamiento</string>
+    <string name="by">por</string>
+    <string name="accept">Aceptar</string>
+    <string name="song_lyrics">Letras de las canciones</string>
+    <string name="unknown_error_occurred">Se produjo un error desconocido</string>
+    <string name="showing_lyrics_for">Mostrando letras para</string>
+    <string name="lyrics_subtitle">"Letras de canciones recuperadas que se enviarán a la aplicación "</string>
+    <string name="song_name_not_provided">No se ha proporcionado el nombre de la canción</string>
 </resources>
