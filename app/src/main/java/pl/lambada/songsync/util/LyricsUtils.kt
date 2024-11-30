@@ -289,26 +289,6 @@ private fun formatLyrics(
     return lrcContent
 }
 
-private fun formatAndSaveLyricsForSong(
-    song: Song,
-    context: Context,
-    sdCardPath: String?,
-    songInfo: SongInfo,
-    lyrics: String,
-    directOffset: Boolean
-) {
-    val targetFile = song.filePath.toLrcFile()
-
-    val lrcContent = generateLrcContent(
-        songInfo,
-        lyrics,
-        context.getString(R.string.generated_using),
-        directOffset = directOffset
-    )
-
-    writeLyricsToFile(targetFile, lrcContent, context, song, sdCardPath)
-}
-
 fun saveToExternalPath(
     context: Context,
     sourceFilePath: String?,
