@@ -20,11 +20,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Exposure
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -75,10 +78,9 @@ fun LyricsSuccessContent(
                 modifier = Modifier.padding(start = 6.dp)
             )
             Spacer(modifier = Modifier.weight(1f))
-            OutlinedButton(
+            IconButton(
                 onClick = { /* handled by repeatingClickable */ },
                 modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp)) // otherwise square ripple
                     .repeatingClickable(
                         interactionSource = remember { MutableInteractionSource() },
                         enabled = true,
@@ -86,7 +88,11 @@ fun LyricsSuccessContent(
                         onClick = { onSetOffset(offset - 100) }
                     )
             ) {
-                Text(text = "-0.1s")
+                Icon(
+                    imageVector = Icons.Default.Remove,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
             }
             Spacer(modifier = Modifier.width(10.dp))
             Text(
@@ -94,10 +100,9 @@ fun LyricsSuccessContent(
                     "${offset / 1000.0}s",
             )
             Spacer(modifier = Modifier.width(10.dp))
-            OutlinedButton(
+            IconButton(
                 onClick = { /* handled by repeatingClickable */ },
                 modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp)) // otherwise square ripple
                     .repeatingClickable(
                         interactionSource = remember { MutableInteractionSource() },
                         enabled = true,
@@ -105,7 +110,11 @@ fun LyricsSuccessContent(
                         onClick = { onSetOffset(offset + 100) }
                     )
             ) {
-                Text(text = "+0.1s")
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
 

@@ -95,9 +95,6 @@ fun Modifier.repeatingClickable(
                     }
                 }
             }
-        }.indication(
-            interactionSource = interactionSource,
-            indication = ripple()
-        )
+        }
     }
 )
