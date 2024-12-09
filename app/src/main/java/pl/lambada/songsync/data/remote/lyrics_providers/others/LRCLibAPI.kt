@@ -23,12 +23,12 @@ class LRCLibAPI {
     suspend fun getSongInfo(query: SongInfo, offset: Int = 0): SongInfo? {
         val search = withContext(Dispatchers.IO) {
             URLEncoder.encode(
-                "${query.songName}", // it doesn't work with artist name and song name together
+                "${query.songName} ${query.artistName}",
                 StandardCharsets.UTF_8.toString()
             )
         }
 
-        if (search == "")
+        if (search == "+")
             throw EmptyQueryException()
 
         val response = client.get(
