@@ -251,30 +251,34 @@ private suspend fun downloadLyricsForSong(
             }
                 .onFailure(onFailedLyricsResponse)
                 .onSuccess {
-                    formatAndSaveLyricsForSong(
-                        song,
-                        context,
-                        viewModel.userSettingsController.sdCardPath,
+                    val lrcContent = formatLyrics(
                         songInfo,
                         it,
+                        context,
                         viewModel.userSettingsController.directlyModifyTimestamps
                     )
+
+                    if(viewModel.userSettingsController.embedLyricsIntoFiles) {
+                        embedLyricsInFile(
+                            context,
+                            song.filePath ?: throw NullPointerException("File path is null"),
+                            lrcContent
+                        )
+                    } else {
+                        writeLyricsToFile(song.filePath.toLrcFile(), lrcContent, context, song,viewModel.userSettingsController.sdCardPath)
+                    }
 
                     onLyricsSaved()
                 }
         }
 }
 
-private fun formatAndSaveLyricsForSong(
-    song: Song,
-    context: Context,
-    sdCardPath: String?,
+private fun formatLyrics(
     songInfo: SongInfo,
     lyrics: String,
+    context: Context,
     directOffset: Boolean
-) {
-    val targetFile = song.filePath.toLrcFile()
-
+): String {
     val lrcContent = generateLrcContent(
         songInfo,
         lyrics,
@@ -282,7 +286,7 @@ private fun formatAndSaveLyricsForSong(
         directOffset = directOffset
     )
 
-    writeLyricsToFile(targetFile, lrcContent, context, song, sdCardPath)
+    return lrcContent
 }
 
 fun saveToExternalPath(
