@@ -11,24 +11,22 @@ import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import pl.lambada.songsync.ui.components.SettingsItem
+import pl.lambada.songsync.ui.components.SettingsHeadLabel
 import pl.lambada.songsync.R
 
 @Composable
 fun TranslationSection(uriHandler: UriHandler) {
-    SettingsItem(label = stringResource(id = R.string.translation)) {
-        Column(
-            modifier = Modifier
-                .clickable { uriHandler.openUri("https://hosted.weblate.org/engage/songsync/") }
-                .padding(horizontal = 22.dp, vertical = 16.dp)
-        ) {
-            Text(stringResource(id = R.string.help_us_translate))
-            Text(
-                text = stringResource(id = R.string.translation_website),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 12.sp,
-                lineHeight = 16.sp,
-            )
-        }
+    Column(
+        modifier = Modifier
+            .clickable { uriHandler.openUri("https://hosted.weblate.org/engage/songsync/") }
+            .padding(horizontal = 22.dp, vertical = 16.dp)
+    ) {
+        Text(stringResource(id = R.string.help_us_translate))
+        Text(
+            text = stringResource(id = R.string.translation_website),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
+        )
     }
 }

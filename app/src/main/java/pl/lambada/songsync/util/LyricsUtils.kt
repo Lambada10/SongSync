@@ -10,7 +10,6 @@ import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.util.Log
-import androidx.compose.runtime.produceState
 import androidx.documentfile.provider.DocumentFile
 import com.kyant.taglib.TagLib
 import pl.lambada.songsync.R
@@ -370,3 +369,4 @@ fun parseLyrics(lyrics: String): List<Pair<String, String>> {
         timestamp to text
     }
 }
+
