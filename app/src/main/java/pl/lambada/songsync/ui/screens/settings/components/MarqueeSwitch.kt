@@ -9,11 +9,10 @@ import pl.lambada.songsync.ui.components.SwitchItem
 
 @Composable
 fun MarqueeSwitch(selected: Boolean, onToggle: (Boolean) -> Unit) {
-    SettingsItem(label = stringResource(R.string.disable_marquee)) {
-        SwitchItem(
-            label = stringResource(R.string.disable_marquee_summary),
-            selected = selected,
-            onClick = { onToggle(!selected) }
-        )
-    }
+    SwitchItem(
+        label = stringResource(R.string.disable_marquee),
+        description = stringResource(R.string.disable_marquee_summary),
+        selected = selected,
+        onClick = { onToggle(!selected) }
+    )
 }

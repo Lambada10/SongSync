@@ -25,8 +25,9 @@ fun TranslationSection(uriHandler: UriHandler) {
             Text(stringResource(id = R.string.help_us_translate))
             Text(
                 text = stringResource(id = R.string.translation_website),
-                color = MaterialTheme.colorScheme.outline,
-                fontSize = 12.sp
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 12.sp,
+                lineHeight = 16.sp,
             )
         }
     }

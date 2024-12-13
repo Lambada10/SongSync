@@ -11,11 +11,10 @@ fun OffsetModeSwitch(
     selected: Boolean,
     onToggle: (Boolean) -> Unit
 ) {
-    SettingsItem(label = stringResource(R.string.offset_mode)) {
-        SwitchItem(
-            label = stringResource(R.string.offset_mode_summary),
-            selected = selected,
-            onClick = { onToggle(!selected) }
-        )
-    }
+    SwitchItem(
+        label = stringResource(R.string.offset_mode),
+        description = stringResource(R.string.offset_mode_summary),
+        selected = selected,
+        onClick = { onToggle(!selected) }
+    )
 }

@@ -28,8 +28,9 @@ fun SupportSection(uriHandler: UriHandler) {
             Text(stringResource(R.string.bugs_or_suggestions_contact_us))
             Text(
                 text = stringResource(R.string.telegram_group),
-                color = MaterialTheme.colorScheme.outline,
-                fontSize = 12.sp
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 12.sp,
+                lineHeight = 16.sp,
             )
         }
         Text(

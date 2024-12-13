@@ -8,11 +8,10 @@ import pl.lambada.songsync.ui.components.SwitchItem
 
 @Composable
 fun SyncedLyricsSwitch(selected: Boolean, onToggle: (Boolean) -> Unit) {
-    SettingsItem(label = stringResource(id = R.string.synced_lyrics)) {
-        SwitchItem(
-            label = stringResource(id = R.string.synced_lyrics_summary),
-            selected = selected,
-            onClick = { onToggle(!selected) }
-        )
-    }
+    SwitchItem(
+        label = stringResource(id = R.string.synced_lyrics),
+        description = stringResource(id = R.string.synced_lyrics_summary),
+        selected = selected,
+        onClick = { onToggle(!selected) }
+    )
 }

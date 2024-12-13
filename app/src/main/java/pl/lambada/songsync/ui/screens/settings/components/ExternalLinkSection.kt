@@ -25,8 +25,9 @@ fun ExternalLinkSection(label: String, description: String, url: String, uriHand
         Text(stringResource(R.string.we_are_open_source))
         Text(
             text = description,
-            color = MaterialTheme.colorScheme.outline,
-            fontSize = 12.sp
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
         )
     }
 }

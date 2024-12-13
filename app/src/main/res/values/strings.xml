@@ -153,4 +153,5 @@
     <string name="lyrics_subtitle">"Retrieved song lyrics that will be sent to the application "</string>
     <string name="song_name_not_provided">The song name has not been provided</string>
     <string name="unknown_error_occurred">An unknown error occurred</string>
+    <string name="pure_black_theme_summary">Use pure black theme when dark mode is enabled</string>
 </resources>
