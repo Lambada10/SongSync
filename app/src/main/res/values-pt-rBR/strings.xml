@@ -131,8 +131,8 @@
     <string name="offset">Desvio</string>
     <string name="song_path">Mostrar caminho da música</string>
     <string name="song_path_description">Mostrar o caminho de um arquivo de música na lista de músicas</string>
-    <string name="synced_lyrics">Obter letras sincronizadas</string>
-    <string name="synced_lyrics_summary">Alterne para alternar entre letras sincronizadas e não sincronizadas do Musixmatch.</string>
+    <string name="synced_lyrics">Obter letras não sincronizadas</string>
+    <string name="synced_lyrics_summary">Alterne para obter letras não sincronizadas do Musixmatch quando letras sincronizadas não forem encontradas.</string>
     <string name="title">Titulo</string>
     <string name="artist">Artista</string>
     <string name="album">Álbum</string>
@@ -147,4 +147,11 @@
     <string name="translation">Tradução</string>
     <string name="help_us_translate">Ajude-nos a traduzir o aplicativo para o seu idioma!</string>
     <string name="translation_website">Abra o Weblate</string>
+    <string name="showing_lyrics_for">Mostrando letras para</string>
+    <string name="by">por</string>
+    <string name="accept">Aceitar</string>
+    <string name="song_lyrics">Letra da música</string>
+    <string name="lyrics_subtitle">"Letras de músicas recuperadas que serão enviadas para o aplicativo "</string>
+    <string name="song_name_not_provided">O nome da música não foi fornecido</string>
+    <string name="unknown_error_occurred">Ocorreu um erro desconhecido</string>
 </resources>
