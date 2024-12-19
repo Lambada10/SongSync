@@ -97,7 +97,7 @@
     <string name="embed_lyrics_in_file">ファイルに歌詞を埋め込む</string>
     <string name="embedded_lyrics_in_file">歌詞が曲のファイルに埋め込まれています</string>
     <string name="multi_person_word_by_word_summary">Apple Music から歌詞を取得時に複数人の歌詞形式を使用します</string>
-    <string name="synced_lyrics_summary">Musixmatch で同期の歌詞と非同期の歌詞を切り替えます。</string>
+    <string name="synced_lyrics_summary">同期された歌詞が見つからない場合は、Musixmatch から非同期の歌詞を取得するように切り換えます。</string>
     <string name="title">タイトル</string>
     <string name="date_added">追加した日時</string>
     <string name="translation">翻訳</string>
@@ -126,7 +126,7 @@
     <string name="offset">オフセット</string>
     <string name="song_path">曲のパスを表示</string>
     <string name="song_path_description">曲の一覧にファイルのパスを表示する</string>
-    <string name="synced_lyrics">同期された歌詞を取得</string>
+    <string name="synced_lyrics">非同期の歌詞を取得</string>
     <string name="artist">アーティスト</string>
     <string name="album">アルバム</string>
     <string name="year">年</string>
@@ -140,4 +140,11 @@
     <string name="date_modified">変更した日時</string>
     <string name="help_us_translate">アプリをあなたの母国語に翻訳してくれませんか！</string>
     <string name="translation_website">Weblate を開く</string>
+    <string name="showing_lyrics_for">歌詞を表示</string>
+    <string name="by">-</string>
+    <string name="accept">同意</string>
+    <string name="song_lyrics">曲の歌詞</string>
+    <string name="lyrics_subtitle">"取得した歌詞はアプリに送信されます "</string>
+    <string name="unknown_error_occurred">不明なエラーが発生しました</string>
+    <string name="song_name_not_provided">曲名が提供されていません</string>
 </resources>
