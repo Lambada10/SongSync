@@ -116,7 +116,7 @@
     <string name="descending">Absteigend</string>
     <string name="artist">Interpret</string>
     <string name="offset_mode">Versetzungsmodus</string>
-    <string name="synced_lyrics">Synchronisierte Liedtexte abrufen</string>
+    <string name="synced_lyrics">Unsynchronisierte Liedtexte abrufen</string>
     <string name="ascending">Aufsteigend</string>
     <string name="duration">Dauer</string>
     <string name="year">Jahr</string>
