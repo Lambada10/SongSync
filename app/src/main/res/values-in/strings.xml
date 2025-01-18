@@ -124,8 +124,8 @@
     <string name="offset">Seimbang</string>
     <string name="song_path">Tampilkan jalur lagu</string>
     <string name="song_path_description">Tampilkan jalur file lagu di daftar lagu</string>
-    <string name="synced_lyrics">Dapatkan Lirik yang Disinkronkan</string>
-    <string name="synced_lyrics_summary">Matikan untuk beralih antara lirik yang disinkronkan dan tidak disinkronkan dari Musixmatch.</string>
+    <string name="synced_lyrics">Dapatkan Lirik yang Tidak Disinkronkan</string>
+    <string name="synced_lyrics_summary">Beralih untuk mendapatkan lirik yang tidak disinkronkan dari Musixmatch saat lirik yang disinkronkan tidak ditemukan.</string>
     <string name="title">Judul</string>
     <string name="artist">Artis</string>
     <string name="album">Album</string>
@@ -141,4 +141,11 @@
     <string name="translation">Terjemahan</string>
     <string name="help_us_translate">Bantu kami menerjemahkan aplikasi ke bahasa Anda!</string>
     <string name="translation_website">Buka weblate</string>
+    <string name="showing_lyrics_for">Menampilkan lirik untuk</string>
+    <string name="by">oleh</string>
+    <string name="accept">Terima</string>
+    <string name="song_lyrics">Lirik lagu</string>
+    <string name="lyrics_subtitle">"Lirik lagu yang diambil yang akan dikirim ke aplikasi "</string>
+    <string name="song_name_not_provided">Nama lagu belum disediakan</string>
+    <string name="unknown_error_occurred">Terjadi kesalahan yang tidak diketahui</string>
 </resources>
