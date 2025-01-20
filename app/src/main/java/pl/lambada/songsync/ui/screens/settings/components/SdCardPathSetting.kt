@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Environment
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -24,14 +25,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pl.lambada.songsync.R
-import pl.lambada.songsync.ui.components.SettingsItem
 
 
 @Composable
 fun SdCardPathSetting(sdPath: String?, onClearPath: () -> Unit, onUpdatePath: (String) -> Unit) {
     var picker by remember { mutableStateOf(false) }
-    SettingsItem(
-        label = stringResource(R.string.sd_card),
+    Column(
         modifier = Modifier.padding(horizontal = 22.dp, vertical = 16.dp)
     ) {
         Text(stringResource(R.string.set_sd_path))
