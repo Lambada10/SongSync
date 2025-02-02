@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.remote.UpdateState
 import pl.lambada.songsync.data.UserSettingsController
+import pl.lambada.songsync.ui.components.SettingsHeadLabel
 import pl.lambada.songsync.ui.screens.settings.components.OffsetModeSwitch
 import pl.lambada.songsync.ui.screens.settings.components.SettingsScreenTopBar
 import pl.lambada.songsync.ui.screens.settings.components.AppInfoSection
@@ -65,20 +66,19 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = paddingValues
         ) {
+            item { SettingsHeadLabel(label = stringResource(id = R.string.theme)) }
             item {
                 if (isSystemInDarkTheme()) PureBlackThemeSwitch(
                     selected = userSettingsController.pureBlack,
                     onToggle = { userSettingsController.updatePureBlack(it) }
                 )
             }
-
             item {
                 MarqueeSwitch(
                     selected = userSettingsController.disableMarquee,
                     onToggle = { userSettingsController.updateDisableMarquee(it) }
                 )
             }
-
             item {
                 ShowPathSwitch(
                     selected = userSettingsController.showPath,
@@ -86,27 +86,25 @@ fun SettingsScreen(
                 )
             }
 
+            item { SettingsHeadLabel(label = stringResource(id = R.string.provider)) }
             item {
                 TranslationSwitch(
                     selected = userSettingsController.includeTranslation,
                     onToggle = { userSettingsController.updateIncludeTranslation(it) }
                 )
             }
-
             item {
                 MultiPersonSwitch(
                     selected = userSettingsController.multiPersonWordByWord,
                     onToggle = { userSettingsController.updateMultiPersonWordByWord(it) }
                 )
             }
-
             item {
                 SyncedLyricsSwitch(
                     selected = userSettingsController.unsyncedFallbackMusixmatch,
                     onToggle = { userSettingsController.updateUnsyncedFallbackMusixmatch(it) }
                 )
             }
-
             item {
                 OffsetModeSwitch(
                     selected = userSettingsController.directlyModifyTimestamps,
@@ -115,6 +113,7 @@ fun SettingsScreen(
             }
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                item { SettingsHeadLabel(label = stringResource(R.string.sd_card)) }
                 item {
                     SdCardPathSetting(
                         sdPath = userSettingsController.sdCardPath,
@@ -128,6 +127,7 @@ fun SettingsScreen(
                 }
             }
 
+            item { SettingsHeadLabel(label = stringResource(R.string.about_songsync)) }
             item {
                 AppInfoSection(
                     version = version,
@@ -135,21 +135,24 @@ fun SettingsScreen(
                 )
             }
 
+            item { SettingsHeadLabel(label = stringResource(R.string.source_code)) }
             item {
                 ExternalLinkSection(
-                    label = stringResource(R.string.source_code),
-                    description = stringResource(R.string.view_on_github),
                     url = "https://github.com/Lambada10/SongSync",
                     uriHandler = uriHandler
                 )
             }
 
+            item { SettingsHeadLabel(stringResource(R.string.support)) }
             item { SupportSection(uriHandler = uriHandler) }
 
+            item { SettingsHeadLabel(label = stringResource(id = R.string.translation)) }
             item { TranslationSection(uriHandler = uriHandler) }
 
+            item { SettingsHeadLabel(stringResource(R.string.contributors)) }
             item { ContributorsSection(uriHandler = uriHandler) }
 
+            item { SettingsHeadLabel(label = stringResource(id = R.string.thanks_to)) }
             item { CreditsSection(uriHandler = uriHandler) }
         }
     }
