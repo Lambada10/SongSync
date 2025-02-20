@@ -155,4 +155,5 @@
     <string name="showing_lyrics_for">Mostrando letras para</string>
     <string name="lyrics_subtitle">"Letras de canciones recuperadas que se enviarán a la aplicación "</string>
     <string name="song_name_not_provided">No se ha proporcionado el nombre de la canción</string>
+    <string name="pure_black_theme_summary">Utilizar el tema \"negro puro\" cuando el modo oscuro este actuvado</string>
 </resources>
