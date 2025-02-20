@@ -1,5 +1,6 @@
 package pl.lambada.songsync
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationChannel
@@ -10,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -33,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.ViewCompat
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -72,10 +75,7 @@ class MainActivity : ComponentActivity() {
         createNotificationChannel()
 
         setContent {
-            val context = LocalContext.current
             val navController = rememberNavController()
-            var hasLoadedPermissions by remember { mutableStateOf(false) }
-            var hasPermissions by remember { mutableStateOf(false) }
             var networkError by rememberSaveable { mutableStateOf<Boolean?>(null) }
 
             LaunchedEffect(Unit) {
@@ -85,30 +85,23 @@ class MainActivity : ComponentActivity() {
             }
 
             SongSyncTheme(pureBlack = userSettingsController.pureBlack) {
-                // Check for permissions and get all songs
-                RequestPermissions(
-                    onGranted = { hasPermissions = true },
-                    context = context,
-                    onDone = { hasLoadedPermissions = true }
-                )
-
                 if (networkError == true) NoInternetDialog(
                     onConfirm = ::finishAndRemoveTask,
                     onIgnore = { networkError = false }
                 )
 
+                // check in case user revoked permissions later
+                if (userSettingsController.passedInit)
+                    CheckForPermissions(
+                        userSettingsController = userSettingsController
+                    )
+
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    if (!hasLoadedPermissions) {
-                        LoadingScreen()
-                    } else if (!hasPermissions) {
-                        PermissionsDeniedDialogue(onCloseAppRequest = ::finishAndRemoveTask)
-                    } else {
-                        Navigator(
-                            navController = navController,
-                            userSettingsController = userSettingsController,
-                            lyricsProviderService = lyricsProviderService
-                        )
-                    }
+                    Navigator(
+                        navController = navController,
+                        userSettingsController = userSettingsController,
+                        lyricsProviderService = lyricsProviderService
+                    )
                 }
             }
         }
@@ -116,9 +109,31 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(2) // "Done" notification
         super.onResume()
+    }
+}
+
+@Composable
+@OptIn(ExperimentalPermissionsApi::class)
+private fun MainActivity.CheckForPermissions(
+    userSettingsController: UserSettingsController
+) {
+    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
+        if (!Environment.isExternalStorageManager()) {
+            userSettingsController.updatePassedInit(false)
+        }
+    } else {
+        val permissions = rememberMultiplePermissionsState(
+            permissions = listOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+        )
+        if (!permissions.allPermissionsGranted) {
+            userSettingsController.updatePassedInit(false)
+        }
     }
 }
 
@@ -145,88 +160,5 @@ private fun Activity.createNotificationChannel() {
         channel.description = channelDescription
 
         notificationManager.createNotificationChannel(channel)
-    }
-}
-
-@Composable
-fun PermissionsDeniedDialogue(onCloseAppRequest: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = { /* don't dismiss */ },
-        confirmButton = {
-            OutlinedButton(onClick = onCloseAppRequest) {
-                Text(stringResource(R.string.close_app))
-            }
-        },
-        title = { Text(stringResource(R.string.permission_denied)) },
-        text = {
-            Column {
-                Text(stringResource(R.string.requires_higher_storage_permissions))
-            }
-        }
-    )
-}
-
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-fun RequestPermissions(onGranted: () -> Unit, context: Context, onDone: () -> Unit) {
-    var storageManager: ActivityResultLauncher<Intent>? = null
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        storageManager =
-            rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if (Environment.isExternalStorageManager()) {
-                    onGranted()
-                }
-                onDone()
-            }
-    }
-    val storagePermissionState = rememberMultiplePermissionsState(
-        listOf(
-            android.Manifest.permission.READ_EXTERNAL_STORAGE,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ),
-        onPermissionsResult = {
-            if (
-                it[android.Manifest.permission.READ_EXTERNAL_STORAGE]!! &&
-                it[android.Manifest.permission.WRITE_EXTERNAL_STORAGE]!!
-            ) {
-                onGranted()
-            }
-            onDone()
-        }
-    )
-    var notificationPermission: PermissionState? = null
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        notificationPermission = rememberPermissionState(
-            permission = android.Manifest.permission.POST_NOTIFICATIONS
-        )
-    }
-    LaunchedEffect(Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (!notificationPermission!!.status.isGranted)
-                notificationPermission.launchPermissionRequest()
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                intent.addCategory("android.intent.category.DEFAULT")
-                intent.data = android.net.Uri.parse(
-                    String.format(
-                        "package:%s",
-                        context.applicationContext.packageName
-                    )
-                )
-                storageManager!!.launch(intent)
-            } else {
-                onGranted()
-                onDone()
-            }
-        } else {
-            if (storagePermissionState.allPermissionsGranted) {
-                onGranted()
-                onDone()
-            } else {
-                storagePermissionState.launchMultiplePermissionRequest()
-            }
-        }
     }
 }

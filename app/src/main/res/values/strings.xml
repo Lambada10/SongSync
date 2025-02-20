@@ -154,4 +154,11 @@
     <string name="song_name_not_provided">The song name has not been provided</string>
     <string name="unknown_error_occurred">An unknown error occurred</string>
     <string name="pure_black_theme_summary">Use pure black theme when dark mode is enabled</string>
+    <string name="all_files_access">All files access</string>
+    <string name="all_files_access_description">Required for saving lrc files in song\'s directory without opening the file picker each time</string>
+    <string name="notification_access">Notification access (Optional)</string>
+    <string name="notification_access_description">Used to show download progress notification</string>
+    <string name="_continue">Continue</string>
+    <string name="init_screen_title">Welcome to SongSync!</string>
+    <string name="init_screen_description">To get started, please grant the following permissions:</string>
 </resources>

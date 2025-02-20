@@ -17,6 +17,9 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
     var embedLyricsIntoFiles by mutableStateOf(dataStore.get(embedKey, false))
         private set
 
+    var passedInit by mutableStateOf(dataStore.get(passedInitKey, false))
+        private set
+
     var selectedProvider by mutableStateOf(
         Providers.entries
             .find { it.displayName == dataStore.get(selectedProviderKey, Providers.SPOTIFY.displayName) }!!
@@ -70,6 +73,11 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
     fun updateEmbedLyrics(to: Boolean) {
         dataStore.set(embedKey, to)
         embedLyricsIntoFiles = to
+    }
+
+    fun updatePassedInit(to: Boolean) {
+        dataStore.set(passedInitKey, to)
+        passedInit = to
     }
 
     fun updateSelectedProviders(to: Providers) {
@@ -139,6 +147,7 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
 }
 
 private val embedKey = booleanPreferencesKey("embed_lyrics")
+private val passedInitKey = booleanPreferencesKey("passed_init")
 private val selectedProviderKey = stringPreferencesKey("provider")
 private val blacklistedFoldersKey = stringPreferencesKey("blacklist")
 private val hideLyricsKey = booleanPreferencesKey("hide_lyrics")
