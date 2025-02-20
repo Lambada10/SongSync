@@ -12,12 +12,10 @@ import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import pl.lambada.songsync.R
-import pl.lambada.songsync.ui.components.SettingsItem
 
 @Composable
 fun ContributorsSection(uriHandler: UriHandler) {
-    SettingsItem(stringResource(R.string.contributors)) {
+    Column{
         Contributor.entries.forEach {
             val additionalInfo = stringResource(id = it.contributionLevel.stringResource)
             Column(

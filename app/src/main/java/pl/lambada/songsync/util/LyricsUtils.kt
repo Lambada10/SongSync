@@ -369,3 +369,4 @@ fun parseLyrics(lyrics: String): List<Pair<String, String>> {
         timestamp to text
     }
 }
+

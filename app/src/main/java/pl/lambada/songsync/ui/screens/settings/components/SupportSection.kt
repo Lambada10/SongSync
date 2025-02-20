@@ -12,29 +12,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pl.lambada.songsync.R
-import pl.lambada.songsync.ui.components.SettingsItem
+import pl.lambada.songsync.ui.components.SettingsHeadLabel
 
 
 @Composable
 fun SupportSection(uriHandler: UriHandler) {
-    SettingsItem(
-        stringResource(R.string.support),
+    Column(
+        modifier = Modifier
+            .clickable { uriHandler.openUri("https://t.me/LambadaOT") }
+            .padding(horizontal = 22.dp, vertical = 16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .clickable { uriHandler.openUri("https://t.me/LambadaOT") }
-                .padding(horizontal = 22.dp, vertical = 16.dp)
-        ) {
-            Text(stringResource(R.string.bugs_or_suggestions_contact_us))
-            Text(
-                text = stringResource(R.string.telegram_group),
-                color = MaterialTheme.colorScheme.outline,
-                fontSize = 12.sp
-            )
-        }
+        Text(stringResource(R.string.bugs_or_suggestions_contact_us))
         Text(
-            stringResource(R.string.create_issue),
-            modifier = Modifier.padding(horizontal = 22.dp)
+            text = stringResource(R.string.telegram_group),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
         )
     }
+    Text(
+        stringResource(R.string.create_issue),
+        modifier = Modifier.padding(horizontal = 22.dp)
+    )
 }
