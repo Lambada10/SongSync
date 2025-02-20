@@ -148,4 +148,5 @@
     <string name="offset_mode_summary">LRC siltide kasutamise asemel luba otseselt muuta laulusõnade ajatempleid</string>
     <string name="lyrics_subtitle">"Allalaaditud laulusõnad, mis saadetakse otse rakendusele "</string>
     <string name="synced_lyrics_summary">Kui sünkroniseeritud laulusõnu ei leidu, siis luba laadida Musixmatchi teenusest sünkroniseerimata laulusõnu.</string>
+    <string name="pure_black_theme_summary">Tumeda kujunduse korral kasuta süsimusti värve</string>
 </resources>
