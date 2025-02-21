@@ -19,12 +19,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import pl.lambada.songsync.R
-import pl.lambada.songsync.data.UserSettingsController
 import pl.lambada.songsync.ui.ScreenHome
 import pl.lambada.songsync.ui.screens.init.components.InitScreenTopBar
 import pl.lambada.songsync.ui.screens.init.components.PermissionItem
 import pl.lambada.songsync.ui.screens.init.components.permissions.AllFilesAccess
-import pl.lambada.songsync.ui.screens.init.components.permissions.LoadPartialPermissionTicks
 import pl.lambada.songsync.ui.screens.init.components.permissions.PostNotifications
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,10 +33,7 @@ fun InitScreen(
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-        LoadPartialPermissionTicks(
-            viewModel = viewModel,
-            context = context,
-        )
+        viewModel.onLoad(context)
     }
     Scaffold(
         topBar = {
@@ -67,8 +62,8 @@ fun InitScreen(
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     PermissionItem(
-                        title = R.string.notification_access,
-                        description = R.string.notification_access_description,
+                        title = R.string.show_notification_permission,
+                        description = R.string.show_notification_description,
                         onClick = { viewModel.notificationClicked = true },
                         granted = viewModel.notificationPermissionGranted
                     )
