@@ -149,4 +149,11 @@
     <string name="lyrics_subtitle">"Allalaaditud laulusõnad, mis saadetakse otse rakendusele "</string>
     <string name="synced_lyrics_summary">Kui sünkroniseeritud laulusõnu ei leidu, siis luba laadida Musixmatchi teenusest sünkroniseerimata laulusõnu.</string>
     <string name="pure_black_theme_summary">Tumeda kujunduse korral kasuta süsimusti värve</string>
+    <string name="show_notification_permission">Näita teavitust (valikuline)</string>
+    <string name="show_notification_description">Kasutatakse allalaadimise edenemise-kohase teavituse kuvamiseks</string>
+    <string name="all_files_access">Ligipääs kõikidele failidele</string>
+    <string name="all_files_access_description">See on vajalik lrc-failide salvestamiseks lugude kaustadesse ilma, et peaks iga kord failivalijat avama</string>
+    <string name="_continue">Jätka</string>
+    <string name="init_screen_title">Tere tulemast kasutama SongSynci!</string>
+    <string name="init_screen_description">Alustamiseks palun luba järgnevad õigused:</string>
 </resources>
