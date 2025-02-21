@@ -13,6 +13,8 @@ import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
 import pl.lambada.songsync.ui.common.animatedComposable
 import pl.lambada.songsync.ui.screens.home.HomeScreen
 import pl.lambada.songsync.ui.screens.home.HomeViewModel
+import pl.lambada.songsync.ui.screens.init.InitScreen
+import pl.lambada.songsync.ui.screens.init.InitScreenViewModel
 import pl.lambada.songsync.ui.screens.lyricsFetch.LyricsFetchScreen
 import pl.lambada.songsync.ui.screens.lyricsFetch.LyricsFetchViewModel
 import pl.lambada.songsync.ui.screens.settings.SettingsScreen
@@ -33,8 +35,16 @@ fun Navigator(
     SharedTransitionLayout {
         NavHost(
             navController = navController,
-            startDestination = ScreenHome
+            startDestination = if (userSettingsController.passedInit) ScreenHome else InitScreen,
         ) {
+            animatedComposable<InitScreen> {
+                InitScreen(
+                    navController = navController,
+                    viewModel = viewModel {
+                        InitScreenViewModel(userSettingsController)
+                    },
+                )
+            }
             animatedComposable<ScreenHome> {
                 HomeScreen(
                     navController = navController,
@@ -71,6 +81,9 @@ fun Navigator(
         }
     }
 }
+
+@Serializable
+object InitScreen
 
 @Serializable
 object ScreenHome
