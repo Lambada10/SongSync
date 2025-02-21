@@ -17,6 +17,7 @@ import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.screens.home.HomeViewModel
 import pl.lambada.songsync.util.ext.getVersion
+import pl.lambada.songsync.util.ext.sanitize
 import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.File
 import java.io.FileNotFoundException
@@ -40,10 +41,14 @@ fun generateLrcContent(
 }
 
 fun newLyricsFilePath(filePath: String?, song: SongInfo): File {
-    return filePath?.toLrcFile() ?: File(
-        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-        "SongSync/${song.songName} - ${song.artistName}.lrc"
-    )
+    return if (filePath == null || filePath.isEmpty()) {
+        File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+            "SongSync/${song.songName} - ${song.artistName}.lrc"
+        ).sanitize()
+    } else {
+        filePath.toLrcFile()!!
+    }
 }
 
 fun writeLyricsToFile(

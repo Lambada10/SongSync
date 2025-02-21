@@ -70,15 +70,16 @@ class MainActivity : ComponentActivity() {
 
         val dataStore = this.dataStore
         val userSettingsController = UserSettingsController(dataStore)
-
         checkOrCreateDownloadSubFolder()
         createNotificationChannel()
 
         setContent {
             val navController = rememberNavController()
             var networkError by rememberSaveable { mutableStateOf<Boolean?>(null) }
+            val context = LocalContext.current
 
             LaunchedEffect(Unit) {
+                context.cacheDir.deleteRecursively()
                 if (networkError == null) lyricsProviderService
                     .refreshSpotifyToken()
                     .onFailure { networkError = true }

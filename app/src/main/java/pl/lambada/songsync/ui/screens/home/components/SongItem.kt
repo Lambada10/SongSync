@@ -126,7 +126,7 @@ fun SongItem(
                     Spacer(modifier = Modifier.height(4.dp))
                     AnimatedText(
                         animate = !disableMarquee,
-                        text = filePath,
+                        text = filePath.replace(".nowplaying", ""),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.contentColorFor(bgColor),
                         modifier = Modifier.sharedBounds(

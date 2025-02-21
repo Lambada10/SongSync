@@ -1,5 +1,11 @@
 package pl.lambada.songsync.ui.screens.home
 
+import android.content.ComponentName
+import android.content.Context
+import android.media.MediaMetadata
+import android.media.session.MediaController
+import android.media.session.MediaSessionManager
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.Crossfade
@@ -16,11 +22,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -30,6 +39,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -41,6 +51,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import pl.lambada.songsync.domain.model.Song
+import pl.lambada.songsync.domain.model.SongInfo
+import pl.lambada.songsync.services.NotificationListener
 import pl.lambada.songsync.ui.LyricsFetchScreen
 import pl.lambada.songsync.ui.ScreenSettings
 import pl.lambada.songsync.ui.screens.home.components.BatchDownloadLyrics
@@ -272,6 +285,39 @@ fun HomeScreenLoaded(
                     }
                 }
 
+                item {
+                    if (viewModel.playingSongTitle.isNotEmpty()) {
+                        Text("Song from Now Playing")
+                        SongItem(
+                            filePath = viewModel.playingSongFilePath,
+                            selected = false,
+                            quickSelect = false,
+                            onSelectionChanged = {},
+                            onNavigateToSongRequest = {
+                                navController.navigate(
+                                    LyricsFetchScreen(
+                                        songName = viewModel.playingSongTitle,
+                                        artists = viewModel.playingSongArtist,
+                                        coverUri = viewModel.playingSongAlbumArt.toString(),
+                                        filePath = viewModel.playingSongFilePath
+                                    )
+                                )
+                            },
+                            song = Song(
+                                title = viewModel.playingSongTitle,
+                                artist = viewModel.playingSongArtist,
+                                imgUri = viewModel.playingSongAlbumArt,
+                                filePath = viewModel.playingSongFilePath
+                            ),
+                            sharedTransitionScope = sharedTransitionScope,
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            disableMarquee = viewModel.userSettingsController.disableMarquee,
+                            showPath = viewModel.userSettingsController.showPath
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        HorizontalDivider()
+                    }
+                }
 
                 items(viewModel.displaySongs.size) { index ->
                     val song = viewModel.displaySongs[index]
