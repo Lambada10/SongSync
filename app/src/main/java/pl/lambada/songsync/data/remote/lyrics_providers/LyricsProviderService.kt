@@ -5,6 +5,7 @@ import pl.lambada.songsync.data.remote.lyrics_providers.others.AppleAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.LRCLibAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.MusixmatchAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.NeteaseAPI
+import pl.lambada.songsync.data.remote.lyrics_providers.others.QQMusicAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.spotify.SpotifyLyricsAPI
 import pl.lambada.songsync.domain.model.SongInfo
@@ -24,6 +25,9 @@ class LyricsProviderService {
 
     // LRCLib Track ID
     private var lrcLibID = 0
+
+    // QQMusic request payload
+    private var qqPayload = ""
 
     // Netease Track ID and stuff
     private var neteaseID = 0L
@@ -67,6 +71,10 @@ class LyricsProviderService {
                     neteaseID = it?.neteaseID ?: 0
                 } ?: throw NoTrackFoundException()
 
+                Providers.QQMUSIC -> QQMusicAPI().getSongInfo(query, offset).also {
+                    qqPayload = it?.qqPayload ?: ""
+                } ?: throw NoTrackFoundException()
+
                 Providers.APPLE -> AppleAPI().getSongInfo(query, offset).also {
                     appleID = it?.appleID ?: 0
                 } ?: throw NoTrackFoundException()
@@ -104,6 +112,8 @@ class LyricsProviderService {
             Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(
                 neteaseID, includeTranslationNetEase, includeRomanizationNetEase
             )
+
+            Providers.QQMUSIC -> QQMusicAPI().getSyncedLyrics(qqPayload, multiPersonWordByWord)
 
             Providers.APPLE -> AppleAPI().getSyncedLyrics(
                 appleID, multiPersonWordByWord

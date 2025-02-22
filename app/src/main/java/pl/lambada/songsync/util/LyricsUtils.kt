@@ -178,6 +178,7 @@ fun handleSecurityException(
 enum class Providers(val displayName: String) {
     SPOTIFY("Spotify (via SpotifyLyricsAPI)"),
     LRCLIB("LRCLib"),
+    QQMUSIC("QQ Music"),
     NETEASE("Netease") { val inf = 0},
     APPLE("Apple Music"),
     MUSIXMATCH("Musixmatch")
