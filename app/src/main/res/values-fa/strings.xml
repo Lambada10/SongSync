@@ -8,7 +8,7 @@
     <string name="embedded_lyrics_in_file">ترانه‌ها در پروندۀ آهنگ جاسازی شدند</string>
     <string name="multi_person_word_by_word_summary">هنگام گرفتن ترانه‌ها از قالب چند نفرۀ Apple Music استفاده شود</string>
     <string name="song_path_description">نشان دادن مسیر پروندۀ یک آهنگ در فهرست آهنگ‌ها</string>
-    <string name="synced_lyrics">گرفتن ترانه‌های هم‌گام شده</string>
+    <string name="synced_lyrics">گرفتن ترانه‌های هم‌گام نشده</string>
     <string name="change_api_strategy">هم‌چنین می‌توانید روش‌های جایگزین اتصال به شبکۀ Spotify در تنظیمات را امتحان کنید.</string>
     <string name="no_lyrics_only">فقط نمایش دادن آهنگ‌های بدون ترانه</string>
     <string name="ignore_folders">نادیده گرفتن پوشه‌ها</string>
@@ -45,7 +45,7 @@
     <string name="file_saved_to">پرونده در %1$s ذخیره شد</string>
     <string name="invert_selection">برعکس کردن گزینش</string>
     <string name="invalid_query">جستار نامعتبر</string>
-    <string name="clear">پاک کردن</string>
+    <string name="clear">پاک‌سازی</string>
     <string name="changelog">گزارش تغییرات:\n%1$s</string>
     <string name="download">بارگیری</string>
     <string name="up_to_date">شما درحال استفاده از آخرین نگارش هستید</string>
@@ -56,8 +56,8 @@
     <string name="way_to_get_token">روش گرفتن توکن Spotify</string>
     <string name="cant_be_empty">فیلدها نمی‌توانند خالی باشند</string>
     <string name="web_player_keys">‏API پخش‌کنندۀ وب</string>
-    <string name="spotify_client_secret">Spotify Client Secret</string>
-    <string name="spotify_client_id">Spotify Client ID</string>
+    <string name="spotify_client_secret">رمز کارخواه اسپاتیفای</string>
+    <string name="spotify_client_id">آی‌دی کارخواه اسپاتیفای</string>
     <string name="custom_keys">اعتبارنامۀ API شخصی</string>
     <string name="pure_black_theme">زمینۀ تیرۀ مطلق</string>
     <string name="sd_card">کارت حافظه</string>
@@ -76,7 +76,7 @@
     <string name="multi_person_word_by_word">ترانه‌های کلمه‌به‌کلمۀ چند نفره</string>
     <string name="offset">جابه‌جایی</string>
     <string name="song_path">نشان دادن مسیر آهنگ</string>
-    <string name="synced_lyrics_summary">برای جابه‌جایی بین ترانه‌های هم‌گام‌سازی شده و هم‌گام‌سازی نشده از Musixmatch تغییر دهید.</string>
+    <string name="synced_lyrics_summary">برای گرفتن ترانه‌های هم‌گام‌سازی نشده از Musixmatch وقتی ترانه‌ها پیدا نشدند تغییر دهید.</string>
     <string name="title">عنوان</string>
     <string name="artist">هنرمند</string>
     <string name="album">آلبوم</string>
@@ -84,8 +84,8 @@
     <string name="duration">مدت زمان</string>
     <string name="sort">چینش</string>
     <string name="offset_mode">حالت جابه‌جایی</string>
-    <string name="syncedlyrics_py">Syncedlyrics (for Netease headers and LrcLib)</string>
-    <string name="statusbar_lyrics_ext">Statusbar lyrics ext (For Netease)</string>
+    <string name="syncedlyrics_py">Syncedlyrics (برای سرآیندهای Netease و LrcLib)</string>
+    <string name="statusbar_lyrics_ext">افزونۀ ترانه‌های نوار وضعیت (برای Netease)</string>
     <string name="disable_marquee">از کار انداختن متن متحرک</string>
     <string name="include_translation">شامل شدن ترجمه</string>
     <string name="ascending">صعودی</string>
@@ -120,7 +120,7 @@
     <string name="song_name_no_args">نام آهنگ</string>
     <string name="artist_name_no_args">نام هنرمند</string>
     <string name="local_song">آهنگ محلی</string>
-    <string name="lyrics_copied_to_clipboard">ترانه‌ها در بریده‌دان کپی شدند</string>
+    <string name="lyrics_copied_to_clipboard">ترانه‌ها در تخته‌گیره کپی شدند</string>
     <string name="search">جست‌وجو</string>
     <string name="cloud_song">آهنگ ابری</string>
     <string name="selected_count">%1$d گزیده شده</string>
@@ -135,10 +135,25 @@
     <string name="bugs_or_suggestions_contact_us">مشکلی پیدا کردید؟ پیشنهادی دارید؟ می‌خواهید مشارکت کنید؟ با خیال راحت می‌توانید با من در گروه تلگرام ارتباط برقرار کنید.</string>
     <string name="requires_higher_storage_permissions">این برنامه به دسترسی محل ذخیره برای پوییدن کتابخانۀ موسیقی شما و ذخیرۀ ترانه‌ها نیاز دارد.</string>
     <string name="edit">ویرایش</string>
-    <string name="copy_lyrics_to_clipboard">کپی ترانه‌ها در بریده‌دان</string>
+    <string name="copy_lyrics_to_clipboard">کپی ترانه‌ها در تخته‌گیره</string>
     <plurals name="this_will_download_lyrics_for_all_songs">
-        <item quantity="one">این ترانه‌ها را برای یک آهنگ بارگیری خواهد کرد. ترانه‌های آهنگ‌های موجود با جدیدها بازنویسی خواهند شد. این ممکن است نسبت به بارگیری یک‌به‌یک دقت کمتری داشته باشد. مطمئنید می‌خواهید ادامه دهید؟</item>
-        <item quantity="other">این ترانه‌ها را برای %1$d آهنگ بارگیری خواهد کرد. ترانه‌های آهنگ‌های موجود با جدیدها بازنویسی خواهند شد. این ممکن است نسبت به بارگیری یک‌به‌یک دقت کمتری داشته باشد. مطمئنید می‌خواهید ادامه دهید؟</item>
+        <item quantity="one">ترانه‌ها برای یک آهنگ بارگیری خواهند شد. ترانه‌های موجود برای آهنگ‌ها با جدیدها بازنویسی خواهند شد. این ممکن است نسبت به بارگیری یک به یک دقت کمتری داشته باشد. مطمئنید می‌خواهید ادامه دهید؟</item>
+        <item quantity="other">ترانه‌ها برای %1$d آهنگ بارگیری خواهند شد. ترانه‌های موجود برای آهنگ‌ها با جدیدها بازنویسی خواهند شد. این ممکن است نسبت به بارگیری یک به یک دقت کمتری داشته باشد. مطمئنید می‌خواهید ادامه دهید؟</item>
     </plurals>
     <string name="set_sd_path_warn">شما در حال استفاده از نگارش قدیمی‌تر اندروید هستید. از این‌که مسیر کارت حافظه را در تنظیمات وارد کردید اطمینان حاصل کنید. اگر نکرده‌اید لطفا این پیغام را لغو و آن را تنظیم کنید.</string>
+    <string name="pure_black_theme_summary">استفاده از زمینۀ تیرۀ مطلق وقتی حالت تیره به کار افتاده است</string>
+    <string name="showing_lyrics_for">نمایش دادن ترانه‌ها برای</string>
+    <string name="by">توسط</string>
+    <string name="accept">قبول</string>
+    <string name="song_lyrics">ترانه‌های آهنگ</string>
+    <string name="lyrics_subtitle">"ترانه‌های آهنگ دریافتی که به اپلیکیشن فرستاده خواهند شد "</string>
+    <string name="song_name_not_provided">نام آهنگ ارائه نشده است</string>
+    <string name="unknown_error_occurred">یک خطای ناشناخته رخ داد</string>
+    <string name="all_files_access">دسترسی همۀ پرونده‌ها</string>
+    <string name="all_files_access_description">برای ذخیرۀ پرونده‌های lrc در شاخۀ آهنگ بدون هر بار باز کردن انتخاب‌گر پرونده نیاز است</string>
+    <string name="show_notification_permission">نمایش اعلان (اختیاری)</string>
+    <string name="show_notification_description">برای نمایش اعلان پیشرفت بارگیری استفاده شده</string>
+    <string name="_continue">ادامه</string>
+    <string name="init_screen_title">به SongSync خوش‌آمدید!</string>
+    <string name="init_screen_description">برای شروع، لطفا اجازۀ دسترسی‌های زیر را بدهید:</string>
 </resources>
