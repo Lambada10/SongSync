@@ -94,6 +94,7 @@ class LyricsProviderService {
         provider: Providers,
         // TODO providers could be a sealed interface to include such parameters
         includeTranslationNetEase: Boolean = false,
+        includeRomanizationNetEase: Boolean = false,
         multiPersonWordByWord: Boolean = false,
         unsyncedFallbackMusixmatch: Boolean = true
     ): String? {
@@ -101,7 +102,7 @@ class LyricsProviderService {
             Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink!!, version)
             Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(lrcLibID)
             Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(
-                neteaseID, includeTranslationNetEase
+                neteaseID, includeTranslationNetEase, includeRomanizationNetEase
             )
 
             Providers.APPLE -> AppleAPI().getSyncedLyrics(

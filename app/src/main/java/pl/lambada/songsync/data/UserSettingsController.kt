@@ -37,6 +37,9 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
     var includeTranslation by mutableStateOf(dataStore.get(includeTranslationKey, false))
         private set
 
+    var includeRomanization by mutableStateOf(dataStore.get(includeRomanizationKey, false))
+        private set
+
     var multiPersonWordByWord by mutableStateOf(dataStore.get(multiPersonWordByWordKey, true))
         private set
 
@@ -100,6 +103,11 @@ class UserSettingsController(private val dataStore: DataStore<Preferences>) {
         includeTranslation = to
     }
 
+    fun updateIncludeRomanization(to: Boolean) {
+        dataStore.set(includeRomanizationKey, to)
+        includeRomanization = to
+    }
+
     fun updateMultiPersonWordByWord(to: Boolean) {
         dataStore.set(multiPersonWordByWordKey, to)
         multiPersonWordByWord = to
@@ -152,6 +160,7 @@ private val selectedProviderKey = stringPreferencesKey("provider")
 private val blacklistedFoldersKey = stringPreferencesKey("blacklist")
 private val hideLyricsKey = booleanPreferencesKey("hide_lyrics")
 private val includeTranslationKey = booleanPreferencesKey("include_translation")
+private val includeRomanizationKey = booleanPreferencesKey("include_romanization")
 private val multiPersonWordByWordKey = booleanPreferencesKey("multi_person_word_by_word")
 private val unsyncedFallbackMusixmatchKey = booleanPreferencesKey("unsynced_lyrics_fallback")
 private val disableMarqueeKey = booleanPreferencesKey("marquee_disable")

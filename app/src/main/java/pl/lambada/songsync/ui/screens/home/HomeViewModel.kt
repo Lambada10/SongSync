@@ -298,6 +298,7 @@ class HomeViewModel(
                 version,
                 provider = userSettingsController.selectedProvider,
                 includeTranslationNetEase = userSettingsController.includeTranslation,
+                includeRomanizationNetEase = userSettingsController.includeRomanization,
                 multiPersonWordByWord = userSettingsController.multiPersonWordByWord,
                 unsyncedFallbackMusixmatch = userSettingsController.unsyncedFallbackMusixmatch
             )

@@ -29,6 +29,7 @@ import pl.lambada.songsync.ui.screens.settings.components.ExternalLinkSection
 import pl.lambada.songsync.ui.screens.settings.components.MarqueeSwitch
 import pl.lambada.songsync.ui.screens.settings.components.MultiPersonSwitch
 import pl.lambada.songsync.ui.screens.settings.components.PureBlackThemeSwitch
+import pl.lambada.songsync.ui.screens.settings.components.RomanizationSwitch
 import pl.lambada.songsync.ui.screens.settings.components.SdCardPathSetting
 import pl.lambada.songsync.ui.screens.settings.components.ShowPathSwitch
 import pl.lambada.songsync.ui.screens.settings.components.SupportSection
@@ -91,6 +92,12 @@ fun SettingsScreen(
                 TranslationSwitch(
                     selected = userSettingsController.includeTranslation,
                     onToggle = { userSettingsController.updateIncludeTranslation(it) }
+                )
+            }
+            item {
+                RomanizationSwitch(
+                    selected = userSettingsController.includeRomanization,
+                    onToggle = { userSettingsController.updateIncludeRomanization(it) }
                 )
             }
             item {

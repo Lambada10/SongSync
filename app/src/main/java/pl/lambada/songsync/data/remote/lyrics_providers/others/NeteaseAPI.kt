@@ -84,7 +84,11 @@ class NeteaseAPI {
      * @param id The ID of the song from search results.
      * @return The synced lyrics as a string.
      */
-    suspend fun getSyncedLyrics(id: Long, includeTranslation: Boolean = false): String? {
+    suspend fun getSyncedLyrics(
+        id: Long,
+        includeTranslation: Boolean = false,
+        includeRomanization: Boolean = false
+    ): String? {
         val response = client.get(
             baseURL + "song/lyric"
         ) {
@@ -94,6 +98,7 @@ class NeteaseAPI {
             parameter("id", id)
             parameter("lv", 1)
             parameter("tv", 1)
+            parameter("rv", 1)
         }
         val responseBody = response.bodyAsText(Charsets.UTF_8)
 
@@ -105,10 +110,14 @@ class NeteaseAPI {
         if (json.lrc.lyric == "")
             return null
 
-        if (includeTranslation && json.tlyric != null && json.tlyric.lyric != "") {
-            return json.lrc.lyric + "\n\n" + json.tlyric.lyric
-        }
+        var lyric = json.lrc.lyric
 
-        return json.lrc.lyric
+        if (includeTranslation && json.tlyric!!.lyric != "")
+            lyric += "\n\n" + json.tlyric.lyric
+
+        if (includeRomanization && json.romalrc!!.lyric != "")
+            lyric += "\n\n" + json.romalrc.lyric
+
+        return lyric
     }
 }

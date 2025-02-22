@@ -30,6 +30,7 @@ data class NeteaseArtist(
 data class NeteaseLyricsResponse(
     val lrc: NeteaseLyrics,
     val tlyric: NeteaseLyrics?,
+    val romalrc: NeteaseLyrics?,
     val code: Int
 )
 

@@ -164,4 +164,6 @@
     <string name="now_playing_song">Now playing song</string>
     <string name="notification_access">Notification access (Optional)</string>
     <string name="notification_access_description">This is used to retrieve the current song playing on your device. The app does not read any other notifications.</string>
+    <string name="include_romanization">Include romanization</string>
+    <string name="include_romanization_summary">Include romanized lyrics when getting song lyrics from Netease provider</string>
 </resources>

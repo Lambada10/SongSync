@@ -49,6 +49,7 @@ class LyricsFetchViewModel(
             version,
             userSettingsController.selectedProvider,
             userSettingsController.includeTranslation,
+            userSettingsController.includeRomanization,
             userSettingsController.multiPersonWordByWord,
             userSettingsController.unsyncedFallbackMusixmatch
         )
