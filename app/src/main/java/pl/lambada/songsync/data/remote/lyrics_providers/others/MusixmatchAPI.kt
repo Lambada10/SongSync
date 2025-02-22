@@ -22,19 +22,19 @@ class MusixmatchAPI {
     suspend fun getSongInfo(query: SongInfo, offset: Int = 0): SongInfo? {
         val artistName = withContext(Dispatchers.IO) {
             URLEncoder.encode(
-                "${query.artistName}",
+                query.artistName,
                 Charsets.UTF_8.toString()
             )
         }
 
         val songName = withContext(Dispatchers.IO) {
             URLEncoder.encode(
-                "${query.songName}",
+                query.songName,
                 Charsets.UTF_8.toString()
             )
         }
 
-        if (artistName == "" || songName == "")
+        if (artistName.isBlank() || songName.isBlank())
             throw EmptyQueryException()
 
         val response = client.get(

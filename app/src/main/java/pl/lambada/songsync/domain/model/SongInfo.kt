@@ -11,6 +11,15 @@ import kotlinx.parcelize.Parcelize
  * @param artistName The name of the artist.
  * @param songLink The link to the song.
  * @param albumCoverLink The link to the album cover.
+ * @param lrcLibID The ID for LRCLib.
+ * @param qqPayload The payload for QQMusic.
+ * @param neteaseID The ID for Netease.
+ * @param appleID The ID for Apple Music.
+ * @param musixmatchID The ID for Musixmatch.
+ * @param hasSyncedLyrics Flag indicating if the song has synced lyrics (Musixmatch-only).
+ * @param hasUnsyncedLyrics Flag indicating if the song has unsynced lyrics (Musixmatch-only).
+ * @param syncedLyrics The synced lyrics (Musixmatch-only).
+ * @param unsyncedLyrics The unsynced lyrics (Musixmatch-only).
  */
 @Suppress("SpellCheckingInspection")
 @Parcelize
