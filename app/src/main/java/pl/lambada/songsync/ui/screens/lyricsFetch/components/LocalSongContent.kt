@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Downloading
+import androidx.compose.material.icons.filled.PlayCircleOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,12 +28,21 @@ fun SharedTransitionScope.LocalSongContent(
     disableMarquee: Boolean
 ) {
     Row {
-        Icon(
-            imageVector = Icons.Filled.Downloading,
-            contentDescription = null,
-            Modifier.padding(end = 5.dp)
-        )
-        Text(stringResource(R.string.local_song))
+        if (song.filePath.isNotEmpty()) {
+            Icon(
+                imageVector = Icons.Filled.Downloading,
+                contentDescription = null,
+                Modifier.padding(end = 5.dp)
+            )
+            Text(stringResource(R.string.local_song))
+        } else {
+            Icon(
+                imageVector = Icons.Filled.PlayCircleOutline,
+                contentDescription = null,
+                Modifier.padding(end = 5.dp)
+            )
+            Text(stringResource(R.string.now_playing_song))
+        }
     }
     Spacer(modifier = Modifier.height(6.dp))
     SongCard(

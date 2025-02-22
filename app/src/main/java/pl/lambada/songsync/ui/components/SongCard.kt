@@ -51,7 +51,7 @@ fun SharedTransitionScope.SongCard(
             outer = Modifier
                 .fillMaxWidth()
                 .clickable(filePath != null) {
-                    openFileFromPath(context, filePath!!)
+                    openFileFromPath(context, filePath!!.replace(".nowplaying", ""))
                 },
             inner = modifier
         )

@@ -1,5 +1,6 @@
 package pl.lambada.songsync.ui.screens.lyricsFetch
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -159,7 +160,7 @@ fun SharedTransitionScope.LyricsFetchScreen(
                             viewModel.saveLyricsToFile(
                                 it,
                                 queryState.song,
-                                viewModel.source?.filePath,
+                                viewModel.source?.filePath?.replace(".nowplaying", ""),
                                 context,
                                 context.getString(R.string.generated_using)
                             )
@@ -167,7 +168,7 @@ fun SharedTransitionScope.LyricsFetchScreen(
                         onEmbedLyrics = {
                             viewModel.embedLyrics(
                                 it,
-                                viewModel.source?.filePath,
+                                viewModel.source?.filePath?.replace(".nowplaying", ""),
                                 context,
                                 queryState.song
                             )

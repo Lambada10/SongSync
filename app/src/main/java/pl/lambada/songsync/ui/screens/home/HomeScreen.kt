@@ -19,8 +19,10 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -36,11 +38,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import pl.lambada.songsync.R
+import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.ui.LyricsFetchScreen
 import pl.lambada.songsync.ui.ScreenSettings
 import pl.lambada.songsync.ui.screens.home.components.BatchDownloadLyrics
@@ -272,6 +277,39 @@ fun HomeScreenLoaded(
                     }
                 }
 
+                item {
+                    if (viewModel.playingSongTitle.isNotEmpty()) {
+                        Text(stringResource(id = R.string.now_playing_song))
+                        SongItem(
+                            filePath = viewModel.playingSongFilePath,
+                            selected = false,
+                            quickSelect = false,
+                            onSelectionChanged = {},
+                            onNavigateToSongRequest = {
+                                navController.navigate(
+                                    LyricsFetchScreen(
+                                        songName = viewModel.playingSongTitle,
+                                        artists = viewModel.playingSongArtist,
+                                        coverUri = viewModel.playingSongAlbumArt.toString(),
+                                        filePath = viewModel.playingSongFilePath
+                                    )
+                                )
+                            },
+                            song = Song(
+                                title = viewModel.playingSongTitle,
+                                artist = viewModel.playingSongArtist,
+                                imgUri = viewModel.playingSongAlbumArt,
+                                filePath = viewModel.playingSongFilePath
+                            ),
+                            sharedTransitionScope = sharedTransitionScope,
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            disableMarquee = viewModel.userSettingsController.disableMarquee,
+                            showPath = viewModel.userSettingsController.showPath
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        HorizontalDivider()
+                    }
+                }
 
                 items(viewModel.displaySongs.size) { index ->
                     val song = viewModel.displaySongs[index]

@@ -132,7 +132,7 @@ class LyricsFetchViewModel(
         runCatching {
             embedLyricsInFile(
                 context = context,
-                filePath ?: throw NullPointerException("File path is null"),
+                filePath = if (filePath != null && filePath.isNotEmpty()) filePath else throw NullPointerException("File path is null"),
                 lrcContent
             )
         }.onFailure { exception ->

@@ -1,7 +1,11 @@
 package pl.lambada.songsync.ui.screens.home
 
+import android.content.ComponentName
 import android.content.ContentUris
 import android.content.Context
+import android.graphics.Bitmap
+import android.media.MediaMetadata
+import android.media.session.MediaSessionManager
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.compose.runtime.derivedStateOf
@@ -21,14 +25,18 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import pl.lambada.songsync.R
 import pl.lambada.songsync.data.UserSettingsController
 import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.SortOrders
 import pl.lambada.songsync.domain.model.SortValues
+import pl.lambada.songsync.services.NotificationListener
 import pl.lambada.songsync.util.downloadLyrics
 import pl.lambada.songsync.util.ext.toLrcFile
+import java.io.File
+import java.util.UUID
 
 /**
  * ViewModel class for the main functionality of the app.
@@ -44,6 +52,11 @@ class HomeViewModel(
     var isRefreshing by mutableStateOf(false)
 
     var searchQuery by mutableStateOf("")
+
+    var playingSongTitle by mutableStateOf("")
+    var playingSongArtist by mutableStateOf("")
+    var playingSongAlbumArt by mutableStateOf<Uri?>(null)
+    var playingSongFilePath by mutableStateOf("")
 
     // Filter settings
     private var cachedFolders: MutableList<String>? = null
@@ -155,6 +168,7 @@ class HomeViewModel(
             cursor?.close()
             cachedSongs = songs
             viewModelScope.launch { filterSongs() }
+            viewModelScope.launch { updatePlayingSongInfo(context) }
             cachedSongs!!
         }
     }
@@ -319,5 +333,37 @@ class HomeViewModel(
             onDownloadComplete = onDownloadComplete,
             onRateLimitReached = onRateLimitReached,
         )
+    }
+
+    fun updatePlayingSongInfo(context: Context) = runCatching {
+        val msm = context.getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
+        val controllers = msm.getActiveSessions(ComponentName(context, NotificationListener::class.java))
+        val metadata = controllers[0].metadata
+        playingSongTitle = metadata!!.getString(MediaMetadata.METADATA_KEY_TITLE) ?: context.getString(R.string.unknown)
+        playingSongArtist = metadata.getString(MediaMetadata.METADATA_KEY_ARTIST) ?: context.getString(R.string.unknown)
+        playingSongFilePath =  try {
+            allSongs!!.filter {
+                (it.title == playingSongTitle || (it.title == null && playingSongTitle == context.getString(R.string.unknown)))
+                &&
+                (it.artist == playingSongArtist || (it.artist == null && playingSongArtist == context.getString(R.string.unknown)))
+            }[0].filePath!! + ".nowplaying" // shared transition uses path as key, add to avoid breaking stuff
+        } catch (e: IndexOutOfBoundsException) {
+            ""
+        }
+        playingSongAlbumArt = try {
+            metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)!!.let {
+                // not same name of files because img won't update, cache dir cleared at app start
+                val file = File(context.cacheDir, "${UUID.randomUUID()}.jpg")
+                it.compress(Bitmap.CompressFormat.JPEG, 100, file.outputStream())
+                Uri.parse(file.absolutePath)
+            }
+        } catch (e: NullPointerException) {
+            null
+        }
+    }.onFailure {
+        playingSongTitle = ""
+        playingSongArtist = ""
+        playingSongFilePath = ""
+        playingSongAlbumArt = null
     }
 }
