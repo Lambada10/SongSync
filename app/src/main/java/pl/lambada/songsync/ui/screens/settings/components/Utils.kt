@@ -32,6 +32,10 @@ enum class Contributor(
     NXOIM(
         devName = "nxoim", ContributionLevel.CONTRIBUTOR,
         github = "https://github.com/nxoim"
+    ),
+    PAXSENIX0(
+        devName = "Paxsenix0", ContributionLevel.CONTRIBUTOR,
+        github = "https://github.com/paxsenix0"
     )
 }
 

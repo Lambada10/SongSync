@@ -31,6 +31,7 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 * [SpotifyLyricsAPI](https://github.com/akashrchandran/spotify-lyrics-api)
 * [syncedlyrics](https://github.com/0x7d4/syncedlyrics)
 * [Statusbar Lyric Ext](https://github.com/cjybyjk/StatusBarLyricExt)
+* [Alex](https://github.com/paxsenix0) for access to various apis
 
 ### Friend projects
 [Gramophone](https://github.com/AkaneTan/Gramophone)
