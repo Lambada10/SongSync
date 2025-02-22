@@ -27,14 +27,6 @@ fun FailedDialogue(
 
                 is EmptyQueryException -> Text(stringResource(R.string.invalid_query))
 
-                is FileNotFoundException -> { // Rate limit
-                    Column {
-                        Text(text = stringResource(R.string.spotify_api_rate_limit_reached))
-                        Text(text = stringResource(R.string.please_try_again_later))
-                        Text(text = stringResource(R.string.change_api_strategy))
-                    }
-                }
-
                 else -> Text(exception.toString())
             }
         }
