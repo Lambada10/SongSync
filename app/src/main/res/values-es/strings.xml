@@ -155,5 +155,17 @@
     <string name="showing_lyrics_for">Mostrando letras para</string>
     <string name="lyrics_subtitle">"Letras de canciones recuperadas que se enviarán a la aplicación "</string>
     <string name="song_name_not_provided">No se ha proporcionado el nombre de la canción</string>
-    <string name="pure_black_theme_summary">Utilizar el tema \"negro puro\" cuando el modo oscuro este actuvado</string>
+    <string name="pure_black_theme_summary">Utilizar el tema "negro puro" cuando el modo oscuro esté activado</string>
+    <string name="all_files_access">Acceso a todos los archivos</string>
+    <string name="all_files_access_description">Requerido para guardar archivos lrc en el directorio de la canción sin abrir el selector de archivos cada vez</string>
+    <string name="show_notification_permission">Mostrar notificación (Opcional)</string>
+    <string name="show_notification_description">Usado para mostrar la notificación de progreso de descarga</string>
+    <string name="_continue">Continuar</string>
+    <string name="init_screen_title">¡Bienvenido a SongSync!</string>
+    <string name="init_screen_description">Para comenzar, por favor otorga los siguientes permisos:</string>
+    <string name="now_playing_song">Canción en reproducción</string>
+    <string name="notification_access">Acceso a notificaciones (Opcional)</string>
+    <string name="notification_access_description">Esto se usa para recuperar la canción que se está reproduciendo en tu dispositivo. La aplicación no lee ninguna otra notificación.</string>
+    <string name="include_romanization">Incluir romanización</string>
+    <string name="include_romanization_summary">Incluir letras romanizadas al obtener letras de canciones desde el proveedor Netease</string>
 </resources>
