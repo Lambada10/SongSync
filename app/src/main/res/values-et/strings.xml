@@ -139,7 +139,6 @@
     <string name="embedded_lyrics_in_file">Laulusõnad on lisatud helifaili</string>
     <string name="embed_non_local_song_error">Sa proovisid lisada laulusõnu helifaili, mis ei asu selles nutiseadmes. Katkestame tegevuse.</string>
     <string name="multi_person_word_by_word">Sõnahaaval kuvatavad laulusõnad mitmele kasutajale</string>
-    <string name="multi_person_word_by_word_summary">Laulusõnade laadimisel Apple Musicu teenusest, kasuta mitmele kasutajale sobivat vormingut</string>
     <string name="offset">Nihe</string>
     <string name="song_path">Näita loo asukohta</string>
     <string name="song_path_description">Näita lugude loendis iga loo asukohta</string>

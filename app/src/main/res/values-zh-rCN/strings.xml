@@ -132,5 +132,4 @@
     <string name="syncedlyrics_py">已同步的歌词（网易云音乐和Lrclib）</string>
     <string name="statusbar_lyrics_ext">状态栏歌词扩展（网易云音乐）</string>
     <string name="provider_summary">请在下面选择歌词提供方</string>
-    <string name="multi_person_word_by_word_summary">从Apple Music获取歌词时使用多人歌词格式</string>
 </resources>

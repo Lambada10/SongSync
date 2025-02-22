@@ -125,7 +125,6 @@
     <string name="song_path_description">Pfad zur Lieddatei in Songliste anzeigen</string>
     <string name="song_path">Pfad von Lied anzeigen</string>
     <string name="offset">Versetzung</string>
-    <string name="multi_person_word_by_word_summary">Liedtexte von Apple Music im Mehrere-Personen-Format herunterladen</string>
     <string name="multi_person_word_by_word">Mehrere-Personen-Format für wortsychronisierte Liedteyte</string>
     <string name="embed_non_local_song_error">Du hast versucht, Liedtexte bei einer nicht-lokalen Datei einzubetten. Vorgang abgebrochen.</string>
     <string name="embedded_lyrics_in_file">Liedtexte wurden in Lieddatei eingebettet</string>

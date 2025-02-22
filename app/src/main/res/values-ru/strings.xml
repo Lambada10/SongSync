@@ -121,7 +121,6 @@
     <string name="embedded_lyrics_in_file">Текст был встроен в файл песни</string>
     <string name="embed_non_local_song_error">Вы попытались встроить текст в нелокальный файл. Операция прервана.</string>
     <string name="multi_person_word_by_word">Текст песни по словам для нескольких человек</string>
-    <string name="multi_person_word_by_word_summary">Использовать формат текста песни по словам для нескольких человек при получении текстов из Apple Music</string>
     <string name="offset">Смещение</string>
     <string name="song_path">Показать путь к песне</string>
     <string name="song_path_description">Показать путь к файлу песни в списке песен</string>

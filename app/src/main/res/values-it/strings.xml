@@ -108,7 +108,6 @@
     <string name="embedded_lyrics_in_file">Il testo è stato incorporato nel file della canzone</string>
     <string name="embed_non_local_song_error">Hai provato a incorporare il testo in un file non locale. Operazione interrotta.</string>
     <string name="multi_person_word_by_word">Testi multi-persona parola per parola</string>
-    <string name="multi_person_word_by_word_summary">Utilizza il formato di testo multi-persona quando ottieni testi da Apple Music</string>
     <string name="offset">Offset</string>
     <string name="song_path">Mostra il percorso della canzone</string>
     <string name="synced_lyrics_summary">Attiva/disattiva per passare dai testi sincronizzati a quelli non sincronizzati di Musixmatch.</string>

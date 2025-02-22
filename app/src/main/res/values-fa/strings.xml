@@ -6,7 +6,6 @@
     <string name="provider_summary">لطفا ارائه‌دهندۀ ترانه‌ها را از زیر برگزینید</string>
     <string name="internal_error">خطای داخلی: %s</string>
     <string name="embedded_lyrics_in_file">ترانه‌ها در پروندۀ آهنگ جاسازی شدند</string>
-    <string name="multi_person_word_by_word_summary">هنگام گرفتن ترانه‌ها از قالب چند نفرۀ Apple Music استفاده شود</string>
     <string name="song_path_description">نشان دادن مسیر پروندۀ یک آهنگ در فهرست آهنگ‌ها</string>
     <string name="synced_lyrics">گرفتن ترانه‌های هم‌گام نشده</string>
     <string name="change_api_strategy">هم‌چنین می‌توانید روش‌های جایگزین اتصال به شبکۀ Spotify در تنظیمات را امتحان کنید.</string>

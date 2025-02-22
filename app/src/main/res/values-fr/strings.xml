@@ -109,7 +109,6 @@
     <string name="song_path_description">Afficher le chemin d\'une chanson dans la liste des chansons</string>
     <string name="song_path">Afficher le chemin de la chanson</string>
     <string name="offset">Compenser</string>
-    <string name="multi_person_word_by_word_summary">Utilisez le format de paroles à plusieurs personnes lorsque vous obtenez des paroles à partir d\'Apple Music</string>
     <string name="multi_person_word_by_word">Paroles mot à mot à plusieurs personnes</string>
     <string name="embedded_lyrics_in_file">Les paroles ont été intégrées au fichier de la chanson</string>
     <string name="embed_lyrics_in_file">Intégrer les paroles au fichier</string>

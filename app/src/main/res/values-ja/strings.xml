@@ -96,7 +96,6 @@
     <string name="set_sd_path_warn">古いバージョンの Android を使用しています。設定で SD カードのパスが設定済みであることを確認してください。未設定の場合は、このダイアログをキャンセルして設定してください。</string>
     <string name="embed_lyrics_in_file">ファイルに歌詞を埋め込む</string>
     <string name="embedded_lyrics_in_file">歌詞が曲のファイルに埋め込まれています</string>
-    <string name="multi_person_word_by_word_summary">Apple Music から歌詞を取得時に複数人の歌詞形式を使用します</string>
     <string name="synced_lyrics_summary">同期された歌詞が見つからない場合は、Musixmatch から非同期の歌詞を取得するように切り換えます。</string>
     <string name="title">タイトル</string>
     <string name="date_added">追加した日時</string>
