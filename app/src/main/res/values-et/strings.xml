@@ -155,4 +155,10 @@
     <string name="_continue">Jätka</string>
     <string name="init_screen_title">Tere tulemast kasutama SongSynci!</string>
     <string name="init_screen_description">Alustamiseks palun luba järgnevad õigused:</string>
+    <string name="now_playing_song">Hetkel esitamisel lugu</string>
+    <string name="notification_access">Ligipääs teavitustele (valikuline)</string>
+    <string name="notification_access_description">Seda õigust kasutame hetkel sinu nutiseadmes esitamisel oleva loo tuvastamiseks. Muid teavitusi see rakendus ei loe.</string>
+    <string name="include_romanization">Kaasa ladina tähestikus laulusõnad</string>
+    <string name="include_romanization_summary">Kui teenusepakkujaks on Netease, siis laulusõnade laadimisel kaasa ka ladina tähtedega kirjutatud laulusõnad</string>
+    <string name="multi_person_word_by_word_summary2">Kui teenusepakkuja seda võimaldab, siis laadi laulusõnad mitmele kasutajale mõeldud vormingus</string>
 </resources>
