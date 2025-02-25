@@ -155,4 +155,10 @@
     <string name="_continue">ادامه</string>
     <string name="init_screen_title">به SongSync خوش‌آمدید!</string>
     <string name="init_screen_description">برای شروع، لطفا اجازۀ دسترسی‌های زیر را بدهید:</string>
+    <string name="now_playing_song">آهنگ در حال پخش</string>
+    <string name="notification_access">دسترسی اعلان (اختیاری)</string>
+    <string name="include_romanization">شامل شدن رومی‌سازی</string>
+    <string name="multi_person_word_by_word_summary2">استفاده از قالب چند نفره هنگام گرفتن ترانه‌ها از ارائه‌دهندۀ پشتیبانی شده</string>
+    <string name="notification_access_description">این برای گرفتن آهنگ کنونی در حال پخش در دستگاه شما استفاده می‌شود. برنامه هیچ اعلان دیگری را نمی‌خواند.</string>
+    <string name="include_romanization_summary">شامل شدن ترانه‌های رومی‌سازی شده هنگام گرفتن ترانه‌های آهنگ از ارائه‌دهندۀ Netease</string>
 </resources>
