@@ -14,6 +14,7 @@ class SpotifyLyricsAPI {
     /**
      * Gets synced lyrics using the song link and returns them as a string formatted as an LRC file.
      * @param songLink The link to the song.
+     * @param version The version of the app.
      * @return The synced lyrics as a string.
      */
     suspend fun getSyncedLyrics(songLink: String, version: String = ""): String? {
