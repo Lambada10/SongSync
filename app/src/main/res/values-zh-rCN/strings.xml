@@ -79,7 +79,7 @@
         <item quantity="other">这将会为 %1$d 首歌曲下载歌词。已经存在的歌词将会被新的歌词覆写。在单独下载歌词时获取到的歌曲可能会不准确。确定要继续吗？</item>
     </plurals>
     <string name="embedded_lyrics_in_file">歌词已嵌入歌曲文件</string>
-    <string name="synced_lyrics_summary">拖动以在Musixmatch的同步和非同步歌词间切换。</string>
+    <string name="synced_lyrics_summary">选中后当没找到已同步歌词时将从 Musixmatch 获取未同步歌词。</string>
     <string name="artist">艺术家</string>
     <string name="descending">降序</string>
     <string name="change_api_strategy">你还可以在设置中尝试连接至Spotify的其他方式。</string>
@@ -111,7 +111,7 @@
     <string name="embed_non_local_song_error">你在尝试向非本地歌曲文件嵌入歌词。操作中止。</string>
     <string name="song_path">显示歌曲路径</string>
     <string name="song_path_description">在歌曲列表中显示歌曲文件路径</string>
-    <string name="synced_lyrics">获取同步歌词</string>
+    <string name="synced_lyrics">获取未同步歌词</string>
     <string name="title">标题</string>
     <string name="album">专辑</string>
     <string name="year">年份</string>
@@ -132,4 +132,32 @@
     <string name="syncedlyrics_py">已同步的歌词（网易云音乐和Lrclib）</string>
     <string name="statusbar_lyrics_ext">状态栏歌词扩展（网易云音乐）</string>
     <string name="provider_summary">请在下面选择歌词提供方</string>
+    <string name="pure_black_theme_summary">启用深色模式时使用纯黑主题</string>
+    <string name="accept">接受</string>
+    <string name="song_lyrics">歌曲歌词</string>
+    <string name="by">by</string>
+    <string name="lyrics_subtitle">"获取了将被发送到应用的歌曲歌词 "</string>
+    <string name="song_name_not_provided">尚未提供歌曲名</string>
+    <string name="unknown_error_occurred">发生了未知错误</string>
+    <string name="all_files_access">访问所有文件</string>
+    <string name="show_notification_permission">显示通知（可选）</string>
+    <string name="show_notification_description">用于显示下载进度通知</string>
+    <string name="_continue">继续</string>
+    <string name="all_files_access_description">如果不想每次都打开文件选择器将歌词文件保存在歌曲目录中，那么必须授予该权限</string>
+    <string name="init_screen_title">欢迎来到 SongSync！</string>
+    <string name="init_screen_description">要开始使用，请授予以下权限：</string>
+    <string name="now_playing_song">正在播放歌曲</string>
+    <string name="notification_access">通知权限（可选）</string>
+    <string name="notification_access_description">用于获取当前设备上正在播放的歌曲。本应用不读取任何其他通知。</string>
+    <string name="include_romanization_summary">从网易获得歌词时包括罗马化歌词</string>
+    <string name="include_romanization">包含罗马化歌词</string>
+    <string name="multi_person_word_by_word_summary2">从受支持的提供商处获得歌词时使用多人歌词</string>
+    <string name="spotify_client_secret">Spotify 客户端 Secret</string>
+    <string name="spotify_client_id">Spotify 客户端 ID</string>
+    <string name="disable_marquee">停用 Marquee 文本</string>
+    <string name="disable_marquee_summary">在应用中停用文本移动动画</string>
+    <string name="offset">偏移</string>
+    <string name="offset_mode">偏移模式</string>
+    <string name="offset_mode_summary">直接修改歌词时间戳而非使用偏移 LRC 标签</string>
+    <string name="multi_person_word_by_word">多人逐字歌词</string>
 </resources>
