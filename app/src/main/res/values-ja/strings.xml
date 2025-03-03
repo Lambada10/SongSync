@@ -146,4 +146,18 @@
     <string name="lyrics_subtitle">"取得した歌詞はアプリに送信されます "</string>
     <string name="unknown_error_occurred">不明なエラーが発生しました</string>
     <string name="song_name_not_provided">曲名が提供されていません</string>
+    <string name="pure_black_theme_summary">ダークモードが有効化されている場合にピュアブラックテーマを使用します</string>
+    <string name="all_files_access">すべてのファイルにアクセス</string>
+    <string name="_continue">続行</string>
+    <string name="init_screen_title">SongSync にようこそ！</string>
+    <string name="show_notification_permission">通知を表示 (オプション)</string>
+    <string name="all_files_access_description">ファイルピッカーを毎回開かずに曲のディレクトリに lrc ファイルを保存するために必要です</string>
+    <string name="show_notification_description">ダウンロードの進捗通知を表示するために使用します</string>
+    <string name="init_screen_description">開始するには次の権限を許可してください:</string>
+    <string name="now_playing_song">再生中の曲</string>
+    <string name="notification_access">通知のアクセス (オプション)</string>
+    <string name="notification_access_description">デバイスで現在再生中の曲を取得するために使用します。このアプリはその他の通知は読み取りません。</string>
+    <string name="include_romanization">ローマ字表記を含める</string>
+    <string name="include_romanization_summary">NetEase プロバイダーから歌詞を取得時に、ローマ字表記の歌詞を含めます</string>
+    <string name="multi_person_word_by_word_summary2">対応したプロバイダーから歌詞を取得する場合に複数の歌詞形式を使用します</string>
 </resources>
