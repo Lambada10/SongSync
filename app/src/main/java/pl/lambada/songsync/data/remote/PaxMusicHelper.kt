@@ -6,6 +6,13 @@ import pl.lambada.songsync.util.ext.toLrcTimestamp
 import pl.lambada.songsync.util.networking.Ktor.json
 
 class PaxMusicHelper {
+
+    /**
+     * Formats syllable lyrics into LRC format.
+     * @param lyrics The list of PaxLyrics objects.
+     * @param multiPersonWordByWord Flag to format lyrics for multiple persons word by word.
+     * @return The formatted lyrics as a string.
+     */
     private fun formatSyllableLyrics(lyrics: List<PaxLyrics>, multiPersonWordByWord: Boolean): String {
         val syncedLyrics = StringBuilder()
         for (line in lyrics) {
@@ -46,6 +53,11 @@ class PaxMusicHelper {
         return syncedLyrics.toString().dropLast(1)
     }
 
+    /**
+     * Formats line lyrics into LRC format.
+     * @param lyrics The list of PaxLyrics objects.
+     * @return The formatted lyrics as a string.
+     */
     private fun formatLineLyrics(lyrics: List<PaxLyrics>): String {
         val syncedLyrics = StringBuilder()
         for (line in lyrics) {
@@ -54,28 +66,28 @@ class PaxMusicHelper {
         return syncedLyrics.toString()
     }
 
+    /**
+     * Formats word-by-word lyrics into LRC format.
+     * @param apiResponse The API response containing the lyrics.
+     * @param multiPersonWordByWord Flag to format lyrics for multiple persons word by word.
+     * @return The formatted lyrics as a string or null if the lyrics were not found.
+     */
     fun formatWordByWordLyrics(apiResponse: String, multiPersonWordByWord: Boolean): String? {
-        try {
+        return try {
             val data = json.decodeFromString<PaxResponse>(apiResponse)
             if (data.content!!.isEmpty())
                 return null
 
             val lines = data.content
 
-            return when (data.type) {
-                "Syllable" -> {
-                    formatSyllableLyrics(lines, multiPersonWordByWord).dropLast(1)
-                }
-
-                "Line" -> {
-                    formatLineLyrics(lines).dropLast(1)
-                }
-
+            when (data.type) {
+                "Syllable" -> formatSyllableLyrics(lines, multiPersonWordByWord).dropLast(1)
+                "Line" -> formatLineLyrics(lines).dropLast(1)
                 else -> null
             }
         } catch (e: Exception) {
             val data = json.decodeFromString<List<PaxLyrics>>(apiResponse)
-            return formatSyllableLyrics(data, multiPersonWordByWord)
+            formatSyllableLyrics(data, multiPersonWordByWord)
         }
     }
 }
