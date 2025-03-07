@@ -139,4 +139,24 @@
     <string name="descending">降序</string>
     <string name="show_notification_permission">顯示通知(可選)</string>
     <string name="show_notification_description">用於顯示下載進度通知</string>
+    <string name="showing_lyrics_for">顯示歌詞</string>
+    <string name="all_files_access_description">如果不想每次都打開檔案選擇器將rc檔案保存在歌曲路徑中，那麼必須授於該權限</string>
+    <string name="success_failed">成功: %1$d, 沒有歌詞: %2$d, 失敗: %3$d</string>
+    <string name="please_do_not_close_the_app_this_may_take_a_while">請不要關閉本應用，這需要一些時間</string>
+    <string name="download_complete">下載完成</string>
+    <string name="no">否</string>
+    <string name="downloading_lyrics">正在下載歌詞</string>
+    <string name="song">曲目: %1$s</string>
+    <string name="progress">進度: %1$d/%2$d (%3$d%%)</string>
+    <string name="spotify_for_developers">面相開發者的Spotify</string>
+    <string name="if_connected_spotify_down">如果網路已經連線，那麼Spotify的伺服器可能正在維護。請稍後再試。</string>
+    <plurals name="this_will_download_lyrics_for_all_songs">
+        <item quantity="other">這將下載 %1$d 首歌曲的歌詞。已經存在的歌詞將會被新的歌詞覆蓋。這可能不如一一下載歌詞準確。確定要繼續嗎?</item>
+    </plurals>
+    <string name="credentials_saved">已保存的證書</string>
+    <string name="invalid_credentials">無效的證書</string>
+    <string name="spotify_client_secret">Spotify客戶端Secret</string>
+    <string name="disable_marquee">禁用選取框文本</string>
+    <string name="offset_mode">偏移模式</string>
+    <string name="offset_mode_summary">直接修改歌詞時間戳而不是使用偏移LRC標籤</string>
 </resources>
