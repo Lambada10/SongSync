@@ -138,7 +138,7 @@
     <string name="statusbar_lyrics_ext">Testo della barra di stato ext (per Netease)</string>
     <string name="song_path_description">Mostra il percorso di un file musicale nell\'elenco dei brani</string>
     <string name="album">Album</string>
-    <string name="synced_lyrics">Ottieni testi sincronizzati</string>
+    <string name="synced_lyrics">Ottieni testi non sincronizzati</string>
     <string name="year">Anno</string>
     <string name="duration">Durata</string>
 </resources>
