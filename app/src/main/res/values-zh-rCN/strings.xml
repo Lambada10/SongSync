@@ -160,4 +160,5 @@
     <string name="offset_mode">偏移模式</string>
     <string name="offset_mode_summary">直接修改歌词时间戳而非使用偏移 LRC 标签</string>
     <string name="multi_person_word_by_word">多人逐字歌词</string>
+    <string name="showing_lyrics_for">显示歌词</string>
 </resources>
