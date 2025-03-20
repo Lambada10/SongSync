@@ -87,6 +87,7 @@ dependencies {
     implementation(libs.ktor.core)
     implementation(libs.ktor.cio)
     implementation(libs.taglib)
+    implementation(libs.kotlin.onetimepassword)
     implementation(libs.datastore.preferences)
     implementation(libs.ui.tooling) //NOT RECOMMENDED
     implementation(libs.ui.tooling.preview) //NOT RECOMMENDED
