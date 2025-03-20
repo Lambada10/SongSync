@@ -8,6 +8,7 @@ package pl.lambada.songsync.util
  * @property message An optional message associated with the resource state.
  */
 sealed class ResourceState<T>(val data: T? = null, val message: String? = null) {
+
     /**
      * Represents a loading state.
      *

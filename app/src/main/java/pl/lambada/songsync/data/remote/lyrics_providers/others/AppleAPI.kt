@@ -15,6 +15,12 @@ import java.net.URLEncoder
 class AppleAPI {
     private val baseURL = "https://paxsenix.alwaysdata.net/"
 
+    /**
+     * Searches for song information using the song name and artist name.
+     * @param query The SongInfo object with songName and artistName fields filled.
+     * @param offset The offset used for trying to find a better match or searching again.
+     * @return Search result as a SongInfo object.
+     */
     suspend fun getSongInfo(query: SongInfo, offset: Int = 0): SongInfo? {
         val search = withContext(Dispatchers.IO) {
             URLEncoder.encode(
@@ -23,7 +29,7 @@ class AppleAPI {
             )
         }
 
-        if (search == " ")
+        if (search.isBlank())
             throw EmptyQueryException()
 
         val response = client.get(
@@ -56,6 +62,12 @@ class AppleAPI {
         )
     }
 
+    /**
+     * Gets synced lyrics using the song ID and returns them as a string formatted as an LRC file.
+     * @param id The ID of the song from search results.
+     * @param multiPersonWordByWord Flag to format lyrics for multiple persons word by word.
+     * @return The synced lyrics as a string.
+     */
     suspend fun getSyncedLyrics(id: Long, multiPersonWordByWord: Boolean): String? {
         val response = client.get(
             baseURL + "getAppleMusicLyrics.php?id=$id"
