@@ -43,10 +43,10 @@ class LyricsFetchViewModel(
 
     var lyricsFetchState by mutableStateOf<LyricsFetchState>(LyricsFetchState.NotSubmitted)
 
-    private suspend fun getSyncedLyrics(link: String?, version: String): String? =
+    private suspend fun getSyncedLyrics(title: String, artist: String): String? =
         lyricsProviderService.getSyncedLyrics(
-            link,
-            version,
+            title,
+            artist,
             userSettingsController.selectedProvider,
             userSettingsController.includeTranslation,
             userSettingsController.includeRomanization,
@@ -70,7 +70,7 @@ class LyricsFetchViewModel(
                     ?: error("Error fetching lyrics for the song.")
 
                 queryState = QueryStatus.Success(result)
-                loadLyrics(result.songLink, context)
+                loadLyrics(result.songName!!, result.artistName!!)
             } catch (e: Exception) {
                 queryState = when (e) {
                     is UnknownHostException -> QueryStatus.NoConnection
@@ -105,14 +105,14 @@ class LyricsFetchViewModel(
         showToast(context, R.string.file_saved_to, file.absolutePath)
     }
 
-    private fun loadLyrics(songLink: String?, context: Context) {
+    private fun loadLyrics(title: String, artist: String) {
         viewModelScope.launch {
             lyricsFetchState = LyricsFetchState.Pending
 
             try {
                 val lyrics = getSyncedLyrics(
-                    link = songLink,
-                    version = context.getVersion()
+                    title,
+                    artist
                 ) ?: throw NullPointerException("Lyrics result is null")
 
                 lyricsFetchState = LyricsFetchState.Success(lyrics)

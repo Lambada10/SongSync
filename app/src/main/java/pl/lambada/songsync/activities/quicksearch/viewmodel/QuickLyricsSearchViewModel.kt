@@ -55,7 +55,7 @@ class QuickLyricsSearchViewModel(
                     )
                 } else {
                     updateScreenState(ScreenState.Success(result))
-                    fetchLyrics(result.songLink, context)
+                    fetchLyrics(result.songName!!, result.artistName!!, context)
                 }
 
             } else {
@@ -69,14 +69,14 @@ class QuickLyricsSearchViewModel(
         }
     }
 
-    private fun fetchLyrics(songLink: String?, context: Context) {
+    private fun fetchLyrics(title: String, artist: String, context: Context) {
         updateLyricsState(ResourceState.Loading())
         viewModelScope.launch(Dispatchers.IO) {
 
             val lyricsCall = runCatching {
                 getSyncedLyrics(
-                    link = songLink,
-                    version = context.getVersion()
+                    title,
+                    artist
                 )
             }
 
@@ -106,10 +106,10 @@ class QuickLyricsSearchViewModel(
         }
     }
 
-    private suspend fun getSyncedLyrics(link: String?, version: String): String? =
+    private suspend fun getSyncedLyrics(title: String, artist: String): String? =
         lyricsProviderService.getSyncedLyrics(
-            link,
-            version,
+            title,
+            artist,
             userSettingsController.selectedProvider,
             userSettingsController.includeTranslation,
             userSettingsController.includeRomanization,

@@ -93,7 +93,6 @@ class SpotifyAPI {
                 parameter("totpVer", 5)
             }
             val responseBody = response.bodyAsText(Charsets.UTF_8)
-            Log.e("SpotifyAPI", responseBody)
             val json = json.decodeFromString<WebPlayerTokenResponse>(responseBody)
 
             this.spotifyToken = json.accessToken

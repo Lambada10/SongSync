@@ -291,11 +291,11 @@ class HomeViewModel(
     suspend fun getSongInfo(query: SongInfo): SongInfo? =
         lyricsProviderService.getSongInfo(query, provider = userSettingsController.selectedProvider)
 
-    suspend fun getSyncedLyrics(link: String?, version: String): String? {
+    suspend fun getSyncedLyrics(title: String, artist: String): String? {
         return try {
             lyricsProviderService.getSyncedLyrics(
-                link,
-                version,
+                title,
+                artist,
                 provider = userSettingsController.selectedProvider,
                 includeTranslationNetEase = userSettingsController.includeTranslation,
                 includeRomanizationNetEase = userSettingsController.includeRomanization,
