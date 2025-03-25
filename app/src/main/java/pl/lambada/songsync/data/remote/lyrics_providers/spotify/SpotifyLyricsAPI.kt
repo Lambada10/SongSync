@@ -12,7 +12,7 @@ import pl.lambada.songsync.util.networking.Ktor.client
 import pl.lambada.songsync.util.networking.Ktor.json
 
 class SpotifyLyricsAPI {
-    private val baseURL = "https://slapi-five.vercel.app/api/lyrics"
+    private val baseURL = "https://lyrichub.vercel.app/api/spotify"
 
     /**
      * Gets synced lyrics using the song link and returns them as a string formatted as an LRC file.
