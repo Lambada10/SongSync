@@ -176,7 +176,7 @@ fun handleSecurityException(
  * Defines possible provider choices
  */
 enum class Providers(val displayName: String) {
-    SPOTIFY("Spotify (via SpotifyLyricsAPI)"),
+    SPOTIFY("Spotify"),
     LRCLIB("LRCLib"),
     QQMUSIC("QQ Music"),
     NETEASE("Netease") { val inf = 0},
