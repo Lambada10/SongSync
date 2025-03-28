@@ -1,6 +1,5 @@
 package pl.lambada.songsync.ui.screens.home
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -112,8 +111,6 @@ fun HomeScreen(
                     selectedProvider = viewModel.userSettingsController.selectedProvider,
                     onSelectAllSongsRequest = viewModel::selectAllDisplayingSongs,
                     onInvertSongSelectionRequest = viewModel::invertSongSelection,
-                    embedLyrics = viewModel.userSettingsController.embedLyricsIntoFiles,
-                    onEmbedLyricsChangeRequest = viewModel.userSettingsController::updateEmbedLyrics,
                     cachedSize = cachedSize
                 )
             }
