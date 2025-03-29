@@ -26,7 +26,7 @@
     <string name="telegram_group">Telegram skupina</string>
     <string name="no_internet_connection">Žádný přístup k internetu</string>
     <string name="song_name_no_args">Jméno písně</string>
-    <string name="artist_name_no_args">Jmáno umělce</string>
+    <string name="artist_name_no_args">Jméno umělce</string>
     <string name="lyrics_copied_to_clipboard">Text zkopírován do schránky</string>
     <string name="checking_for_updates">Hledání aktualizací</string>
     <string name="update_available">Aktualizace dostupná</string>
@@ -62,4 +62,7 @@
     <string name="permission_denied">Přístup odepřen</string>
     <string name="album">Album</string>
     <string name="batch_download_lyrics">Hromadné stahování textů</string>
+    <string name="download">Stáhnout</string>
+    <string name="search">Hledat</string>
+    <string name="copy_lyrics_to_clipboard">Zkopírovat text do schránky</string>
 </resources>
