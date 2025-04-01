@@ -148,4 +148,18 @@
         <item quantity="many">Cela téléchargera les paroles de %1$d chansons. Les paroles existantes des chansons seront remplacées par de nouvelles. Cela peut être moins précis que de télécharger les paroles une par une. Êtes-vous sûr de vouloir continuer ?</item>
         <item quantity="other">Cela téléchargera les paroles de %1$d chansons. Les paroles existantes des chansons seront remplacées par de nouvelles. Cela peut être moins précis que de télécharger les paroles une par une. Êtes-vous sûr de vouloir continuer ?</item>
     </plurals>
+    <string name="all_files_access_description">Nécessaire pour enregistrer les fichiers lrc dans le dossier des chansons sans ouvrir le sélecteur de fichiers à chaque fois</string>
+    <string name="pure_black_theme_summary">Utiliser le thème noir lorsque le mode sombre est activé</string>
+    <string name="all_files_access">Accès à tous les fichiers</string>
+    <string name="show_notification_permission">Afficher les notifications (facultatif)</string>
+    <string name="show_notification_description">Utilisé pour afficher une notification de progression du téléchargement</string>
+    <string name="_continue">Continuer</string>
+    <string name="init_screen_title">Bienvenue sur SongSync !</string>
+    <string name="init_screen_description">Pour commencer, veuillez accorder les autorisations suivantes :</string>
+    <string name="now_playing_song">Chanson en cours de lecture</string>
+    <string name="notification_access">Accès aux notifications (facultatif)</string>
+    <string name="notification_access_description">Cette fonction permet de récupérer la chanson en cours de lecture sur votre appareil. L\'application n\'a accès à aucune autre notification.</string>
+    <string name="include_romanization">Inclure la romanisation</string>
+    <string name="include_romanization_summary">Inclure les paroles romanisées lors de l\'obtention des paroles de chansons auprès du fournisseur Netease</string>
+    <string name="multi_person_word_by_word_summary2">Utilisez le format de paroles de plusieurs personnes lorsque vous obtenez des paroles auprès d\'un fournisseur pris en charge</string>
 </resources>
