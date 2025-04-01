@@ -65,4 +65,17 @@
     <string name="download">Stáhnout</string>
     <string name="search">Hledat</string>
     <string name="copy_lyrics_to_clipboard">Zkopírovat text do schránky</string>
+    <string name="contributor">Přispěvatel</string>
+    <string name="contributors">Přispěvatelé</string>
+    <string name="success_failed">Úspěch: %1$d, Žádný text: %2$d, Selhalo: %3$d</string>
+    <string name="please_do_not_close_the_app_this_may_take_a_while">Prosím nezavírejte aplikaci, toto může trvat dlouho</string>
+    <string name="success">Úspěch: %1$d</string>
+    <string name="failed">Selhalo: %1$d</string>
+    <string name="spotify_api_rate_limit_reached">Limit možných požadavků Spotify API dosažen</string>
+    <string name="what_is_songsync">SongSync je aplikace, která umožňuje stahování synchronizovaného textu (.lrc soubory) pro vaší muziku.</string>
+    <string name="changelog">Seznam změn:\n%1$s</string>
+    <string name="provider">Poskytovatel textů</string>
+    <string name="provider_summary">Vyberte poskytovatel textů níže</string>
+    <string name="restart_the_app">Otevřte aplikaci znovu aby se změny projevily</string>
+    <string name="pure_black_theme">Úplně černé téma</string>
 </resources>
