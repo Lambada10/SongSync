@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import pl.lambada.songsync.R
+import pl.lambada.songsync.util.ext.BackPressHandler
 
 @Composable
 fun HomeSearchBar(
@@ -60,6 +61,15 @@ fun HomeSearchBar(
         willShowIme = false
     }
     val focusManager = LocalFocusManager.current
+
+    BackPressHandler(
+        enabled = showingSearch,
+        onBackPressed = {
+            onQueryChange("")
+            onShowSearchChange(false)
+            onShowingSearchChange(false)
+        }
+    )
 
     TextField(
         query,
