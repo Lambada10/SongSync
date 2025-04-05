@@ -180,7 +180,7 @@ class HomeViewModel(
     fun updateSearchResults(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
             if (query.isEmpty()) {
-                _searchResults.value = emptyList()
+                _searchResults.value = _cachedFilteredSongs.value
                 return@launch
             }
 
