@@ -18,32 +18,33 @@ class PaxMusicHelper {
             }
 
             for (syllable in line.text) {
-                syncedLyrics.append("<${syllable.timestamp!!.toLrcTimestamp()}>${syllable.text}")
-                if (!syllable.part) {
+                val formatedBeginTimestamp = "<${syllable.timestamp!!.toLrcTimestamp()}>"
+                val formatedEndTimestamp = "<${syllable.endtime?.toLrcTimestamp()}>"
+                if (!syncedLyrics.endsWith(formatedBeginTimestamp))
+                    syncedLyrics.append(formatedBeginTimestamp)
+                syncedLyrics.append(syllable.text)
+                if (!syllable.part)
                     syncedLyrics.append(" ")
-                }
-                syncedLyrics.append("<${syllable.endtime?.toLrcTimestamp()}>")
+                syncedLyrics.append(formatedEndTimestamp)
             }
 
             if (line.background && multiPersonWordByWord) {
-                syncedLyrics.append("<${line.text.last().endtime?.toLrcTimestamp()}>\n")
-
-                syncedLyrics.append("[bg:")
-
+                syncedLyrics.append("\n[bg:")
                 for (syllable in line.backgroundText) {
-                    syncedLyrics.append("<${syllable.timestamp!!.toLrcTimestamp()}>${syllable.text}")
-                    if (!syllable.part) {
+                    val formatedBeginTimestamp = "<${syllable.timestamp!!.toLrcTimestamp()}>"
+                    val formatedEndTimestamp = "<${syllable.endtime?.toLrcTimestamp()}>"
+                    if (!syncedLyrics.endsWith(formatedBeginTimestamp))
+                        syncedLyrics.append(formatedBeginTimestamp)
+                    syncedLyrics.append(syllable.text)
+                    if (!syllable.part)
                         syncedLyrics.append(" ")
-                    }
-                    syncedLyrics.append("<${syllable.endtime?.toLrcTimestamp()}>")
+                    syncedLyrics.append(formatedEndTimestamp)
                 }
-
-                syncedLyrics.append("<${line.endtime.toLrcTimestamp()}>]\n")
-            } else {
-                syncedLyrics.append("<${line.endtime.toLrcTimestamp()}>\n")
+                syncedLyrics.append("]")
             }
+            syncedLyrics.append("\n")
         }
-        return syncedLyrics.toString().dropLast(1)
+        return syncedLyrics.toString()
     }
 
     private fun formatLineLyrics(lyrics: List<PaxLyrics>): String {
