@@ -91,4 +91,8 @@ dependencies {
     implementation(libs.datastore.preferences)
     implementation(libs.ui.tooling) //NOT RECOMMENDED
     implementation(libs.ui.tooling.preview) //NOT RECOMMENDED
+    implementation("io.ktor:ktor-client-core:2.3.4")
+    implementation("io.ktor:ktor-client-cio:2.3.4")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.4")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.4")
 }
