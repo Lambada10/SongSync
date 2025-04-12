@@ -119,7 +119,6 @@
     <string name="embed_lyrics_in_file">اِدمُج الكلمات بالملف</string>
     <string name="embedded_lyrics_in_file">تمَّ دمج الكلمات بملفّ الأغنية</string>
     <string name="multi_person_word_by_word">كلمات مزمّنة كلمةً كلمة لعدّة أشخاص</string>
-    <string name="multi_person_word_by_word_summary">استعمل صيغة الكلمات متعدّدة الأشخاص عند أخذ الكلمات من Apple Music</string>
     <string name="offset">التأخير</string>
     <string name="song_path">أظهِر مسار الأغنية</string>
     <string name="synced_lyrics">استورد كلماتٍ مُزمَّنة</string>

@@ -120,7 +120,6 @@
     <string name="include_translation_summary">Sertakan lirik terjemahan saat mendapatkan lirik lagu dari penyedia Netease</string>
     <string name="embed_lyrics_in_file">Sematkan lirik ke file</string>
     <string name="multi_person_word_by_word">Lirik beberapa orang kata demi kata</string>
-    <string name="multi_person_word_by_word_summary">Gunakan format lirik beberapa orang saat mendapatkan lirik dari Apple Music</string>
     <string name="offset">Seimbang</string>
     <string name="song_path">Tampilkan jalur lagu</string>
     <string name="song_path_description">Tampilkan jalur file lagu di daftar lagu</string>

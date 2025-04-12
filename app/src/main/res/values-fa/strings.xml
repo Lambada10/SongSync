@@ -6,7 +6,6 @@
     <string name="provider_summary">لطفا ارائه‌دهندۀ ترانه‌ها را از زیر برگزینید</string>
     <string name="internal_error">خطای داخلی: %s</string>
     <string name="embedded_lyrics_in_file">ترانه‌ها در پروندۀ آهنگ جاسازی شدند</string>
-    <string name="multi_person_word_by_word_summary">هنگام گرفتن ترانه‌ها از قالب چند نفرۀ Apple Music استفاده شود</string>
     <string name="song_path_description">نشان دادن مسیر پروندۀ یک آهنگ در فهرست آهنگ‌ها</string>
     <string name="synced_lyrics">گرفتن ترانه‌های هم‌گام نشده</string>
     <string name="change_api_strategy">هم‌چنین می‌توانید روش‌های جایگزین اتصال به شبکۀ Spotify در تنظیمات را امتحان کنید.</string>
@@ -88,8 +87,8 @@
     <string name="statusbar_lyrics_ext">افزونۀ ترانه‌های نوار وضعیت (برای Netease)</string>
     <string name="disable_marquee">از کار انداختن متن متحرک</string>
     <string name="include_translation">شامل شدن ترجمه</string>
-    <string name="ascending">صعودی</string>
-    <string name="descending">نزولی</string>
+    <string name="ascending">پس‌رونده</string>
+    <string name="descending">پیش‌رونده</string>
     <string name="settings">تنظیمات</string>
     <string name="date_added">تاریخ افزوده شدن</string>
     <string name="date_modified">تاریخ اصلاح شدن</string>
@@ -156,4 +155,10 @@
     <string name="_continue">ادامه</string>
     <string name="init_screen_title">به SongSync خوش‌آمدید!</string>
     <string name="init_screen_description">برای شروع، لطفا اجازۀ دسترسی‌های زیر را بدهید:</string>
+    <string name="now_playing_song">آهنگ در حال پخش</string>
+    <string name="notification_access">دسترسی اعلان (اختیاری)</string>
+    <string name="include_romanization">شامل شدن اشعار عاشقانه</string>
+    <string name="multi_person_word_by_word_summary2">استفاده از قالب چند نفره هنگام گرفتن ترانه‌ها از ارائه‌دهندۀ پشتیبانی شده</string>
+    <string name="notification_access_description">این برای گرفتن آهنگ کنونی در حال پخش در دستگاه شما استفاده می‌شود. برنامه هیچ اعلان دیگری را نمی‌خواند.</string>
+    <string name="include_romanization_summary">شامل شدن ترانه‌های رومی‌سازی شده هنگام گرفتن ترانه‌های آهنگ از ارائه‌دهندۀ Netease</string>
 </resources>

@@ -121,7 +121,6 @@
     <string name="disable_marquee_summary">Desativar animação de texto em movimento no aplicativo</string>
     <string name="include_translation">Incluir tradução</string>
     <string name="include_translation_summary">Incluir letras traduzidas ao obter letras de músicas do provedor Netease</string>
-    <string name="multi_person_word_by_word_summary">Use o formato de letras para várias pessoas ao obter letras do Apple Music</string>
     <string name="embed_lyrics_in_file">Incorporar letras no arquivo</string>
     <string name="embed_non_local_song_error">Você tentou incorporar a letra em um arquivo não local. Abortando operação.</string>
     <string name="duration">Duração</string>

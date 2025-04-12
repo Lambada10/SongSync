@@ -121,7 +121,6 @@
     <string name="embedded_lyrics_in_file">Текст был встроен в файл песни</string>
     <string name="embed_non_local_song_error">Вы попытались встроить текст в нелокальный файл. Операция прервана.</string>
     <string name="multi_person_word_by_word">Текст песни по словам для нескольких человек</string>
-    <string name="multi_person_word_by_word_summary">Использовать формат текста песни по словам для нескольких человек при получении текстов из Apple Music</string>
     <string name="offset">Смещение</string>
     <string name="song_path">Показать путь к песне</string>
     <string name="song_path_description">Показать путь к файлу песни в списке песен</string>
@@ -150,4 +149,18 @@
     <string name="unknown_error_occurred">Произошла неизвестная ошибка</string>
     <string name="showing_lyrics_for">Показаны тексты песен для</string>
     <string name="song_lyrics">Текст песни</string>
+    <string name="pure_black_theme_summary">При активации тёмного режима применять полностью чёрную тему</string>
+    <string name="all_files_access_description">Необходимо для автоматического сохранения LRC-файлов в папку с песней, чтобы не приходилось каждый раз выбирать место сохранения</string>
+    <string name="all_files_access">Доступ ко всем файлам</string>
+    <string name="show_notification_permission">Показывать уведомления (необязательно)</string>
+    <string name="show_notification_description">Применяется для отображения уведомления о процессе загрузки</string>
+    <string name="_continue">Продолжить</string>
+    <string name="init_screen_title">Добро пожаловать в SongSync!</string>
+    <string name="init_screen_description">Для начала работы, пожалуйста, выдайте эти разрешения:</string>
+    <string name="now_playing_song">Текущая песня</string>
+    <string name="notification_access">Доступ к уведомлениям (необязательно)</string>
+    <string name="notification_access_description">Это используется для получения текущей песни, воспроизводимой на вашем устройстве. Приложение не считывает никакие другие уведомления.</string>
+    <string name="include_romanization">Включить романизацию</string>
+    <string name="include_romanization_summary">Предоставлять романизированные тексты при получении текстов песен от Netease</string>
+    <string name="multi_person_word_by_word_summary2">Отображать текст песни в разделении по исполнителям, если источник текста это позволяет</string>
 </resources>

@@ -97,8 +97,8 @@ class LyricsProviderService {
      * @return The synced lyrics as a string.
      */
     suspend fun getSyncedLyrics(
-        songLink: String?,
-        version: String,
+        songTitle: String,
+        artistName: String,
         provider: Providers,
         // TODO providers could be a sealed interface to include such parameters
         includeTranslationNetEase: Boolean = false,
@@ -107,7 +107,7 @@ class LyricsProviderService {
         unsyncedFallbackMusixmatch: Boolean = true
     ): String? {
         return when (provider) {
-            Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songLink!!, version)
+            Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songTitle, artistName)
             Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(lrcLibID)
             Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(
                 neteaseID, includeTranslationNetEase, includeRomanizationNetEase

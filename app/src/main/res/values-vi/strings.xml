@@ -116,7 +116,6 @@
     <string name="provider">Bên cung cấp lời bài hát</string>
     <string name="open_website">Mở trang web</string>
     <string name="song_path_description">Hiện đường dẫn tệp bài hát trong danh sách bài hát</string>
-    <string name="multi_person_word_by_word_summary">Dùng định dạng lời bài hát nhiều người khi lấy lời bài hát từ Apple Music</string>
     <string name="provider_summary">Vui lòng chọn bên cung cấp lời bài hát từ dưới đây</string>
     <string name="ignore">Bỏ qua</string>
     <string name="internal_error">Lỗi nội bộ:%s</string>

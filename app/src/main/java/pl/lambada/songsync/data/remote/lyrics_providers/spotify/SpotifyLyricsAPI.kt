@@ -1,43 +1,38 @@
 package pl.lambada.songsync.data.remote.lyrics_providers.spotify
 
 import android.os.Build
+import android.util.Log
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
+import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.lyrics_providers.spotify.SyncedLinesResponse
 import pl.lambada.songsync.util.networking.Ktor.client
 import pl.lambada.songsync.util.networking.Ktor.json
 
 class SpotifyLyricsAPI {
-    private val baseURL = "https://spotify-lyrics-api-cyan.vercel.app/"
+    private val baseURL = "https://lyrichub.vercel.app/api/spotify"
 
     /**
      * Gets synced lyrics using the song link and returns them as a string formatted as an LRC file.
-     * @param songLink The link to the song.
-     * @param version The version of the app.
+     * @param title The title of the song.
+     * @param artist The name of the artist.
      * @return The synced lyrics as a string.
      */
-    suspend fun getSyncedLyrics(songLink: String, version: String = ""): String? {
-        val response = client.get("$baseURL?url=$songLink&format=lrc") {
-            header("User-Agent", "SongSync v${version}, ${Build.FINGERPRINT}")
+    suspend fun getSyncedLyrics(title: String, artist: String): String? {
+        val response = client.get(baseURL) {
+            parameter("query", "$title $artist")
         }
         val responseBody = response.bodyAsText(Charsets.UTF_8)
-
         if (response.status.value !in 200..299)
             return null
 
         val json = json.decodeFromString<SyncedLinesResponse>(responseBody)
 
-        if (json.error)
+        if (json.lyrics == "Not Found.")
             return null
 
-        val lines = json.lines
-        val syncedLyrics = StringBuilder()
-
-        for (line in lines) {
-            syncedLyrics.append("[${line.timeTag}]${line.words}\n")
-        }
-
-        return syncedLyrics.toString().dropLast(1)
+        return json.lyrics
     }
 }

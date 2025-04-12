@@ -142,7 +142,6 @@
     <string name="translation_website">Abrir Weblate</string>
     <string name="statusbar_lyrics_ext">Extensión de letras en la barra de estado (para NetEase)</string>
     <string name="multi_person_word_by_word">Letra multipersonal palabra por palabra</string>
-    <string name="multi_person_word_by_word_summary">Utilizar el formato de letras multipersona al obtener letras de Apple Music</string>
     <string name="offset">Compensar</string>
     <string name="synced_lyrics">Obtener letras no sincronizadas</string>
     <string name="synced_lyrics_summary">Activa o desactiva la obtención de letras no sincronizadas de Musixmatch cuando no se encuentran letras sincronizadas.</string>

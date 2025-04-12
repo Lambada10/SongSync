@@ -139,7 +139,6 @@
     <string name="embedded_lyrics_in_file">Laulusõnad on lisatud helifaili</string>
     <string name="embed_non_local_song_error">Sa proovisid lisada laulusõnu helifaili, mis ei asu selles nutiseadmes. Katkestame tegevuse.</string>
     <string name="multi_person_word_by_word">Sõnahaaval kuvatavad laulusõnad mitmele kasutajale</string>
-    <string name="multi_person_word_by_word_summary">Laulusõnade laadimisel Apple Musicu teenusest, kasuta mitmele kasutajale sobivat vormingut</string>
     <string name="offset">Nihe</string>
     <string name="song_path">Näita loo asukohta</string>
     <string name="song_path_description">Näita lugude loendis iga loo asukohta</string>
@@ -156,4 +155,10 @@
     <string name="_continue">Jätka</string>
     <string name="init_screen_title">Tere tulemast kasutama SongSynci!</string>
     <string name="init_screen_description">Alustamiseks palun luba järgnevad õigused:</string>
+    <string name="now_playing_song">Hetkel esitamisel lugu</string>
+    <string name="notification_access">Ligipääs teavitustele (valikuline)</string>
+    <string name="notification_access_description">Seda õigust kasutame hetkel sinu nutiseadmes esitamisel oleva loo tuvastamiseks. Muid teavitusi see rakendus ei loe.</string>
+    <string name="include_romanization">Kaasa ladina tähestikus laulusõnad</string>
+    <string name="include_romanization_summary">Kui teenusepakkujaks on Netease, siis laulusõnade laadimisel kaasa ka ladina tähtedega kirjutatud laulusõnad</string>
+    <string name="multi_person_word_by_word_summary2">Kui teenusepakkuja seda võimaldab, siis laadi laulusõnad mitmele kasutajale mõeldud vormingus</string>
 </resources>
