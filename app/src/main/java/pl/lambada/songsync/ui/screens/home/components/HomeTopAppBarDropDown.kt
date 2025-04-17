@@ -1,6 +1,5 @@
 package pl.lambada.songsync.ui.screens.home.components
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
@@ -9,24 +8,18 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.core.stringPreferencesKey
 import pl.lambada.songsync.R
+import pl.lambada.songsync.ui.components.ProvidersDropdownMenu
 import pl.lambada.songsync.util.Providers
-import pl.lambada.songsync.util.dataStore
-import pl.lambada.songsync.util.set
 
 @Composable
 fun HomeTopAppBarDropDown(
@@ -90,49 +83,10 @@ fun HomeTopAppBarDropDown(
             }
         )
     }
-    val providers = Providers.entries.toTypedArray()
-    val dataStore = LocalContext.current.dataStore
-    DropdownMenu(
+    ProvidersDropdownMenu(
         expanded = expandedProviders,
-        onDismissRequest = { expandedProviders = false }
-    ) {
-        Text(
-            text = stringResource(id = R.string.provider),
-            modifier = Modifier.padding(start = 18.dp, top = 8.dp),
-            fontSize = 12.sp
-        )
-        providers.forEach {
-            DropdownMenuItem(
-                text = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = it.displayName,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 6.dp)
-                        )
-                        RadioButton(
-                            selected = selectedProvider == it,
-                            onClick = {
-                                onProviderSelectRequest(it)
-                                dataStore.set(
-                                    stringPreferencesKey("provider"),
-                                    it.displayName
-                                )
-                                expandedProviders = false
-                            }
-                        )
-                    }
-                },
-                onClick = {
-                    onProviderSelectRequest(it)
-                    dataStore.set(
-                        stringPreferencesKey("provider"),
-                        it.displayName
-                    )
-                    expandedProviders = false
-                }
-            )
-        }
-    }
+        onDismissRequest = { expandedProviders = false },
+        selectedProvider = selectedProvider,
+        onProviderSelectRequest = onProviderSelectRequest,
+    )
 }
