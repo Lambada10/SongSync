@@ -1,6 +1,5 @@
 package pl.lambada.songsync.ui.screens.lyricsFetch
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -16,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,6 +26,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -37,6 +41,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import pl.lambada.songsync.R
+import pl.lambada.songsync.ui.components.ProvidersDropdownMenu
+import pl.lambada.songsync.ui.screens.lyricsFetch.components.CloudProviderTitle
 import pl.lambada.songsync.ui.screens.lyricsFetch.components.FailedDialogue
 import pl.lambada.songsync.ui.screens.lyricsFetch.components.LocalSongContent
 import pl.lambada.songsync.ui.screens.lyricsFetch.components.NoConnectionDialogue
@@ -62,6 +68,8 @@ fun SharedTransitionScope.LyricsFetchScreen(
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
     val clipboardManager = LocalClipboardManager.current
+
+    var expandedProviders by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if (viewModel.source != null) viewModel.loadSongInfo(context)
@@ -97,6 +105,24 @@ fun SharedTransitionScope.LyricsFetchScreen(
                     Text(
                         text = stringResource(id = R.string.search),
                         modifier = Modifier.padding(start = 6.dp),
+                    )
+                },
+                actions = {
+                    IconButton(onClick = { expandedProviders = !expandedProviders }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "More"
+                        )
+                    }
+                    ProvidersDropdownMenu(
+                        expanded = expandedProviders,
+                        selectedProvider = viewModel.userSettingsController.selectedProvider,
+                        onDismissRequest = { expandedProviders = false },
+                        onProviderSelectRequest = { it ->
+                            (viewModel.userSettingsController::updateSelectedProviders)(it)
+                            if (viewModel.queryState != QueryStatus.NotSubmitted)
+                                viewModel.loadSongInfo(context)
+                        },
                     )
                 },
                 scrollBehavior = scrollBehavior
@@ -139,6 +165,11 @@ fun SharedTransitionScope.LyricsFetchScreen(
                         Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        Spacer(modifier = Modifier.height(10.dp))
+                        CloudProviderTitle(
+                            selectedProvider = viewModel.userSettingsController.selectedProvider,
+                            onExpandProvidersRequest = { expandedProviders = true }
+                        )
                         Spacer(modifier = Modifier.height(16.dp))
                         CircularProgressIndicator()
                     }
@@ -186,7 +217,9 @@ fun SharedTransitionScope.LyricsFetchScreen(
                         animatedVisibilityScope = animatedVisibilityScope,
                         disableMarquee = viewModel.userSettingsController.disableMarquee,
                         allowTryingAgain =
-                            viewModel.userSettingsController.selectedProvider != Providers.MUSIXMATCH
+                            viewModel.userSettingsController.selectedProvider != Providers.MUSIXMATCH,
+                        selectedProvider = viewModel.userSettingsController.selectedProvider,
+                        onExpandProvidersRequest = { expandedProviders = true },
                     )
 
                     is QueryStatus.Failed -> FailedDialogue(
