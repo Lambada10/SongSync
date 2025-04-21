@@ -85,7 +85,7 @@
     <string name="error_checking_for_updates">Error checking for updates</string>
     <string name="close">Close</string>
     <string name="filters">Filters</string>
-    <string name="no_lyrics_only">Only show songs without lyrics</string>
+    <string name="no_lyrics_only">Only show songs without LRC file lyrics</string>
     <string name="ignore_folders">Ignore folders</string>
     <string name="save">Save</string>
     <string name="credentials_saved">Credentials saved</string>
