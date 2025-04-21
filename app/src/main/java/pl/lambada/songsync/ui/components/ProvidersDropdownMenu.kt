@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
 import pl.lambada.songsync.util.Providers
 import pl.lambada.songsync.util.dataStore
@@ -37,6 +40,7 @@ fun ProvidersDropdownMenu(
 ) {
     val providers = Providers.entries.toTypedArray()
     val dataStore = LocalContext.current.dataStore
+    val scope = rememberCoroutineScope()
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
@@ -81,7 +85,10 @@ fun ProvidersDropdownMenu(
                                     stringPreferencesKey("provider"),
                                     it.displayName
                                 )
-                                onDismissRequest()
+                                scope.launch {
+                                    delay(200)
+                                    onDismissRequest()
+                                }
                             }
                         )
                     }
@@ -92,7 +99,10 @@ fun ProvidersDropdownMenu(
                         stringPreferencesKey("provider"),
                         it.displayName
                     )
-                    onDismissRequest()
+                    scope.launch {
+                        delay(200)
+                        onDismissRequest()
+                    }
                 }
             )
         }
