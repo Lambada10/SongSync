@@ -420,6 +420,7 @@ internal data class DropdownMenuPositionProvider(
 fun DropdownMenuContent(
     expandedState: MutableTransitionState<Boolean>,
     scrollState: ScrollState,
+    transformOrigin: TransformOrigin,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -438,7 +439,9 @@ fun DropdownMenuContent(
             transformOrigin = if (LocalLayoutDirection.current == LayoutDirection.Ltr)
                 TransformOrigin(1f, 0f)
             else
-                TransformOrigin(1f, 1f), // TODO: consider the origin position
+                TransformOrigin(0f, 0f),
+            // TODO: use transformOrigin if necessary
+            //       it has a little issue currently on enter so fixed value has been used
         ),
         exit = fadeOut(
             animationSpec = tween(
@@ -452,10 +455,7 @@ fun DropdownMenuContent(
                 easing = LinearEasing,
             ),
             targetScale = 0.8f,
-            transformOrigin = if (LocalLayoutDirection.current == LayoutDirection.Ltr)
-                TransformOrigin(1f, 0f)
-            else
-                TransformOrigin(1f, 1f), // TODO: consider the origin position
+            transformOrigin = transformOrigin,
         ),
         modifier = modifier
     ) {
@@ -493,7 +493,8 @@ fun DropdownMenuContent(
                     modifier = Modifier
                         .padding(vertical = DropdownMenuVerticalPadding)
                         .width(IntrinsicSize.Max)
-                        .verticalScroll(scrollState), content = content
+                        .verticalScroll(scrollState),
+                    content = content
                 )
             }
         }
