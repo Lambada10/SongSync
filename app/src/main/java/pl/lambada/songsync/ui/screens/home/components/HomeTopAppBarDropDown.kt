@@ -16,18 +16,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import pl.lambada.songsync.R
 import pl.lambada.songsync.ui.components.ProvidersDropdownMenuContent
 import pl.lambada.songsync.ui.components.dropdown.AnimatedDropdownMenu
 import pl.lambada.songsync.util.Providers
-import pl.lambada.songsync.util.ui.MotionConstants.DURATION_EXIT
 import pl.lambada.songsync.util.ui.tweenEnter
 import pl.lambada.songsync.util.ui.tweenExit
 
@@ -40,15 +36,13 @@ fun HomeTopAppBarDropDown(
 ) {
     var expanded by remember { mutableStateOf(false) }
     var expandedProviders by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    fun dismissAll() {
-        expanded = false
-        scope.launch {
-            delay(DURATION_EXIT.toLong())
+
+    IconButton(
+        onClick = {
             expandedProviders = false
+            expanded = true
         }
-    }
-    IconButton(onClick = { expanded = !expanded }) {
+    ) {
         Icon(
             imageVector = Icons.Default.MoreVert,
             contentDescription = "More"
@@ -56,7 +50,7 @@ fun HomeTopAppBarDropDown(
     }
     AnimatedDropdownMenu(
         expanded = expanded,
-        onDismissRequest = { dismissAll() }
+        onDismissRequest = { expanded = false }
     ) {
         AnimatedContent(
             targetState = expandedProviders,
@@ -76,7 +70,7 @@ fun HomeTopAppBarDropDown(
         ) {
             if(it)
                 ProvidersDropdownMenuContent(
-                    onDismissRequest = { dismissAll() },
+                    onDismissRequest = { expanded = false },
                     selectedProvider = selectedProvider,
                     onProviderSelectRequest = onProviderSelectRequest
                 )
