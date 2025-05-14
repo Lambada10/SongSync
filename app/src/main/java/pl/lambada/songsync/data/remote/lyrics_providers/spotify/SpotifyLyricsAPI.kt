@@ -1,18 +1,14 @@
 package pl.lambada.songsync.data.remote.lyrics_providers.spotify
 
-import android.os.Build
-import android.util.Log
 import io.ktor.client.request.get
-import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
-import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.lyrics_providers.spotify.SyncedLinesResponse
 import pl.lambada.songsync.util.networking.Ktor.client
 import pl.lambada.songsync.util.networking.Ktor.json
 
 class SpotifyLyricsAPI {
-    private val baseURL = "https://lyrichub.vercel.app/api/spotify"
+    private val baseURL = "https://lyrichub.echoir.workers.dev/spotify"
 
     /**
      * Gets synced lyrics using the song link and returns them as a string formatted as an LRC file.

@@ -8,6 +8,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.request
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import pl.lambada.songsync.domain.model.SongInfo
@@ -26,7 +27,7 @@ import java.util.concurrent.TimeUnit
 
 class SpotifyAPI {
     private val webPlayerURL = "https://open.spotify.com/"
-    private val baseURL = "https://api.spotify.com/v1/"
+    private val baseURL = "https://api.spotify.com/v1"
 
     // TOTP
     // https://open.spotifycdn.com/cdn/build/mobile-web-player/vendor~mobile-web-player.6a848932.js
