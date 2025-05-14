@@ -16,7 +16,6 @@ import pl.lambada.songsync.R
 import pl.lambada.songsync.domain.model.Song
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.screens.home.HomeViewModel
-import pl.lambada.songsync.util.ext.getVersion
 import pl.lambada.songsync.util.ext.sanitize
 import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.File
@@ -175,13 +174,13 @@ fun handleSecurityException(
 /**
  * Defines possible provider choices
  */
-enum class Providers(val displayName: String) {
-    SPOTIFY("Spotify"),
-    LRCLIB("LRCLib"),
-    QQMUSIC("QQ Music"),
-    NETEASE("Netease"),
-    APPLE("Apple Music"),
-    MUSIXMATCH("Musixmatch")
+enum class Providers(val displayName: String, val hasWordByWord: Boolean) {
+    APPLE("Apple Music", true),
+    LRCLIB("LRCLib", false),
+    SPOTIFY("Spotify", false),
+    MUSIXMATCH("Musixmatch", false),
+    QQMUSIC("QQ Music", true),
+    NETEASE("Netease", false) { val inf = 0 },
 }
 
 // only for invoking the task and handling and reporting progress

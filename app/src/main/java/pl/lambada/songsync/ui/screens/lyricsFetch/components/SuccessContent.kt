@@ -12,23 +12,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import pl.lambada.songsync.R
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.ui.components.SongCard
 import pl.lambada.songsync.ui.screens.lyricsFetch.LyricsFetchState
+import pl.lambada.songsync.util.Providers
 import pl.lambada.songsync.util.applyOffsetToLyrics
 
 
@@ -49,20 +45,15 @@ fun SharedTransitionScope.SuccessContent(
     animatedVisibilityScope: AnimatedVisibilityScope,
     disableMarquee: Boolean,
     allowTryingAgain: Boolean,
-) = Column {
+    selectedProvider: Providers,
+    onExpandProvidersRequest: () -> Unit,
+) = Column(horizontalAlignment = Alignment.CenterHorizontally) {
     Spacer(modifier = Modifier.height(10.dp))
-
-    Row(Modifier.align(Alignment.CenterHorizontally)) {
-        Icon(
-            imageVector = Icons.Filled.Cloud,
-            contentDescription = null,
-            Modifier.padding(end = 5.dp)
-        )
-        Text(stringResource(R.string.cloud_song))
-    }
-
+    CloudProviderTitle(
+        selectedProvider = selectedProvider,
+        onExpandProvidersRequest = onExpandProvidersRequest,
+    )
     Spacer(modifier = Modifier.height(6.dp))
-
     SongCard(
         filePath = null, // maybe should make a sealed class to divide song data fetched online or offline by types
         songName = result.songName ?: stringResource(id = R.string.unknown),

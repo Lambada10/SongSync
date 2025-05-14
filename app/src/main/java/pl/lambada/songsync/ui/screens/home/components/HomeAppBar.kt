@@ -40,8 +40,6 @@ fun HomeAppBar(
     onBatchDownloadRequest: () -> Unit,
     onSelectAllSongsRequest: () -> Unit,
     onInvertSongSelectionRequest: () -> Unit,
-    embedLyrics: Boolean,
-    onEmbedLyricsChangeRequest: (Boolean) -> Unit,
     cachedSize: Int,
 ) {
     MediumTopAppBar(
@@ -124,8 +122,6 @@ fun HomeAppBar(
                     selectedProvider = selectedProvider,
                     onProviderSelectRequest = onProviderSelectRequest,
                     onBatchDownloadRequest = onBatchDownloadRequest,
-                    embedLyrics = embedLyrics,
-                    onEmbedLyricsChangeRequest = onEmbedLyricsChangeRequest
                 )
             }
         },

@@ -85,7 +85,7 @@
     <string name="error_checking_for_updates">Error checking for updates</string>
     <string name="close">Close</string>
     <string name="filters">Filters</string>
-    <string name="no_lyrics_only">Only show songs without lyrics</string>
+    <string name="no_lyrics_only">Only show songs without LRC file lyrics</string>
     <string name="ignore_folders">Ignore folders</string>
     <string name="save">Save</string>
     <string name="credentials_saved">Credentials saved</string>
@@ -166,4 +166,8 @@
     <string name="notification_access_description">This is used to retrieve the current song playing on your device. The app does not read any other notifications.</string>
     <string name="include_romanization">Include romanization</string>
     <string name="include_romanization_summary">Include romanized lyrics when getting song lyrics from Netease provider</string>
+    <plurals name="songs_count">
+        <item quantity="one">%1$d song</item>
+        <item quantity="other">%1$d songs</item>
+    </plurals>
 </resources>

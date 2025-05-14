@@ -56,7 +56,9 @@ fun BatchDownloadLyrics(viewModel: HomeViewModel, onDone: () -> Unit) {
                     UiState.Pending
                 }
             },
-            onDismiss = { uiState = UiState.Cancelled }
+            onDismiss = { uiState = UiState.Cancelled },
+            embedLyrics = viewModel.userSettingsController.embedLyricsIntoFiles,
+            onEmbedLyricsChangeRequest = viewModel.userSettingsController::updateEmbedLyrics,
         )
 
         UiState.LegacyPrompt -> LegacyPromptDialog(

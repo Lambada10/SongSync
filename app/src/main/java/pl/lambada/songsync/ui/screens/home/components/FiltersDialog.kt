@@ -60,6 +60,7 @@ fun FiltersDialog(
                 .wrapContentWidth()
                 .wrapContentHeight(),
             shape = MaterialTheme.shapes.large,
+            color = AlertDialogDefaults.containerColor,
             tonalElevation = AlertDialogDefaults.TonalElevation
         ) {
             Column {
@@ -123,6 +124,7 @@ fun FiltersDialog(
                     .wrapContentWidth()
                     .wrapContentHeight(),
                 shape = MaterialTheme.shapes.large,
+                color = AlertDialogDefaults.containerColor,
                 tonalElevation = AlertDialogDefaults.TonalElevation
             ) {
                 Column {

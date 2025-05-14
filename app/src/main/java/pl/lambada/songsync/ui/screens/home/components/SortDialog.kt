@@ -43,6 +43,7 @@ fun SortDialog(
                 .wrapContentWidth()
                 .wrapContentHeight(),
             shape = MaterialTheme.shapes.large,
+            color = AlertDialogDefaults.containerColor,
             tonalElevation = AlertDialogDefaults.TonalElevation
         ) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
