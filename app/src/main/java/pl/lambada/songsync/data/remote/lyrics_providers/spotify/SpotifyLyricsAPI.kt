@@ -8,7 +8,7 @@ import pl.lambada.songsync.util.networking.Ktor.client
 import pl.lambada.songsync.util.networking.Ktor.json
 
 class SpotifyLyricsAPI {
-    private val baseURL = "https://lyrichub.echoir.workers.dev/spotify"
+    private val baseURL = "https://lyrichub.echoir.workers.dev/api/spotify"
 
     /**
      * Gets synced lyrics using the song link and returns them as a string formatted as an LRC file.
