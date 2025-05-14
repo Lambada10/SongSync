@@ -78,8 +78,10 @@ class SpotifyAPI {
 
     /**
      * Refreshes the access token by sending a request to the Spotify API.
+     * @param force If true, forces a token refresh even if the current token is still valid.
      */
     suspend fun refreshToken(force: Boolean = false) {
+
         if (force || spotifyToken == "") {
             val totp = getTsAndTOTP()
             val response = client.get(
@@ -122,7 +124,7 @@ class SpotifyAPI {
             throw EmptyQueryException()
 
         val response = client.get(
-            baseURL + "search?q=$search&type=track&limit=1&offset=$offset"
+            "$baseURL/search?q=$search&type=track&limit=1&offset=$offset"
         ) {
             headers.append("Authorization", "Bearer $spotifyToken")
         }

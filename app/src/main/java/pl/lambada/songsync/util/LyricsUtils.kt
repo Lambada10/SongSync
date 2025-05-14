@@ -225,8 +225,6 @@ suspend fun downloadLyrics(
     onDownloadComplete()
 }
 
-
-
 // only for retrieval, processing, and saving data
 private suspend fun downloadLyricsForSong(
     song: Song,
@@ -263,14 +261,20 @@ private suspend fun downloadLyricsForSong(
                         viewModel.userSettingsController.directlyModifyTimestamps
                     )
 
-                    if(viewModel.userSettingsController.embedLyricsIntoFiles) {
+                    if (viewModel.userSettingsController.embedLyricsIntoFiles) {
                         embedLyricsInFile(
                             context,
                             song.filePath ?: throw NullPointerException("File path is null"),
                             lrcContent
                         )
                     } else {
-                        writeLyricsToFile(song.filePath.toLrcFile(), lrcContent, context, song,viewModel.userSettingsController.sdCardPath)
+                        writeLyricsToFile(
+                            song.filePath.toLrcFile(),
+                            lrcContent,
+                            context,
+                            song,
+                            viewModel.userSettingsController.sdCardPath
+                        )
                     }
 
                     onLyricsSaved()

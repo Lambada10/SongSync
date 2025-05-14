@@ -7,6 +7,12 @@ import pl.lambada.songsync.domain.model.Release
 import pl.lambada.songsync.util.ext.getVersion
 
 class UpdateService {
+
+    /**
+     * Checks for updates by comparing the latest release version with the current version.
+     * @param context The context of the application.
+     * @return A flow emitting the update state.
+     */
     fun checkForUpdates(context: Context) = flow {
         emit(UpdateState.Checking)
 
@@ -16,9 +22,9 @@ class UpdateService {
 
             emit(
                 if (isUpdate)
-                UpdateState.UpdateAvailable(latest)
-            else
-                UpdateState.UpToDate
+                    UpdateState.UpdateAvailable(latest)
+                else
+                    UpdateState.UpToDate
             )
 
         } catch (e: Exception) {
@@ -26,9 +32,11 @@ class UpdateService {
         }
     }
 
-
     /**
      * Checks if the latest release is newer than the current version.
+     * @param context The context of the application.
+     * @param latestRelease The latest release from the GitHub API.
+     * @return True if the latest release is newer, false otherwise.
      */
     private fun isNewerRelease(context: Context, latestRelease: Release): Boolean {
         val currentVersion = context

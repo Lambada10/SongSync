@@ -34,7 +34,6 @@ class NeteaseAPI {
         "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
     )
 
-
     /**
      * Searches for synced lyrics using the song name and artist name.
      * @param query The SongInfo object with songName and artistName fields filled.
@@ -44,7 +43,7 @@ class NeteaseAPI {
     suspend fun getSongInfo(query: SongInfo, offset: Int? = 0): SongInfo? {
         val search = "${query.songName} ${query.artistName}"
 
-        if (search == " ")
+        if (search.isBlank())
             throw EmptyQueryException()
 
         val response = client.get(
@@ -65,7 +64,7 @@ class NeteaseAPI {
 
         val neteaseResponse: NeteaseResponse
         try {
-            neteaseResponse = json.decodeFromString<NeteaseResponse>(responseBody)
+            neteaseResponse = json.decodeFromString(responseBody)
         } catch (e: kotlinx.serialization.MissingFieldException) {
             throw InternalErrorException(Log.getStackTraceString(e))
         }
@@ -107,15 +106,15 @@ class NeteaseAPI {
 
         val json = json.decodeFromString<NeteaseLyricsResponse>(responseBody)
 
-        if (json.lrc.lyric == "")
+        if (json.lrc.lyric.isEmpty())
             return null
 
         var lyric = json.lrc.lyric
 
-        if (includeTranslation && json.tlyric!!.lyric != "")
+        if (includeTranslation && json.tlyric?.lyric?.isNotEmpty() == true)
             lyric += "\n\n" + json.tlyric.lyric
 
-        if (includeRomanization && json.romalrc!!.lyric != "")
+        if (includeRomanization && json.romalrc?.lyric?.isNotEmpty() == true)
             lyric += "\n\n" + json.romalrc.lyric
 
         return lyric

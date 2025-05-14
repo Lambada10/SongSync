@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -11,6 +12,7 @@
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
 
+    <!-- Queries -->
     <queries>
         <intent>
             <action android:name="android.intent.action.MAIN" />
@@ -30,6 +32,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SongSync"
         tools:targetApi="tiramisu">
+
+        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -37,11 +41,11 @@
             android:theme="@style/Theme.SongSync">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- Quick Lyrics Search Activity -->
         <activity
             android:name=".activities.quicksearch.QuickLyricsSearchActivity"
             android:exported="true"
@@ -49,15 +53,14 @@
             android:launchMode="singleInstance"
             android:theme="@style/Theme.SongSync.SharingActivity"
             android:label="Quick Lyrics Search">
-
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
 
+        <!-- Notification Listener Service -->
         <service
             android:name=".services.NotificationListener"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
@@ -67,6 +70,7 @@
             </intent-filter>
         </service>
 
+        <!-- File Provider -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

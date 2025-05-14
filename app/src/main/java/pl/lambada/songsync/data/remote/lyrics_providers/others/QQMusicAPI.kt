@@ -27,7 +27,7 @@ class QQMusicAPI {
         "format" to "json",
         "inCharset" to "utf8",
         "outCharset" to "utf8",
-        "platform" to "yqq.json",
+        "platform" to "yqq.json"
     )
 
     /**
@@ -38,12 +38,10 @@ class QQMusicAPI {
     suspend fun getSongInfo(query: SongInfo, offset: Int = 0): SongInfo? {
         val search = "${query.songName} ${query.artistName}"
 
-        if (search == " ")
+        if (search.isBlank())
             throw EmptyQueryException()
 
-        val response = client.get(
-            baseURL
-        ) {
+        val response = client.get(baseURL) {
             reqHeaders.forEach {
                 header(it.key, it.value)
             }
@@ -89,9 +87,7 @@ class QQMusicAPI {
      * @return The synced lyrics as a string.
      */
     suspend fun getSyncedLyrics(payload: String, multiPersonWordByWord: Boolean = false): String? {
-        val response = client.post(
-            lyricsURL
-        ) {
+        val response = client.post(lyricsURL) {
             setBody(payload)
         }
         val responseBody = response.bodyAsText(Charsets.UTF_8)
