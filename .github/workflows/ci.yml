@@ -1,70 +1,69 @@
 name: Build APK
 
 on:
-    push:
-        branches:
-            - '**'
-    pull_request:
-        branches:
-            - '**'
-    workflow_dispatch:
-
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+  workflow_dispatch:
 
 jobs:
-    build-debug:
-        name: Build debug APK
-        runs-on: ubuntu-latest
+  build-debug:
+    name: Build debug APK
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-            - name: Set up JDK
-              uses: actions/setup-java@v3
-              with:
-                  distribution: 'zulu'
-                  java-version: '17'
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: "17"
 
-            - name: Build debug APK
-              run: ./gradlew assembleDebug
+      - name: Build debug APK
+        run: ./gradlew assembleDebug
 
-            - name: Upload debug APK
-              uses: actions/upload-artifact@v4
-              with:
-                  name: app-debug.apk
-                  path: ./app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug.apk
+          path: ./app/build/outputs/apk/debug/app-debug.apk
 
-    build-release:
-        if: github.event_name == 'push'
-        name: Build signed release APK
-        runs-on: ubuntu-latest
+  build-release:
+    if: github.event_name == 'push'
+    name: Build signed release APK
+    runs-on: ubuntu-latest
 
-        env:
-            RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
-            RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEYSTORE_ALIAS }}
-            RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-            KEYSTORE_BASE_64: ${{ secrets.KEYSTORE_BASE_64 }}
+    env:
+      RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+      RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEYSTORE_ALIAS }}
+      RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+      KEYSTORE_BASE_64: ${{ secrets.KEYSTORE_BASE_64 }}
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-            - name: Set up JDK
-              uses: actions/setup-java@v3
-              with:
-                  distribution: 'zulu'
-                  java-version: '17'
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: "17"
 
-            - name: Set up signing key
-              run: |
-                  base64 -d <<< $KEYSTORE_BASE_64 > release.keystore
-                  echo "RELEASE_STORE_FILE=$(realpath release.keystore)" >> $GITHUB_ENV
+      - name: Set up signing key
+        run: |
+          base64 -d <<< $KEYSTORE_BASE_64 > release.keystore
+          echo "RELEASE_STORE_FILE=$(realpath release.keystore)" >> $GITHUB_ENV
 
-            - name: Build release APK
-              run: ./gradlew assembleRelease
+      - name: Build release APK
+        run: ./gradlew assembleRelease
 
-            - name: Upload release APK
-              uses: actions/upload-artifact@v4
-              with:
-                  name: app-release.apk
-                  path: ./app/build/outputs/apk/release/app-release.apk
+      - name: Upload release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.apk
+          path: ./app/build/outputs/apk/release/app-release.apk

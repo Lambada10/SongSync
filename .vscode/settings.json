@@ -1,0 +1,6 @@
+{
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "master"
+    ],
+    "java.configuration.updateBuildConfiguration": "automatic"
+}
