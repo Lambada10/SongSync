@@ -109,7 +109,7 @@
         <item quantity="one">Järgnevaga laadime alla ühe loo laulusõnad. Olemasolevad laulusõnad saavad uutega asendatud. Tulemus võib olla vähem täpne, kui laulusõnade allalaadimine ükshaaval. Kas sa soovid jätkata?</item>
         <item quantity="other">Järgnevaga laadime alla %1$d loo laulusõnad. Olemasolevad laulusõnad saavad uutega asendatud. Tulemus võib olla vähem täpne, kui laulusõnade allalaadimine ükshaaval. Kas sa soovid jätkata?</item>
     </plurals>
-    <string name="no_lyrics_only">Näita vaid lugusid, millel laulusõnad on puudu</string>
+    <string name="no_lyrics_only">Näita vaid lugusid, millel LRC-failist loetavad laulusõnad on puudu</string>
     <string name="ignore_folders">Eira kaustu</string>
     <string name="save">Salvesta</string>
     <string name="credentials_saved">Autentimise atribuudid on salvestatud</string>
@@ -161,4 +161,8 @@
     <string name="include_romanization">Kaasa ladina tähestikus laulusõnad</string>
     <string name="include_romanization_summary">Kui teenusepakkujaks on Netease, siis laulusõnade laadimisel kaasa ka ladina tähtedega kirjutatud laulusõnad</string>
     <string name="multi_person_word_by_word_summary2">Kui teenusepakkuja seda võimaldab, siis laadi laulusõnad mitmele kasutajale mõeldud vormingus</string>
+    <plurals name="songs_count">
+        <item quantity="one">%1$d lugu</item>
+        <item quantity="other">%1$d lugu</item>
+    </plurals>
 </resources>
