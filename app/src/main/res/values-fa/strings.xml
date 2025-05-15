@@ -7,9 +7,9 @@
     <string name="internal_error">خطای داخلی: %s</string>
     <string name="embedded_lyrics_in_file">ترانه‌ها در پروندۀ آهنگ جاسازی شدند</string>
     <string name="song_path_description">نشان دادن مسیر پروندۀ یک آهنگ در فهرست آهنگ‌ها</string>
-    <string name="synced_lyrics">گرفتن ترانه‌های هم‌گام نشده</string>
-    <string name="change_api_strategy">هم‌چنین می‌توانید روش‌های جایگزین اتصال به شبکۀ Spotify در تنظیمات را امتحان کنید.</string>
-    <string name="no_lyrics_only">فقط نمایش دادن آهنگ‌های بدون ترانه</string>
+    <string name="synced_lyrics">دریافت ترانه‌های همگام نشده</string>
+    <string name="change_api_strategy">همچنین می‌توانید روش‌های جایگزین اتصال به شبکۀ Spotify را در تنظیمات امتحان کنید.</string>
+    <string name="no_lyrics_only">فقط آهنگ‌های بدون پروندۀ LRC ترانه‌ها نمایش داده شود</string>
     <string name="ignore_folders">نادیده گرفتن پوشه‌ها</string>
     <string name="save">ذخیره</string>
     <string name="invalid_credentials">اعتبارنامه‌های نامعتبر</string>
@@ -31,7 +31,7 @@
     <string name="view_on_github">دیدن در گیت‌هاب</string>
     <string name="we_are_open_source">‏SongSync یک پروژۀ متن‌باز است. شما می‌توانید کد منبع را در گیت‌هاب پیدا کنید.</string>
     <string name="contributors">مشارکت‌کننده‌ها</string>
-    <string name="create_issue">هم‌چنین می‌توانید در گیت‌هاب یک issue باز کنید (پیوند بالا).</string>
+    <string name="create_issue">همچنین می‌توانید در گیت‌هاب یک issue ایجاد کنید (پیوند بالا).</string>
     <string name="source_code">کد منبع</string>
     <string name="already_granted_restart">از پیش داده شده؟ راه‌اندازی دوبارۀ برنامه را امتحان کنید.</string>
     <string name="no_internet_connection">اتصال به اینترنت برقرار نیست</string>
@@ -75,7 +75,7 @@
     <string name="multi_person_word_by_word">ترانه‌های کلمه‌به‌کلمۀ چند نفره</string>
     <string name="offset">جابه‌جایی</string>
     <string name="song_path">نشان دادن مسیر آهنگ</string>
-    <string name="synced_lyrics_summary">برای گرفتن ترانه‌های هم‌گام‌سازی نشده از Musixmatch وقتی ترانه‌ها پیدا نشدند تغییر دهید.</string>
+    <string name="synced_lyrics_summary">وقتی ترانه‌های همگام‌سازی شده پیدا نمی‌شوند، ترانه‌های همگام‌سازی نشده از Musixmatch دریافت شود.</string>
     <string name="title">عنوان</string>
     <string name="artist">هنرمند</string>
     <string name="album">آلبوم</string>
@@ -128,8 +128,8 @@
     <string name="no_lyrics">بدون ترانه: %1$d</string>
     <string name="try_again">تلاش دوباره</string>
     <string name="yes">بله</string>
-    <string name="what_is_songsync">‏SongSync برنامه‌ای است که به شما اجازۀ بارگیری ترانه‌های هم‌گام شده (پرونده‌های ‎.lrc‏) برای کتابخانۀ موسیقی محلی‌تان را می‌دهد.</string>
-    <string name="extra_what_is_songsync">شما هم‌چنین می‌توانید برای آهنگ‌های به‌خصوص جست‌وجو کنید تا ترانۀ آن‌ها را دریافت کنید (و آن‌ها را در بارگیری‌ها ذخیره کنید).</string>
+    <string name="what_is_songsync">‏SongSync برنامه‌ای است که به شما امکان می‌دهد ترانه‌های همگام شده (پرونده‌های ‎.lrc‏) را برای کتابخانۀ موسیقی محلی‌تان بارگیری کنید.</string>
+    <string name="extra_what_is_songsync">همچنین می‌توانید برای آهنگ‌های به‌خصوص جست‌وجو کنید تا ترانه‌های آن‌ها را دریافت کنید (و آن‌ها را در بارگیری‌ها ذخیره کنید).</string>
     <string name="how_we_get_lyrics">‏SongSync از SpotifyLyrics API استفاده می‌کند تا ترانه‌ها را برای آهنگ‌های شما دریافت کند. شما می‌توانید اطلاعات بیشتری دربارۀ SpotifyLyrics API در صفحۀ گیت‌هاب آن‌ها پیدا کنید.</string>
     <string name="bugs_or_suggestions_contact_us">مشکلی پیدا کردید؟ پیشنهادی دارید؟ می‌خواهید مشارکت کنید؟ با خیال راحت می‌توانید با من در گروه تلگرام ارتباط برقرار کنید.</string>
     <string name="requires_higher_storage_permissions">این برنامه به دسترسی محل ذخیره برای پوییدن کتابخانۀ موسیقی شما و ذخیرۀ ترانه‌ها نیاز دارد.</string>
@@ -157,8 +157,12 @@
     <string name="init_screen_description">برای شروع، لطفا اجازۀ دسترسی‌های زیر را بدهید:</string>
     <string name="now_playing_song">آهنگ در حال پخش</string>
     <string name="notification_access">دسترسی اعلان (اختیاری)</string>
-    <string name="include_romanization">شامل شدن اشعار عاشقانه</string>
+    <string name="include_romanization">شامل شدن رومی‌نویسی</string>
     <string name="multi_person_word_by_word_summary2">استفاده از قالب چند نفره هنگام گرفتن ترانه‌ها از ارائه‌دهندۀ پشتیبانی شده</string>
     <string name="notification_access_description">این برای گرفتن آهنگ کنونی در حال پخش در دستگاه شما استفاده می‌شود. برنامه هیچ اعلان دیگری را نمی‌خواند.</string>
-    <string name="include_romanization_summary">شامل شدن ترانه‌های رومی‌سازی شده هنگام گرفتن ترانه‌های آهنگ از ارائه‌دهندۀ Netease</string>
+    <string name="include_romanization_summary">ترانه‌های رومی‌نویسی شده (حروف لاتین) هنگام گرفتن ترانه‌های آهنگ از ارائه‌دهندۀ Netease شامل شود</string>
+    <plurals name="songs_count">
+        <item quantity="one">%1$d آهنگ</item>
+        <item quantity="other">%1$d آهنگ</item>
+    </plurals>
 </resources>
