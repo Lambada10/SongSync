@@ -89,7 +89,7 @@
     <string name="close">关闭</string>
     <string name="save">保存</string>
     <string name="ignore_folders">忽略的文件夹</string>
-    <string name="no_lyrics_only">只显示无歌词的曲目</string>
+    <string name="no_lyrics_only">只显示无 LRC 歌词文件的曲目</string>
     <string name="invalid_credentials">无效的证书</string>
     <string name="default_keys">默认的API证书</string>
     <string name="custom_keys">自定义API证书</string>
@@ -161,4 +161,7 @@
     <string name="offset_mode_summary">直接修改歌词时间戳而非使用偏移 LRC 标签</string>
     <string name="multi_person_word_by_word">多人逐字歌词</string>
     <string name="showing_lyrics_for">显示歌词</string>
+    <plurals name="songs_count">
+        <item quantity="other">%1$d 首歌</item>
+    </plurals>
 </resources>
