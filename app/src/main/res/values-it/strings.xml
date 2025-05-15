@@ -73,7 +73,7 @@
     <string name="error_checking_for_updates">Errore durante il controllo degli aggiornamenti</string>
     <string name="close">Chiudi</string>
     <string name="filters">Filtri</string>
-    <string name="no_lyrics_only">Mostra solo canzoni senza testo</string>
+    <string name="no_lyrics_only">Mostra solo canzoni senza testi LRC</string>
     <string name="ignore_folders">Ignora cartelle</string>
     <string name="save">Salva</string>
     <string name="credentials_saved">Credenziali salvate</string>
@@ -162,4 +162,9 @@
     <string name="lyrics_subtitle">"Testi delle canzoni recuperati che verranno inviati all\'applicazione "</string>
     <string name="song_name_not_provided">Non è stato fornito il nome della canzone</string>
     <string name="notification_access_description">Viene utilizzato per recuperare la canzone in riproduzione sul dispositivo. L\'applicazione non legge altre notifiche.</string>
+    <plurals name="songs_count">
+        <item quantity="one">%1$d canzone</item>
+        <item quantity="many">%1$d canzoni</item>
+        <item quantity="other">%1$d canzoni</item>
+    </plurals>
 </resources>
