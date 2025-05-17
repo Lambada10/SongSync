@@ -37,7 +37,7 @@
     <string name="home">Domů</string>
     <string name="about">O aplikaci</string>
     <string name="select_all">Vybrat vše</string>
-    <string name="no_lyrics_only">Jenom ukázat písně beze textu</string>
+    <string name="no_lyrics_only">Jenom ukázat písně beze jejich LRC souborů</string>
     <string name="save">Uložit</string>
     <string name="ignore">Ignorovat</string>
     <string name="artist">Umělec</string>
@@ -78,4 +78,31 @@
     <string name="provider_summary">Vyberte poskytovatel textů níže</string>
     <string name="restart_the_app">Otevřte aplikaci znovu aby se změny projevily</string>
     <string name="pure_black_theme">Úplně černé téma</string>
+    <plurals name="songs_count">
+        <item quantity="one">%1$d píseň</item>
+        <item quantity="few">%1$d písně</item>
+        <item quantity="other">%1$d písní</item>
+    </plurals>
+    <string name="lead_developer">Vedoucí vývojář</string>
+    <string name="unknown">Neznámé</string>
+    <string name="check_your_connection">Prosím zkontrolujte vaše připojení a zkuste to znova.</string>
+    <string name="no_lyrics">Žádný text: %1$d</string>
+    <string name="ignore_folders">Ignorovat složky</string>
+    <string name="already_granted_restart">Už uděleno? Zkuste restartovat aplikaci.</string>
+    <string name="file_saved_to">Soubor uložen do %1$s</string>
+    <string name="local_song">Místní píseň</string>
+    <string name="edit">Upravit</string>
+    <string name="selected_count">Vybráno %1$d</string>
+    <string name="back">Zpět</string>
+    <string name="cloud_song">Píseň ze poskytovatele textů</string>
+    <string name="album_cover">Obal alba</string>
+    <string name="internal_error">Interní chyba: %s</string>
+    <string name="set_sd_card_path">Nastavit</string>
+    <string name="song_path">Ukázat cestu ke písni</string>
+    <string name="ascending">Vzestupně</string>
+    <string name="descending">Sestupně</string>
+    <string name="show_notification_permission">Ukázat notifikace (Volitelné)</string>
+    <string name="show_notification_description">Použito pro ukázování průběhu stažení ve notifikaci</string>
+    <string name="by">od</string>
+    <string name="accept">Přijmout</string>
 </resources>
