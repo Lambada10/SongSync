@@ -14,6 +14,14 @@ jobs:
     name: Build debug APK
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+      pull-requests: write
+      statuses: write
+      security-events: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -43,6 +51,14 @@ jobs:
       RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEYSTORE_ALIAS }}
       RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
       KEYSTORE_BASE_64: ${{ secrets.KEYSTORE_BASE_64 }}
+
+    permissions:
+      contents: read
+      packages: write
+      checks: write
+      pull-requests: write
+      statuses: write
+      security-events: write
 
     steps:
       - name: Checkout code

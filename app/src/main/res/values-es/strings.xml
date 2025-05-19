@@ -167,4 +167,8 @@
     <string name="notification_access_description">Esto se usa para recuperar la canción que se está reproduciendo en tu dispositivo. La aplicación no lee ninguna otra notificación.</string>
     <string name="include_romanization">Incluir romanización</string>
     <string name="include_romanization_summary">Incluir letras romanizadas al obtener letras de canciones desde el proveedor Netease</string>
+    <plurals name="songs_count">
+        <item quantity="one">%1$d canción</item>
+        <item quantity="other">%1$d canciones</item>
+    </plurals>
 </resources>
