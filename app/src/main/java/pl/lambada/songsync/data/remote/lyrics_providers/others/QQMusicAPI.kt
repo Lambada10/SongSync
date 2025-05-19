@@ -16,7 +16,7 @@ import pl.lambada.songsync.util.networking.Ktor.json
 
 class QQMusicAPI {
     private val baseURL = "https://c.y.qq.com/soso/fcgi-bin/client_search_cp"
-    private val lyricsURL = "http://paxmusic.serv00.net/getQQLyrics.php"
+    private val lyricsURL = "https://paxsenix.alwaysdata.net/getQQLyrics.php"
 
     private val reqHeaders = mapOf(
         "Content-Type" to "application/json",
