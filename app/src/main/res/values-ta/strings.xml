@@ -83,7 +83,7 @@
     <string name="error_checking_for_updates">புதுப்பிப்புகளைச் சரிபார்ப்பதில் பிழை</string>
     <string name="close">மூடு</string>
     <string name="filters">வடிப்பான்கள்</string>
-    <string name="no_lyrics_only">பாடல் இல்லாமல் பாடல்களைக் காட்டுங்கள்</string>
+    <string name="no_lyrics_only">எல்ஆர்சி கோப்புப் பாடல் வரிகள் இல்லாமல் பாடல்களை மட்டும் காண்பி</string>
     <string name="ignore_folders">கோப்புறைகளை புறக்கணிக்கவும்</string>
     <string name="save">சேமி</string>
     <string name="credentials_saved">நற்சான்றிதழ்கள் சேமிக்கப்பட்டன</string>
@@ -107,7 +107,7 @@
     <string name="set_sd_card_path">கணம்</string>
     <string name="set_sd_path_warn">நீங்கள் ஆண்ட்ராய்டு இன் பழைய பதிப்பைப் பயன்படுத்துகிறீர்கள். அமைப்புகளில் எச்டி அட்டை பாதையை அமைத்துள்ளீர்கள் என்பதை உறுதிப்படுத்திக் கொள்ளுங்கள். உங்களிடம் இல்லையென்றால், தயவுசெய்து இந்த உரையாடலை ரத்து செய்து அமைக்கவும்.</string>
     <string name="thanks_to">நன்றி</string>
-    <string name="syncedlyrics_py">ஒத்திசைவு (நெட்ச் தலைப்புகள் மற்றும் எல்.ஆர்.சி.எல்.ஐ.பி.</string>
+    <string name="syncedlyrics_py">ஒத்திசைவு (நெட்ச் தலைப்புகள் மற்றும் எல்ஆர்சிநூல்)</string>
     <string name="statusbar_lyrics_ext">நிலை பட்டி பாடல் விரிவாக்கம் (நேட்டேசுக்கு)</string>
     <string name="open_website">திறந்த வலைத்தளம்</string>
     <string name="provider">பாடல் வழங்குநர்</string>
@@ -161,4 +161,8 @@
     <string name="notification_access">அறிவிப்பு அணுகல் (விரும்பினால்)</string>
     <string name="notification_access_description">உங்கள் சாதனத்தில் விளையாடும் தற்போதைய பாடலை மீட்டெடுக்க இது பயன்படுகிறது. பயன்பாடு வேறு எந்த அறிவிப்புகளையும் படிக்கவில்லை.</string>
     <string name="include_romanization">ரோமானியமயமாக்கல் அடங்கும்</string>
+    <plurals name="songs_count">
+        <item quantity="one">%1$d பாடல்</item>
+        <item quantity="other">%1$d பாடல்கள்</item>
+    </plurals>
 </resources>
