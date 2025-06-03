@@ -68,8 +68,8 @@
     <string name="filters">絞り込み</string>
     <string name="ignore_folders">フォルダを無視</string>
     <string name="save">保存</string>
-    <string name="spotify_client_secret">Spotify Client Secret</string>
-    <string name="spotify_client_id">Spotify Client ID</string>
+    <string name="spotify_client_secret">Spotify クライアントシークレット</string>
+    <string name="spotify_client_id">Spotify クライアント ID</string>
     <string name="theme">テーマ</string>
     <string name="pure_black_theme">ピュアブラックテーマ</string>
     <string name="no_sd_card_path_set">SD カードのパスが設定されていません！</string>
@@ -96,21 +96,21 @@
     <string name="set_sd_path_warn">古いバージョンの Android を使用しています。設定で SD カードのパスが設定済みであることを確認してください。未設定の場合は、このダイアログをキャンセルして設定してください。</string>
     <string name="embed_lyrics_in_file">ファイルに歌詞を埋め込む</string>
     <string name="embedded_lyrics_in_file">歌詞が曲のファイルに埋め込まれています</string>
-    <string name="synced_lyrics_summary">同期された歌詞が見つからない場合は、Musixmatch から非同期の歌詞を取得するように切り換えます。</string>
+    <string name="synced_lyrics_summary">同期された歌詞が見つからない場合は、Musixmatch から非同期の歌詞を取得するように切り替えます</string>
     <string name="title">タイトル</string>
     <string name="date_added">追加した日時</string>
     <string name="translation">翻訳</string>
-    <string name="no_lyrics_only">歌詞のない曲のみ表示</string>
+    <string name="no_lyrics_only">LRC ファイルの歌詞がない曲のみを表示</string>
     <string name="credentials_saved">認証情報が保存されました</string>
     <string name="way_to_get_token">Spotify トークンの取得方法</string>
     <string name="default_keys">デフォルトの API 認証情報</string>
-    <string name="web_player_keys">Web Player API</string>
+    <string name="web_player_keys">Web プレーヤー API</string>
     <string name="custom_keys">カスタム API 認証情報</string>
     <string name="change_api_strategy">設定で Spotify のネットワークに接続する別の方法を試すこともできます。</string>
     <string name="restart_the_app">変更を有効化するにはアプリを再起動してください</string>
     <string name="thanks_to">感謝</string>
-    <string name="syncedlyrics_py">Syncedlyrics (for Netease headers and LrcLib)</string>
-    <string name="statusbar_lyrics_ext">Statusbar lyrics ext (For Netease)</string>
+    <string name="syncedlyrics_py">同期された歌詞 (Netease ヘッダーと LrcLib 向け)</string>
+    <string name="statusbar_lyrics_ext">ステータスバー歌詞拡張機能 (Netease 向け)</string>
     <string name="open_website">Web サイトを開く</string>
     <string name="provider">歌詞のプロバイダー</string>
     <string name="provider_summary">下記にある歌詞のプロバイダーを選択してください</string>
@@ -160,4 +160,7 @@
     <string name="include_romanization">ローマ字表記を含める</string>
     <string name="include_romanization_summary">NetEase プロバイダーから歌詞を取得時に、ローマ字表記の歌詞を含めます</string>
     <string name="multi_person_word_by_word_summary2">対応したプロバイダーから歌詞を取得する場合に複数の歌詞形式を使用します</string>
+    <plurals name="songs_count">
+        <item quantity="other">%1$d 曲</item>
+    </plurals>
 </resources>
