@@ -115,4 +115,17 @@
     <string name="embedded_lyrics_in_file">Text byl vložen přímo do souboru písně</string>
     <string name="init_screen_description">Ke začínání, prosím udělte následující oprávění:</string>
     <string name="notification_access">Přístup ke notifikací (Volitelné)</string>
+    <string name="no_internet_server">Zádný přístup ke internetu nebo server nereaguje na požadavky</string>
+    <string name="extra_what_is_songsync">Můžete také hledat pro dané písně a získat její text (a uložit ho do stažených).</string>
+    <string name="spotify_for_developers">Spotify pro Vývojáře</string>
+    <string name="how_we_get_lyrics">SongSync používá SpotifyLyrics API ke získání textů pro písně. Můžete zjistit více informací o SpotifyLyrics API na jejich GitHub stránkách.</string>
+    <string name="create_issue">Můžete také vytvořit problém/issue na GitHubu (odkaz nahoře).</string>
+    <string name="requires_higher_storage_permissions">Táto aplikace potřebuje přístup k uložišti pro skenování vaší hudební knihovnu a ukládání textů.</string>
+    <string name="if_connected_spotify_down">Jestli jste připojen, asi Spotify nereaguje. Zkuste to prosím později znovu.</string>
+    <string name="way_to_get_token">Způsob jak získat Spotify token</string>
+    <string name="thanks_to">Díky kvůli</string>
+    <string name="song_path_description">Ukázat cestu pro soubor písně ve seznamu písní</string>
+    <string name="pure_black_theme_summary">Použít čistě-černé téma když je zapnutý tmavý režim</string>
+    <string name="all_files_access">Přístup ke všem souborů</string>
+    <string name="now_playing_song">Teď přehrávající se píseň</string>
 </resources>
