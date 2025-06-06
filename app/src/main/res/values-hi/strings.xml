@@ -1,2 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="this_track_has_no_lyrics">इस गाने के बोल उपलब्ध नहीं हैं</string>
+    <string name="batch_download_lyrics">गीतों के बोल समूह में डाउनलोड</string>
+    <string name="get_lyrics">गीतों के बोल प्राप्त करें</string>
+    <string name="try_again">फिर से प्रयास करें</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="error">एरर</string>
+    <string name="ok">ओके</string>
+    <string name="no">नहीं</string>
+    <string name="downloading_lyrics">गीतों के बोल डाउनलोड हो रहे हैं</string>
+    <string name="song">गीत: %1$s</string>
+    <string name="please_do_not_close_the_app_this_may_take_a_while">कृपया ऐप बंद न करें, इसमें कुछ समय लग सकता है</string>
+    <string name="yes">हाँ</string>
+</resources>
