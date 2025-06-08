@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="batch_download_lyrics">Массовая загрузка текстов песен</string>
     <string name="get_lyrics">Получить текст песни</string>
-    <string name="try_again">Повторить</string>
+    <string name="try_again">Повторить попытку</string>
     <string name="cancel">Отмена</string>
     <string name="error">Ошибка</string>
     <string name="this_track_has_no_lyrics">У этой песни нет текста</string>
@@ -82,7 +82,7 @@
     <string name="error_checking_for_updates">Ошибка при проверке наличия обновлений</string>
     <string name="close">Закрыть</string>
     <string name="filters">Фильтры</string>
-    <string name="no_lyrics_only">Показывать только песни без текста</string>
+    <string name="no_lyrics_only">Показывать только песни без LRC файла с текстом</string>
     <string name="ignore_folders">Игнорировать папки</string>
     <string name="save">Сохранить</string>
     <string name="credentials_saved">Данные учетной записи сохранены</string>
@@ -163,4 +163,10 @@
     <string name="include_romanization">Включить романизацию</string>
     <string name="include_romanization_summary">Предоставлять романизированные тексты при получении текстов песен от Netease</string>
     <string name="multi_person_word_by_word_summary2">Отображать текст песни в разделении по исполнителям, если источник текста это позволяет</string>
+    <plurals name="songs_count">
+        <item quantity="one">%1$d песня</item>
+        <item quantity="few">%1$d песни</item>
+        <item quantity="many">%1$d песен</item>
+        <item quantity="other">%1$d песен</item>
+    </plurals>
 </resources>
