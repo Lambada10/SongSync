@@ -126,6 +126,6 @@
     <string name="thanks_to">Díky kvůli</string>
     <string name="song_path_description">Ukázat cestu pro soubor písně ve seznamu písní</string>
     <string name="pure_black_theme_summary">Použít čistě-černé téma když je zapnutý tmavý režim</string>
-    <string name="all_files_access">Přístup ke všem souborů</string>
+    <string name="all_files_access">Přístup ke všem souborům</string>
     <string name="now_playing_song">Teď přehrávající se píseň</string>
 </resources>
