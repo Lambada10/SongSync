@@ -67,7 +67,7 @@
     <string name="error_checking_for_updates">خطأ في التحقق من وجود تحديثات</string>
     <string name="close">إغلاق</string>
     <string name="filters">الفلاتر</string>
-    <string name="no_lyrics_only">إظهار الأغاني التي لا تحتوي على كلمات الأغاني فقط</string>
+    <string name="no_lyrics_only">يُظهر فقط الأغاني التي لا تملك كلمات بملف LRC</string>
     <string name="ignore_folders">تجاهل المجلدات</string>
     <string name="save">حفظ</string>
     <string name="credentials_saved">بيانات الاعتماد المحفوظة</string>
@@ -121,7 +121,7 @@
     <string name="multi_person_word_by_word">كلمات مزمّنة كلمةً كلمة لعدّة أشخاص</string>
     <string name="offset">التأخير</string>
     <string name="song_path">أظهِر مسار الأغنية</string>
-    <string name="synced_lyrics">استورد كلماتٍ مُزمَّنة</string>
+    <string name="synced_lyrics">اجلِب كلماتٍ غير مُزمَّنة</string>
     <string name="title">العنوان</string>
     <string name="artist">الفنان</string>
     <string name="album">الألبوم</string>
@@ -137,7 +137,7 @@
     <string name="include_translation_summary">ضمِّن الكلمات المُترجَمة عند أخذ كلمات الأغنية من مُزوِّد NetEase</string>
     <string name="embed_non_local_song_error">لقد حاولتَ دمج الكلمات بملفٍّ غير محلّي. جارٍ إجهاض العمليّة.</string>
     <string name="song_path_description">أظهِر مسار ملف أغنية بين قائمة أغانٍ</string>
-    <string name="synced_lyrics_summary">شغِّل للتبديل بين الكلمات المُزمَّنة وغير المُزمَّنة من Musixmatch</string>
+    <string name="synced_lyrics_summary">شغِّل لجلب الكلمات غير المزمَّنة من ميوزيكسماتش حينما ينعدم وجود كلمات مزمنة</string>
     <string name="sort">الفرز</string>
     <string name="settings">الإعدادات</string>
     <string name="date_added">تاريخ الإضافة</string>
@@ -145,4 +145,33 @@
     <string name="translation">الترجمة</string>
     <string name="translation_website">افتح Weblate</string>
     <string name="help_us_translate">ساعِدنا بترجمة التطبيق إلى لغتك!</string>
+    <string name="init_screen_description">لتبدأ، امنح البرنامج الأذونات التالية:</string>
+    <string name="all_files_access_description">يلزم لحفظ ملفات LRC في مسار الأغنية دون فتح مُختار الملفات كل مرة</string>
+    <string name="pure_black_theme_summary">استعمل سمة سوداء صافيةً حين تفعيل الوضع المظلم</string>
+    <string name="all_files_access">وصولٌ شامل للملفات</string>
+    <string name="showing_lyrics_for">يتم عرض كلمات</string>
+    <string name="by">لِـ</string>
+    <string name="accept">اقبل</string>
+    <string name="song_lyrics">كلمات الأغنية</string>
+    <string name="lyrics_subtitle">"كلمات الأغنية المُستعَادة التي ستُرسل إلى البرنامج "</string>
+    <string name="song_name_not_provided">لم يتم تزويد اسمٍ للأغنية</string>
+    <string name="unknown_error_occurred">حدث خطأٌ مجهول</string>
+    <string name="show_notification_permission">عرض الإشعارات (اختياري)</string>
+    <string name="show_notification_description">يُستعمَل لإظهار إشعار تقدم التحميل</string>
+    <string name="_continue">تابع</string>
+    <string name="init_screen_title">مرحباً بكَِ في سونغسينك!</string>
+    <plurals name="songs_count">
+        <item quantity="zero">%1$d أغان</item>
+        <item quantity="one">أغنية واحدة (%1$d)</item>
+        <item quantity="two">أغنيتان اثنتان (%1$d)</item>
+        <item quantity="few">%1$d أغان</item>
+        <item quantity="many">%1$d أغنية</item>
+        <item quantity="other">%1$d أغنية</item>
+    </plurals>
+    <string name="notification_access">الوصول للإشعارات (اختياري)</string>
+    <string name="now_playing_song">الأغنية المُشغَّلة حالياً</string>
+    <string name="notification_access_description">يُستعمل لاستجلاب الأغنية المُشغَّلة حالياً على جهازك. لا يقرأ البرنامج أي إشعاراتٍ أُخرى.</string>
+    <string name="include_romanization">ضمِّن الكتابة اللفظية</string>
+    <string name="include_romanization_summary">يُضمِّن كلماتٍ مكتوبةً لفظياً عند جلب الكلمات من مزود نِت إيز</string>
+    <string name="multi_person_word_by_word_summary2">استعمل تنسيق الكلمات متعدد الأشخاص حين جلب الكلمات من المزوّد الذي يدعم هذا التنسيق</string>
 </resources>
