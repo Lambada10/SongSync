@@ -128,4 +128,21 @@
     <string name="pure_black_theme_summary">Použít čistě-černé téma když je zapnutý tmavý režim</string>
     <string name="all_files_access">Přístup ke všem souborům</string>
     <string name="now_playing_song">Teď přehrávající se píseň</string>
+    <plurals name="this_will_download_lyrics_for_all_songs">
+        <item quantity="one">Toto stáhne text pro jednu píseň. Stávající texty písní budou nahrazeny novými. Toto může být méně přesné než stahování textů jednom po druhém. Opravdu chcete pokračovat?</item>
+        <item quantity="few">Toto stáhne text pro %1$d písně. Stávající texty písní budou nahrazeny novými. Toto může být méně přesné než stahování textů jednom po druhém. Opravdu chcete pokračovat?</item>
+        <item quantity="other">Toto stáhne text pro %1$d písní. Stávající texty písní budou nahrazeny novými. Toto může být méně přesné než stahování textů jednom po druhém. Opravdu chcete pokračovat?</item>
+    </plurals>
+    <string name="clear">Vymazat</string>
+    <string name="credentials_saved">Přihlašovací údaje uloženy</string>
+    <string name="invalid_credentials">Neplatné přihlašovací údaje</string>
+    <string name="change_api_strategy">Můžete také vyzkoušet jinačí způsoby pro připojení ke Spotify ve nastavení.</string>
+    <string name="set_sd_path">Nastavte umístění ke vaší SD kartě tady. Toto je povinné pro Android 10 a nižší.</string>
+    <string name="no_sd_card_path_set">Žádné umístění pro SD kartu bylo nastavené!</string>
+    <string name="sd_card_path_set_successfully">Umístění pro SD kartu nastaveno úspěšně!</string>
+    <string name="clear_sd_card_path">Vymazat</string>
+    <string name="set_sd_path_warn">Používáte starší verzi Android. Ujistěte se, že máte nastavené umístění pro SD kartu ve nastavení. Jestli ne, prosím zrušte tuto zprávu a nastavte umístění.</string>
+    <string name="include_translation">Zahrnout překlady</string>
+    <string name="include_translation_summary">Zahrnout překlady textů když se získává text ze poskytovatele Netease</string>
+    <string name="notification_access_description">Toto je použito pro získávání písně která se teď přehrává na vašem zařízení. Aplikace nečte jinačí notifikace.</string>
 </resources>
