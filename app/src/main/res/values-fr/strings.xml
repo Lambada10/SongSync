@@ -75,7 +75,7 @@
     <string name="credentials_saved">Informations d\'identification enregistrées</string>
     <string name="save">Sauvegarder</string>
     <string name="ignore_folders">Ignorer les dossiers</string>
-    <string name="no_lyrics_only">Afficher uniquement les chansons sans paroles</string>
+    <string name="no_lyrics_only">Afficher uniquement les chansons sans fichier LRC de paroles</string>
     <string name="filters">Filtres</string>
     <string name="close">Fermer</string>
     <string name="error_checking_for_updates">Erreur lors de la vérification des mises à jour</string>
@@ -162,4 +162,9 @@
     <string name="include_romanization">Inclure la romanisation</string>
     <string name="include_romanization_summary">Inclure les paroles romanisées lors de l\'obtention des paroles de chansons auprès du fournisseur Netease</string>
     <string name="multi_person_word_by_word_summary2">Utilisez le format de paroles de plusieurs personnes lorsque vous obtenez des paroles auprès d\'un fournisseur pris en charge</string>
+    <plurals name="songs_count">
+        <item quantity="one">%1$d chanson</item>
+        <item quantity="many">%1$d chansons</item>
+        <item quantity="other">%1$d chansons</item>
+    </plurals>
 </resources>
