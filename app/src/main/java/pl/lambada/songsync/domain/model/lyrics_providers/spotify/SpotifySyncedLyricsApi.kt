@@ -4,8 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SyncedLinesResponse(
-    val title: String,
-    val artist: String,
-    val cover: String,
-    val lyrics: String
+    val lyrics: String,
+    val isError: Boolean
 )
