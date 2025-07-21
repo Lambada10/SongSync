@@ -23,6 +23,9 @@ class LyricsProviderService {
     // Spotify API token
     private val spotifyAPI = SpotifyAPI()
 
+    // Spotify Track Url
+    private var spotifyUrl = ""
+
     // LRCLib Track ID
     private var lrcLibID = 0
 
@@ -62,7 +65,10 @@ class LyricsProviderService {
     suspend fun getSongInfo(query: SongInfo, offset: Int = 0, provider: Providers): SongInfo? {
         return try {
             when (provider) {
-                Providers.SPOTIFY -> spotifyAPI.getSongInfo(query, offset)
+                Providers.SPOTIFY -> spotifyAPI.getSongInfo(query, offset).also {
+                    spotifyUrl = it?.songLink ?: ""
+                } ?: throw NoTrackFoundException()
+                
                 Providers.LRCLIB -> LRCLibAPI().getSongInfo(query, offset).also {
                     lrcLibID = it?.lrcLibID ?: 0
                 } ?: throw NoTrackFoundException()
@@ -107,7 +113,7 @@ class LyricsProviderService {
         unsyncedFallbackMusixmatch: Boolean = true
     ): String? {
         return when (provider) {
-            Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(songTitle, artistName)
+            Providers.SPOTIFY -> SpotifyLyricsAPI().getSyncedLyrics(spotifyUrl)
             Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(lrcLibID)
             Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(
                 neteaseID, includeTranslationNetEase, includeRomanizationNetEase
