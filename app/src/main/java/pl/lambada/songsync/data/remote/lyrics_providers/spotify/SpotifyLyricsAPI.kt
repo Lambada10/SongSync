@@ -16,9 +16,9 @@ class SpotifyLyricsAPI {
      * @param artist The name of the artist.
      * @return The synced lyrics as a string.
      */
-    suspend fun getSyncedLyrics(track_id: String): String? {
+    suspend fun getSyncedLyrics(track_url: String): String? {
         val response = client.get(baseURL) {
-            parameter("id", track_id)
+            parameter("url", track_url)
         }
         val responseBody = response.bodyAsText(Charsets.UTF_8)
         if (response.status.value !in 200..299)
