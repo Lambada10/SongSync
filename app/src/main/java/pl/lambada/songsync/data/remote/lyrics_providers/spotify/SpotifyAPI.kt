@@ -11,6 +11,8 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.lyrics_providers.spotify.ServerTimeResponse
 import pl.lambada.songsync.domain.model.lyrics_providers.spotify.TrackSearchResult
@@ -25,23 +27,20 @@ import java.net.UnknownHostException
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
 
+@Serializable
+data class SecretData(
+    val secret: List<Int>,
+    val version: Int
+)
+
 class SpotifyAPI {
     private val webPlayerURL = "https://open.spotify.com/"
     private val baseURL = "https://api.spotify.com/v1"
 
-    // TOTP
-    // https://open.spotifycdn.com/cdn/build/mobile-web-player/vendor~mobile-web-player.6a848932.js
-    private val secretHex = "35353037313435383533343837343939353932323438363330333239333437"
-    private val secretBytes = secretHex.chunked(2).map { it.toInt(16).toByte() }.toByteArray()
-    private val totpGenerator = TimeBasedOneTimePasswordGenerator(
-        secretBytes,
-        TimeBasedOneTimePasswordConfig(
-            30L,
-            TimeUnit.SECONDS,
-            6,
-            HmacAlgorithm.SHA1
-        )
-    )
+    // TOTP variables
+    private var totpSecret: ByteArray? = null
+    private var totpVer: Int = 0
+    private var totpGenerator: TimeBasedOneTimePasswordGenerator? = null
 
     // Request headers
     private val reqHeaders = mapOf(
@@ -55,12 +54,61 @@ class SpotifyAPI {
     private var tokenTime: Long = 0
 
     /**
+     * Fetches secret data from GitHub and initializes TOTP
+     */
+    private suspend fun initializeTOTP() {
+        if (totpGenerator != null) return
+
+        try {
+            val response = client.get("https://github.com/Thereallo1026/spotify-secrets/blob/main/secrets/secretBytes.json?raw=true")
+            val responseBody = response.bodyAsText(Charsets.UTF_8)
+            val secretDataList = json.decodeFromString<List<SecretData>>(responseBody)
+            
+            // Get the last element
+            val gitu = secretDataList.last()
+            
+            totpSecret = toSecret(gitu.secret)
+            totpVer = gitu.version
+            
+            totpGenerator = TimeBasedOneTimePasswordGenerator(
+                totpSecret!!,
+                TimeBasedOneTimePasswordConfig(
+                    30L,
+                    TimeUnit.SECONDS,
+                    6,
+                    HmacAlgorithm.SHA1
+                )
+            )
+            
+            Log.d("SpotifyAPI", "TOTP initialized with version: $totpVer")
+        } catch (e: Exception) {
+            Log.e("SpotifyAPI", "Failed to initialize TOTP", e)
+            throw e
+        }
+    }
+
+    /**
+     * Converts secret data to ByteArray
+     */
+    private fun toSecret(data: List<Int>): ByteArray {
+        val mappedData = data.mapIndexed { index, value -> 
+            value xor ((index % 33) + 9)
+        }
+        
+        val dataString = mappedData.joinToString("")
+        val hexData = dataString.toByteArray(StandardCharsets.UTF_8)
+            .joinToString("") { "%02x".format(it) }
+        
+        return hexData.chunked(2).map { it.toInt(16).toByte() }.toByteArray()
+    }
+
+    /**
      * Gets the server time from the Spotify API.
      * @return The server time in milliseconds.
      */
     private suspend fun getServerTime(): Long {
         val response = client.get(
-            webPlayerURL + "server-time"
+            webPlayerURL + "api/server-time"
         ) {
             reqHeaders.forEach { (key, value) -> header(key, value) }
         }
@@ -73,8 +121,12 @@ class SpotifyAPI {
      * @return A Pair containing the timestamp and the TOTP code.
      */
     private suspend fun getTsAndTOTP(): Pair<Long, String> {
+        if (totpGenerator == null) {
+            initializeTOTP()
+        }
+        
         val serverTime = getServerTime()
-        return Pair(serverTime, totpGenerator.generate(serverTime))
+        return Pair(serverTime, totpGenerator!!.generate(serverTime))
     }
 
     /**
@@ -82,18 +134,17 @@ class SpotifyAPI {
      * @param force If true, forces a token refresh even if the current token is still valid.
      */
     suspend fun refreshToken(force: Boolean = false) {
-
         if (force || spotifyToken == "") {
             val totp = getTsAndTOTP()
             val response = client.get(
-                webPlayerURL + "get_access_token"
+                webPlayerURL + "api/token"
             ) {
                 reqHeaders.forEach { (key, value) -> header(key, value) }
                 parameter("reason", "init")
                 parameter("productType", "mobile-web-player")
                 parameter("ts", totp.first)
                 parameter("totp", totp.second)
-                parameter("totpVer", 5)
+                parameter("totpVer", totpVer) // Use dynamic version
             }
             val responseBody = response.bodyAsText(Charsets.UTF_8)
             val json = json.decodeFromString<WebPlayerTokenResponse>(responseBody)

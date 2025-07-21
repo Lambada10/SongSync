@@ -8,7 +8,7 @@ import pl.lambada.songsync.util.networking.Ktor.client
 import pl.lambada.songsync.util.networking.Ktor.json
 
 class SpotifyLyricsAPI {
-    private val baseURL = "https://lyrichub.echoir.workers.dev/api/spotify"
+    private val baseURL = "https://paxsenix.alwaysdata.net/getLyricsSpotify.php"
 
     /**
      * Gets synced lyrics using the song link and returns them as a string formatted as an LRC file.
@@ -16,9 +16,9 @@ class SpotifyLyricsAPI {
      * @param artist The name of the artist.
      * @return The synced lyrics as a string.
      */
-    suspend fun getSyncedLyrics(title: String, artist: String): String? {
+    suspend fun getSyncedLyrics(track_url: String): String? {
         val response = client.get(baseURL) {
-            parameter("query", "$title $artist")
+            parameter("url", track_url)
         }
         val responseBody = response.bodyAsText(Charsets.UTF_8)
         if (response.status.value !in 200..299)
