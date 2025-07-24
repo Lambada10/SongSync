@@ -86,7 +86,7 @@
     <string name="error_checking_for_updates">Erro ao verificar atualizações</string>
     <string name="close">Fechar</string>
     <string name="filters">Filtros</string>
-    <string name="no_lyrics_only">Mostrar apenas músicas sem letras</string>
+    <string name="no_lyrics_only">Mostrar apenas músicas sem letras do arquivo LRC</string>
     <string name="ignore_folders">Ignorar pastas</string>
     <string name="save">Salvar</string>
     <string name="credentials_saved">Credenciais salvas</string>
@@ -153,4 +153,23 @@
     <string name="lyrics_subtitle">"Letras de músicas recuperadas que serão enviadas para o aplicativo "</string>
     <string name="song_name_not_provided">O nome da música não foi fornecido</string>
     <string name="unknown_error_occurred">Ocorreu um erro desconhecido</string>
+    <string name="multi_person_word_by_word_summary2">Use o formato de letras para várias pessoas ao obter letras de provedores compatíveis</string>
+    <string name="pure_black_theme_summary">Use o tema preto puro quando o modo escuro estiver ativado</string>
+    <string name="all_files_access">Acesso a todos os arquivos</string>
+    <string name="all_files_access_description">Necessário para salvar arquivos lrc no diretório da música sem abrir o seletor de arquivos toda vez</string>
+    <string name="show_notification_permission">Mostrar notificação (opcional)</string>
+    <string name="show_notification_description">Usado para mostrar notificação de progresso do download</string>
+    <string name="_continue">Continuar</string>
+    <string name="init_screen_title">Bem-vindo ao SongSync!</string>
+    <string name="init_screen_description">Para começar, conceda as seguintes permissões:</string>
+    <string name="now_playing_song">Música tocando agora</string>
+    <string name="notification_access">Acesso à notificação (opcional)</string>
+    <string name="notification_access_description">Isso é usado para recuperar a música que está tocando no seu dispositivo. O aplicativo não lê nenhuma outra notificação.</string>
+    <string name="include_romanization">Incluir romanização</string>
+    <string name="include_romanization_summary">Incluir letras romanizadas ao obter letras de músicas do provedor Netease</string>
+    <plurals name="songs_count">
+        <item quantity="one">canção</item>
+        <item quantity="many">canções</item>
+        <item quantity="other">canções</item>
+    </plurals>
 </resources>
