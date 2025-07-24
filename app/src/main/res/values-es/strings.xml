@@ -82,7 +82,7 @@
     <string name="error_checking_for_updates">Error al buscar actualizaciones</string>
     <string name="close">Cerrar</string>
     <string name="filters">Filtros</string>
-    <string name="no_lyrics_only">Mostrar solo canciones sin letras</string>
+    <string name="no_lyrics_only">Mostrar solo canciones sin letras en un archivo LRC</string>
     <string name="ignore_folders">Ignorar carpetas</string>
     <string name="save">Guardar</string>
     <string name="credentials_saved">Credenciales guardadas</string>
@@ -171,4 +171,5 @@
         <item quantity="one">%1$d canción</item>
         <item quantity="other">%1$d canciones</item>
     </plurals>
+    <string name="multi_person_word_by_word_summary2">Utilizar el formato de letras para varias personas, al obtener letras de un proveedor compatible</string>
 </resources>
