@@ -61,9 +61,23 @@ fun LyricsSuccessContent(
     onSetOffset: (Int) -> Unit,
     onSaveLyrics: () -> Unit,
     onEmbedLyrics: () -> Unit,
-    onCopyLyrics: () -> Unit
+    onCopyLyrics: () -> Unit,
+    onLanguageSelected: (String) -> Unit = {}
+    availableLanguages: List<String> = emptyList(),
+    currentLanguage: String? = null,
+    originalLanguage: String? = null,
 ) {
     Column {
+        if (availableLanguages.isNotEmpty()) {
+            LanguageSelector(
+                availableLanguages = availableLanguages,
+                currentLanguage = currentLanguage,
+                originalLanguage = originalLanguage,
+                onLanguageSelected = onLanguageSelected,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
+        
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
