@@ -144,9 +144,9 @@
     <string name="theme">Thème</string>
     <string name="change_api_strategy">Vous pouvez également essayer d\'autres moyens de vous connecter au réseau Spotify dans les paramètres.</string>
     <plurals name="this_will_download_lyrics_for_all_songs">
-        <item quantity="one">Ceci téléchargera les paroles d\'une chanson. Les paroles existantes seront remplacées par les nouvelles. Ce téléchargement peut être moins précis que le téléchargement des paroles une par une. Voulez-vous vraiment continuer?</item>
-        <item quantity="many">Cela téléchargera les paroles de %1$d chansons. Les paroles existantes des chansons seront remplacées par de nouvelles. Cela peut être moins précis que de télécharger les paroles une par une. Êtes-vous sûr de vouloir continuer?</item>
-        <item quantity="other">Ceci téléchargera les paroles de %1$d chansons. Les paroles existantes seront remplacées par les nouvelles. Ce téléchargement peut être moins précis que le téléchargement des paroles une par une. Voulez-vous vraiment continuer?</item>
+        <item quantity="one">Ceci téléchargera les paroles d\'une chanson. Les paroles existantes seront remplacées par les nouvelles. Ce téléchargement peut être moins précis que le téléchargement des paroles une par une. Voulez-vous vraiment continuer ?</item>
+        <item quantity="many">Cela téléchargera les paroles de %1$d chansons. Les paroles existantes des chansons seront remplacées par de nouvelles. Cela peut être moins précis que de télécharger les paroles une par une. Êtes-vous sûr de vouloir continuer ?</item>
+        <item quantity="other">Ceci téléchargera les paroles de %1$d chansons. Les paroles existantes seront remplacées par les nouvelles. Ce téléchargement peut être moins précis que le téléchargement des paroles une par une. Voulez-vous vraiment continuer ?</item>
     </plurals>
     <string name="all_files_access_description">Nécessaire pour enregistrer les fichiers lrc dans le dossier des chansons sans ouvrir le sélecteur de fichiers à chaque fois</string>
     <string name="pure_black_theme_summary">Utiliser le thème noir lorsque le mode sombre est activé</string>
