@@ -62,10 +62,10 @@ fun LyricsSuccessContent(
     onSaveLyrics: () -> Unit,
     onEmbedLyrics: () -> Unit,
     onCopyLyrics: () -> Unit,
-    onLanguageSelected: (String) -> Unit = {}
+    onLanguageSelected: (String) -> Unit = {},
     availableLanguages: List<String> = emptyList(),
     currentLanguage: String? = null,
-    originalLanguage: String? = null,
+    originalLanguage: String? = null
 ) {
     Column {
         if (availableLanguages.isNotEmpty()) {

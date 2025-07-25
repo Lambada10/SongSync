@@ -110,7 +110,7 @@ fun SharedTransitionScope.SuccessContent(
                     onCopyLyrics = { onCopyLyrics(it.lyrics) },
                     onLanguageSelected = { language ->
                         onLanguageSelected(result.musixmatchID, language)
-                    }
+                    },
                     availableLanguages = result.availableLanguages,
                     currentLanguage = result.currentLanguage,
                     originalLanguage = result.originalLanguage,
