@@ -69,4 +69,64 @@ class MusixmatchAPI {
     fun getLyrics(songInfo: SongInfo?, preferUnsynced: Boolean = true): String? {
         return songInfo?.syncedLyrics ?: if (preferUnsynced) songInfo?.unsyncedLyrics else null
     }
+
+    /**
+     * Gets the display name for a language code.
+     * @param languageCode The ISO language code.
+     * @return The display name of the language.
+     */
+    fun getLanguageDisplayName(languageCode: String): String {
+        return when (languageCode) {
+            "en" -> "English"
+            "es" -> "Español"
+            "fr" -> "Français"
+            "de" -> "Deutsch"
+            "it" -> "Italiano"
+            "pt" -> "Português"
+            "ru" -> "Русский"
+            "ja" -> "日本語"
+            "ko" -> "한국어"
+            "zh" -> "中文"
+            "ar" -> "العربية"
+            "hi" -> "हिन्दी"
+            "tr" -> "Türkçe"
+            "pl" -> "Polski"
+            "nl" -> "Nederlands"
+            "sv" -> "Svenska"
+            "da" -> "Dansk"
+            "no" -> "Norsk"
+            "cs" -> "Čeština"
+            "sk" -> "Slovenčina"
+            "hu" -> "Magyar"
+            "ro" -> "Română"
+            "bg" -> "Български"
+            "hr" -> "Hrvatski"
+            "sr" -> "Српски"
+            "sl" -> "Slovenščina"
+            "et" -> "Eesti"
+            "lv" -> "Latviešu"
+            "lt" -> "Lietuvių"
+            "uk" -> "Українська"
+            "he" -> "עברית"
+            "th" -> "ไทย"
+            "vi" -> "Tiếng Việt"
+            "id" -> "Bahasa Indonesia"
+            "ms" -> "Bahasa Melayu"
+            "ta" -> "தமிழ்"
+            "bn" -> "বাংলা"
+            "fa" -> "فارسی"
+            "uz" -> "O'zbek"
+            "ky" -> "Кыргызча"
+            "mn" -> "Монгол"
+            "ka" -> "ქართული"
+            "az" -> "Azərbaycan"
+            "af" -> "Afrikaans"
+            "is" -> "Íslenska"
+            "mk" -> "Македонски"
+            "bs" -> "Bosanski"
+            "fi" -> "Finnish"
+            "nb" -> "Norsk Bokmål"
+            else -> languageCode.uppercase()
+        }
+    }
 }
