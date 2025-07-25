@@ -61,6 +61,35 @@ class MusixmatchAPI {
     }
 
     /**
+     * Gets lyrics in a specific language for a song.
+     * @param songId The Musixmatch song ID.
+     * @param language The language code (e.g., "es", "fr", "de").
+     * @param preferSynced Whether to prefer synced lyrics over unsynced.
+     * @return The lyrics in the requested language or null if not available.
+     */
+    suspend fun getLyricsInLanguage(
+        songId: Long,
+        language: String,
+        preferSynced: Boolean = true
+    ): String? {
+        val response = client.get(
+            "$baseURL/v2/full?id=$songId&lang=$language"
+        )
+        val responseBody = response.bodyAsText(Charsets.UTF_8)
+
+        if (response.status.value !in 200..299)
+            return null
+
+        val result = json.decodeFromString<MusixmatchSearchResponse>(responseBody)
+
+        return if (preferSynced && result.syncedLyrics != null) {
+            result.syncedLyrics.lyrics
+        } else {
+            result.unsyncedLyrics?.lyrics
+        }
+    }
+
+    /**
      * Returns the lyrics.
      * @param songInfo The SongInfo of the song from search results.
      * @param preferUnsynced Flag to prefer unsynced lyrics when synced lyrics are not available.

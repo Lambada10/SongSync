@@ -131,4 +131,8 @@ class LyricsProviderService {
             )
         }
     }
+
+    suspend fun getLyricsInLanguage(songId: Long, language: String): String? {
+        return MusixmatchAPI().getLyricsInLanguage(songId, language)
+    }
 }
