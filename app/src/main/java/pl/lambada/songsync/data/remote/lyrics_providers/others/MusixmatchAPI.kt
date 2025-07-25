@@ -38,7 +38,7 @@ class MusixmatchAPI {
             throw EmptyQueryException()
 
         val response = client.get(
-            "$baseURL/full?artist=$artistName&track=$songName"
+            "$baseURL/v2/full?artist=$artistName&track=$songName"
         )
         val responseBody = response.bodyAsText(Charsets.UTF_8)
 
