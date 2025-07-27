@@ -15,6 +15,8 @@ data class MusixmatchSearchResponse(
     val albumId: Long,
     val hasSyncedLyrics: Boolean,
     val hasUnsyncedLyrics: Boolean,
+    val availableLanguages: List<String> = emptyList(),
+    val originalLanguage: String? = null,
     val syncedLyrics: SyncedLyricsResponse? = null,
     val unsyncedLyrics: UnsyncedLyricsResponse? = null
 )
