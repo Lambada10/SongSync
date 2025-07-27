@@ -56,7 +56,10 @@ class MusixmatchAPI {
             hasSyncedLyrics = result.hasSyncedLyrics,
             hasUnsyncedLyrics = result.hasSyncedLyrics,
             syncedLyrics = result.syncedLyrics?.lyrics,
-            unsyncedLyrics = result.unsyncedLyrics?.lyrics
+            unsyncedLyrics = result.unsyncedLyrics?.lyrics,
+            availableLanguages = result.availableLanguages,
+            originalLanguage = result.originalLanguage,
+            currentLanguage = result.originalLanguage ?: "en"
         )
     }
 
