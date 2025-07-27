@@ -157,7 +157,9 @@ class MusixmatchAPI {
             "mk" -> "Македонски"
             "bs" -> "Bosanski"
             "fi" -> "Finnish"
-            "nb" -> "Norsk Bokmål"
+            "nb" -> "Norsk Bokmål",
+            "f1" -> "Filipino",
+            "el" -> "Ελληνικά"
             else -> languageCode.uppercase()
         }
     }
