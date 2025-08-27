@@ -81,7 +81,7 @@
     <string name="close">Tutup</string>
     <string name="filters">Sortir</string>
     <string name="ignore_folders">Abaikan folder</string>
-    <string name="no_lyrics_only">Hanya perlihatkan lagu-lagu tanpa lirik saja</string>
+    <string name="no_lyrics_only">Hanya perlihatkan lagu-lagu tanpa file LRC saja</string>
     <string name="invalid_credentials">Kredensial tidak valid</string>
     <string name="spotify_client_secret">Klien Rahasia Spotify</string>
     <string name="save">Simpan</string>
@@ -147,4 +147,21 @@
     <string name="lyrics_subtitle">"Lirik lagu yang diambil yang akan dikirim ke aplikasi "</string>
     <string name="song_name_not_provided">Nama lagu belum disediakan</string>
     <string name="unknown_error_occurred">Terjadi kesalahan yang tidak diketahui</string>
+    <string name="multi_person_word_by_word_summary2">Gunakan format lirik beberapa orang ketika mengambil lirik dari penyedia yang didukung</string>
+    <string name="pure_black_theme_summary">Gunakan tema hitam pekat ketika mode gelap diaktifkan</string>
+    <string name="all_files_access">Akses semua file</string>
+    <string name="all_files_access_description">Dibutuhkan untuk menyimpan file lrc di dalam direktori lagu tanpa perlu membuka pemilih file setiap waktu</string>
+    <string name="show_notification_permission">Tampilkan notifikasi (Opsional)</string>
+    <string name="show_notification_description">Digunakan untuk menampilkan notifikasi kemajuan pengunduh</string>
+    <string name="_continue">Lanjut</string>
+    <string name="init_screen_title">Selamat datang di SongSync!</string>
+    <string name="init_screen_description">Untuk memulai, mohon izinkan perizinan berikut:</string>
+    <string name="now_playing_song">Lagu yang diputar sekarang</string>
+    <string name="notification_access">Akses notifikasi (Opsional)</string>
+    <string name="notification_access_description">Ini digunakan untuk melihat lagu yang sedang diputar pada perangkat. Apl tidak akan membaca notifikasi lain.</string>
+    <string name="include_romanization">Sertakan romanisasi</string>
+    <string name="include_romanization_summary">Sertakan romanisasi ketika mengambil lirik lagu dari penyedia Netease</string>
+    <plurals name="songs_count">
+        <item quantity="other">%1$d lagu</item>
+    </plurals>
 </resources>
