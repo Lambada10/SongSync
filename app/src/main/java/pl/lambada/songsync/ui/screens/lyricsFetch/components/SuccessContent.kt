@@ -40,6 +40,7 @@ fun SharedTransitionScope.SuccessContent(
     onSaveLyrics: (String) -> Unit,
     onEmbedLyrics: (String) -> Unit,
     onCopyLyrics: (String) -> Unit,
+    onLanguageSelected: (Long?, String) -> Unit = { _, _ -> },
     openUri: (String) -> Unit,
     lyricsFetchState: LyricsFetchState,
     animatedVisibilityScope: AnimatedVisibilityScope,
@@ -106,7 +107,13 @@ fun SharedTransitionScope.SuccessContent(
                     onSetOffset = onSetOffset,
                     onSaveLyrics = { onSaveLyrics(it.lyrics) },
                     onEmbedLyrics = { onEmbedLyrics(it.lyrics) },
-                    onCopyLyrics = { onCopyLyrics(it.lyrics) }
+                    onCopyLyrics = { onCopyLyrics(it.lyrics) },
+                    onLanguageSelected = { language ->
+                        onLanguageSelected(result.musixmatchID, language)
+                    },
+                    availableLanguages = result.availableLanguages,
+                    currentLanguage = result.currentLanguage,
+                    originalLanguage = result.originalLanguage,
                 )
 
                 is LyricsFetchState.Failed -> Text(stringResource(R.string.this_track_has_no_lyrics))

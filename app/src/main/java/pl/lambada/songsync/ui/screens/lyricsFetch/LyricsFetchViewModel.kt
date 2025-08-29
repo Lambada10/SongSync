@@ -142,6 +142,33 @@ class LyricsFetchViewModel(
             showToast(context, R.string.embedded_lyrics_in_file)
         }
     }
+
+    fun fetchLyricsInLanguage(songId: Long?, language: String) {
+        if (songId == null) return
+        
+        viewModelScope.launch(Dispatchers.IO) {
+            lyricsFetchState = LyricsFetchState.Pending
+            
+            try {
+                val lyrics = lyricsProviderService.getLyricsInLanguage(songId, language)
+                if (lyrics != null) {
+                    lyricsFetchState = LyricsFetchState.Success(lyrics)
+                    
+                    // Update the currentLanguage in the song info
+                    if (queryState is QueryStatus.Success) {
+                        val currentSong = (queryState as QueryStatus.Success).song
+                        queryState = QueryStatus.Success(
+                            currentSong.copy(currentLanguage = language)
+                        )
+                    }
+                } else {
+                    lyricsFetchState = LyricsFetchState.Failed(Exception("No lyrics found for this language"))
+                }
+            } catch (e: Exception) {
+                lyricsFetchState = LyricsFetchState.Failed(e)
+            }
+        }
+    }
 }
 
 private fun resolveEmbedErrorMessage(context: Context, exception: Throwable): String {
