@@ -38,7 +38,7 @@ class MusixmatchAPI {
             throw EmptyQueryException()
 
         val response = client.get(
-            "$baseURL/full?artist=$artistName&track=$songName"
+            "$baseURL/v2/full?artist=$artistName&track=$songName"
         )
         val responseBody = response.bodyAsText(Charsets.UTF_8)
 
@@ -56,8 +56,40 @@ class MusixmatchAPI {
             hasSyncedLyrics = result.hasSyncedLyrics,
             hasUnsyncedLyrics = result.hasSyncedLyrics,
             syncedLyrics = result.syncedLyrics?.lyrics,
-            unsyncedLyrics = result.unsyncedLyrics?.lyrics
+            unsyncedLyrics = result.unsyncedLyrics?.lyrics,
+            availableLanguages = result.availableLanguages,
+            originalLanguage = result.originalLanguage,
+            currentLanguage = result.originalLanguage ?: "en"
         )
+    }
+
+    /**
+     * Gets lyrics in a specific language for a song.
+     * @param songId The Musixmatch song ID.
+     * @param language The language code (e.g., "es", "fr", "de").
+     * @param preferSynced Whether to prefer synced lyrics over unsynced.
+     * @return The lyrics in the requested language or null if not available.
+     */
+    suspend fun getLyricsInLanguage(
+        songId: Long,
+        language: String,
+        preferSynced: Boolean = true
+    ): String? {
+        val response = client.get(
+            "$baseURL/v2/full?id=$songId&lang=$language"
+        )
+        val responseBody = response.bodyAsText(Charsets.UTF_8)
+
+        if (response.status.value !in 200..299)
+            return null
+
+        val result = json.decodeFromString<MusixmatchSearchResponse>(responseBody)
+
+        return if (preferSynced && result.syncedLyrics != null) {
+            result.syncedLyrics.lyrics
+        } else {
+            result.unsyncedLyrics?.lyrics
+        }
     }
 
     /**
@@ -68,5 +100,67 @@ class MusixmatchAPI {
      */
     fun getLyrics(songInfo: SongInfo?, preferUnsynced: Boolean = true): String? {
         return songInfo?.syncedLyrics ?: if (preferUnsynced) songInfo?.unsyncedLyrics else null
+    }
+
+    /**
+     * Gets the display name for a language code.
+     * @param languageCode The ISO language code.
+     * @return The display name of the language.
+     */
+    fun getLanguageDisplayName(languageCode: String): String {
+        return when (languageCode) {
+            "en" -> "English"
+            "es" -> "Español"
+            "fr" -> "Français"
+            "de" -> "Deutsch"
+            "it" -> "Italiano"
+            "pt" -> "Português"
+            "ru" -> "Русский"
+            "ja" -> "日本語"
+            "ko" -> "한국어"
+            "zh" -> "中文"
+            "ar" -> "العربية"
+            "hi" -> "हिन्दी"
+            "tr" -> "Türkçe"
+            "pl" -> "Polski"
+            "nl" -> "Nederlands"
+            "sv" -> "Svenska"
+            "da" -> "Dansk"
+            "no" -> "Norsk"
+            "cs" -> "Čeština"
+            "sk" -> "Slovenčina"
+            "hu" -> "Magyar"
+            "ro" -> "Română"
+            "bg" -> "Български"
+            "hr" -> "Hrvatski"
+            "sr" -> "Српски"
+            "sl" -> "Slovenščina"
+            "et" -> "Eesti"
+            "lv" -> "Latviešu"
+            "lt" -> "Lietuvių"
+            "uk" -> "Українська"
+            "he" -> "עברית"
+            "th" -> "ไทย"
+            "vi" -> "Tiếng Việt"
+            "id" -> "Bahasa Indonesia"
+            "ms" -> "Bahasa Melayu"
+            "ta" -> "தமிழ்"
+            "bn" -> "বাংলা"
+            "fa" -> "فارسی"
+            "uz" -> "O'zbek"
+            "ky" -> "Кыргызча"
+            "mn" -> "Монгол"
+            "ka" -> "ქართული"
+            "az" -> "Azərbaycan"
+            "af" -> "Afrikaans"
+            "is" -> "Íslenska"
+            "mk" -> "Македонски"
+            "bs" -> "Bosanski"
+            "fi" -> "Finnish"
+            "nb" -> "Norsk Bokmål"
+            "f1" -> "Filipino"
+            "el" -> "Ελληνικά"
+            else -> languageCode.uppercase()
+        }
     }
 }
