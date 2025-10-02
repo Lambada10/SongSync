@@ -193,7 +193,9 @@ suspend fun downloadLyrics(
     onRateLimitReached: () -> Unit,
 ) {
     val selectedProvider = viewModel.userSettingsController.selectedProvider
-    Log.d("BatchDownload", "Batch download using provider: $selectedProvider")
+    if (AppConfig.DEBUG) {
+        Log.d("BatchDownload", "Batch download using provider: $selectedProvider")
+    }
     var successCount = 0
     var noLyricsCount = 0
     var failedCount = 0
@@ -381,5 +383,9 @@ fun parseLyrics(lyrics: String): List<Pair<String, String>> {
         val text = line.substringAfter(endChar).trim()
 
         timestamp to text
+
     }
+}
+object AppConfig {
+    const val DEBUG = true // set to false for release builds
 }
