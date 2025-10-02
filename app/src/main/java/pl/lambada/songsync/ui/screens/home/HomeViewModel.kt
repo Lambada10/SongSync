@@ -225,7 +225,7 @@ class HomeViewModel(
      * Filter songs based on user's preferences.
      * @return A list of songs depending on the user's preferences. If no preferences are set, null is returned, so app will use all songs.
      */
-    fun filterSongs() = viewModelScope.launch {
+    fun     filterSongs() = viewModelScope.launch {
         hideFolders = userSettingsController.blacklistedFolders.isNotEmpty()
 
         when {
@@ -290,14 +290,14 @@ class HomeViewModel(
     }
 
     suspend fun getSongInfo(query: SongInfo, selectedProvider: Providers): SongInfo? =
-        lyricsProviderService.getSongInfo(query, provider = userSettingsController.selectedProvider)
+        lyricsProviderService.getSongInfo(query, provider = selectedProvider)
 
     suspend fun getSyncedLyrics(title: String, artist: String, selectedProvider: Providers): String? {
         return try {
             lyricsProviderService.getSyncedLyrics(
                 title,
                 artist,
-                provider = userSettingsController.selectedProvider,
+                provider = selectedProvider,
                 includeTranslationNetEase = userSettingsController.includeTranslation,
                 includeRomanizationNetEase = userSettingsController.includeRomanization,
                 multiPersonWordByWord = userSettingsController.multiPersonWordByWord,
