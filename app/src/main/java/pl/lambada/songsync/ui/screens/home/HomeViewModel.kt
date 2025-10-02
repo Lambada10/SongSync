@@ -33,6 +33,7 @@ import pl.lambada.songsync.domain.model.SongInfo
 import pl.lambada.songsync.domain.model.SortOrders
 import pl.lambada.songsync.domain.model.SortValues
 import pl.lambada.songsync.services.NotificationListener
+import pl.lambada.songsync.util.Providers
 import pl.lambada.songsync.util.downloadLyrics
 import pl.lambada.songsync.util.ext.toLrcFile
 import java.io.File
@@ -288,10 +289,10 @@ class HomeViewModel(
         }
     }
 
-    suspend fun getSongInfo(query: SongInfo): SongInfo? =
+    suspend fun getSongInfo(query: SongInfo, selectedProvider: Providers): SongInfo? =
         lyricsProviderService.getSongInfo(query, provider = userSettingsController.selectedProvider)
 
-    suspend fun getSyncedLyrics(title: String, artist: String): String? {
+    suspend fun getSyncedLyrics(title: String, artist: String, selectedProvider: Providers): String? {
         return try {
             lyricsProviderService.getSyncedLyrics(
                 title,
