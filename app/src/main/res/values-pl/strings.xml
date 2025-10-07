@@ -84,7 +84,7 @@
     <string name="lyrics_subtitle">"Otrzymano tekst utworu, który zostanie wysłany do aplikacji "</string>
     <string name="song_name_not_provided">Brakujący tytuł utworu</string>
     <string name="unknown_error_occurred">Nieznany błąd</string>
-    <string name="pure_black_theme_summary">Użyj czarnego motywu przy włączonym trybie ciemnym</string>
+    <string name="pure_black_theme_summary">Użyj całkowicie czarnego tła przy włączonym trybie ciemnym</string>
     <string name="all_files_access">Dostęp do wszystkich plików</string>
     <string name="all_files_access_description">Wymagany aby zapisać plik LRC w katalogu utworu bez otwierania menedżera plików</string>
     <string name="show_notification_permission">Pokaż powiadomienie (Opcjonalne)</string>
