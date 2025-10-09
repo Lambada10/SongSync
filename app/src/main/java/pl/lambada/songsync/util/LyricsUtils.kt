@@ -192,6 +192,10 @@ suspend fun downloadLyrics(
     onDownloadComplete: () -> Unit,
     onRateLimitReached: () -> Unit,
 ) {
+    val selectedProvider = viewModel.userSettingsController.selectedProvider
+    if (AppConfig.DEBUG) {
+        Log.d("BatchDownload", "Batch download using provider: $selectedProvider")
+    }
     var successCount = 0
     var noLyricsCount = 0
     var failedCount = 0
@@ -202,6 +206,7 @@ suspend fun downloadLyrics(
             song,
             viewModel,
             context,
+            selectedProvider,
             onFailedSongInfoResponse = {
                 failedCount++
                 consecutiveNotFound++
@@ -230,6 +235,7 @@ private suspend fun downloadLyricsForSong(
     song: Song,
     viewModel: HomeViewModel,
     context: Context,
+    selectedProvider: Providers,
     onFailedSongInfoResponse: (Throwable) -> Unit,
     onSuccessfulSongInfoResponse: () -> Unit,
     onFailedLyricsResponse: (Throwable) -> Unit,
@@ -237,7 +243,7 @@ private suspend fun downloadLyricsForSong(
 ) {
     runCatching {
         viewModel
-            .getSongInfo(SongInfo(song.title, song.artist))
+            .getSongInfo(SongInfo(song.title, song.artist), selectedProvider)
             ?: throw NullPointerException("Song info result is null")
     }
         .onFailure(onFailedSongInfoResponse)
@@ -248,7 +254,8 @@ private suspend fun downloadLyricsForSong(
                 viewModel
                     .getSyncedLyrics(
                         songInfo.songName!!,
-                        songInfo.artistName!!
+                        songInfo.artistName!!,
+                        selectedProvider
                     )
                     ?: throw NullPointerException("Lyrics result is null")
             }
@@ -376,6 +383,9 @@ fun parseLyrics(lyrics: String): List<Pair<String, String>> {
         val text = line.substringAfter(endChar).trim()
 
         timestamp to text
+
     }
 }
-
+object AppConfig {
+    const val DEBUG = true // set to false for release builds
+}
