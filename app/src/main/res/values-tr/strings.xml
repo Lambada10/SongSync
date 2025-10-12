@@ -86,7 +86,7 @@
     <string name="error_checking_for_updates">Güncellemeleri kontrol ederken hata oluştu</string>
     <string name="close">Kapat</string>
     <string name="filters">Filtreler</string>
-    <string name="no_lyrics_only">Yalnızca şarkı sözü olmayan şarkıları göster</string>
+    <string name="no_lyrics_only">Yalnızca LRC dosyası şarkı sözü olmayan şarkıları göster</string>
     <string name="ignore_folders">Klasörleri yoksay</string>
     <string name="save">Kaydet</string>
     <string name="credentials_saved">Kimlik bilgileri kaydedildi</string>
@@ -130,7 +130,7 @@
     <string name="song_path">Şarkı yolunu göster</string>
     <string name="song_path_description">Şarkı listesinde bir şarkı dosyasının yolunu göster</string>
     <string name="synced_lyrics">Senkronize Olmayan Şarkı Sözlerini Al</string>
-    <string name="synced_lyrics_summary">Senkronize şarkı sözleri bulunmadığında Musixmatch’ten senkronize olmayan şarkı sözlerini almak için geçiş yap</string>
+    <string name="synced_lyrics_summary">Senkronize şarkı sözleri bulunmadığında Musixmatch’ten senkronize olmayan şarkı sözlerini almak için geçiş yap.</string>
     <string name="title">Başlık</string>
     <string name="artist">Sanatçı</string>
     <string name="album">Albüm</string>
@@ -167,4 +167,8 @@
     <string name="notification_access_description">Bu, cihazınızda şu anda çalan şarkıyı almak için kullanılır. Uygulama diğer bildirimleri okumaz.</string>
     <string name="include_romanization">Romanizasyonu dahil et</string>
     <string name="include_romanization_summary">Netease sağlayıcısından şarkı sözleri alınırken romanize edilmiş şarkı sözlerini dahil et</string>
+    <plurals name="songs_count">
+        <item quantity="one">%1$d şarkı</item>
+        <item quantity="other">%1$d şarkı</item>
+    </plurals>
 </resources>
