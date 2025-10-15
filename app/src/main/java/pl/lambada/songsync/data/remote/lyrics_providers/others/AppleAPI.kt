@@ -13,7 +13,7 @@ import pl.lambada.songsync.util.networking.Ktor.json
 import java.net.URLEncoder
 
 class AppleAPI {
-    private val baseURL = "https://paxsenix.alwaysdata.net/"
+    private val baseURL = "http://lyrics.paxsenix.dpdns.org/"
 
     /**
      * Searches for song information using the song name and artist name.
