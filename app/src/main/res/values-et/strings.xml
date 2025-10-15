@@ -165,4 +165,5 @@
         <item quantity="one">%1$d lugu</item>
         <item quantity="other">%1$d lugu</item>
     </plurals>
+    <string name="select_language">Vali keel</string>
 </resources>
