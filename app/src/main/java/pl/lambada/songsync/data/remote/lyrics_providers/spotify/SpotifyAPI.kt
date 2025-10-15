@@ -60,7 +60,7 @@ class SpotifyAPI {
         if (totpGenerator != null) return
 
         try {
-            val response = client.get("https://github.com/Thereallo1026/spotify-secrets/blob/main/secrets/secretBytes.json?raw=true")
+            val response = client.get("https://raw.githubusercontent.com/xyloflake/spot-secrets-go/refs/heads/main/secrets/secretBytes.json")
             val responseBody = response.bodyAsText(Charsets.UTF_8)
             val secretDataList = json.decodeFromString<List<SecretData>>(responseBody)
             
