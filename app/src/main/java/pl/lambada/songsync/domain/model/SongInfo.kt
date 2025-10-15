@@ -37,4 +37,7 @@ data class SongInfo(
     var hasUnsyncedLyrics: Boolean? = null, // Musixmatch-only
     var syncedLyrics: String? = null, // Musixmatch-only
     var unsyncedLyrics: String? = null, // Musixmatch-only
+    var availableLanguages: List<String> = emptyList(), // Musixmatch-only
+    var originalLanguage: String? = null, // Musixmatch-only
+    var currentLanguage: String? = null, // Musixmatch-only
 ) : Parcelable

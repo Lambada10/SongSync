@@ -212,6 +212,9 @@ fun SharedTransitionScope.LyricsFetchScreen(
                                 context.getString(R.string.lyrics_copied_to_clipboard),
                             )
                         },
+                        onLanguageSelected = { songId, language ->
+                            viewModel.fetchLyricsInLanguage(songId, language)
+                        },
                         openUri = uriHandler::openUri,
                         lyricsFetchState = viewModel.lyricsFetchState,
                         animatedVisibilityScope = animatedVisibilityScope,
