@@ -164,4 +164,5 @@
     <plurals name="songs_count">
         <item quantity="other">%1$d 首歌</item>
     </plurals>
+    <string name="select_language">选择语言</string>
 </resources>
