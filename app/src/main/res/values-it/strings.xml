@@ -167,4 +167,5 @@
         <item quantity="many">%1$d canzoni</item>
         <item quantity="other">%1$d canzoni</item>
     </plurals>
+    <string name="select_language">Seleziona lingua</string>
 </resources>
