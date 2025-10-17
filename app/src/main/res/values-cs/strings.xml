@@ -147,4 +147,5 @@
     <string name="notification_access_description">Toto je použito pro získávání písně která se teď přehrává na vašem zařízení. Aplikace nečte jinačí notifikace.</string>
     <string name="disable_marquee">Vypnout Posouvající Text</string>
     <string name="disable_marquee_summary">Vypnout posouvající text v aplikaci</string>
+    <string name="select_language">Vybrat Jazyk</string>
 </resources>
