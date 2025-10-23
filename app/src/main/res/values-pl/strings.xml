@@ -169,4 +169,5 @@
     <string name="clear_sd_card_path">Wyczyść</string>
     <string name="multi_person_word_by_word_summary2">Użyj formatu Multi-Person podczas pobierania tekstów od dostawcy który go obsługuje</string>
     <string name="multi_person_word_by_word">Tekst słowo w słowo Multi-Person</string>
+    <string name="select_language">Wybierz język</string>
 </resources>
