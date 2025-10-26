@@ -171,4 +171,5 @@
         <item quantity="one">%1$d şarkı</item>
         <item quantity="other">%1$d şarkı</item>
     </plurals>
+    <string name="select_language">Dil Seç</string>
 </resources>
