@@ -1,3 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="batch_download_lyrics">가사 다중 다운로드</string>
+    <string name="get_lyrics">가사 가져오기</string>
+    <string name="try_again">다시 시도</string>
+    <string name="cancel">취소</string>
+    <string name="error">오류</string>
+    <string name="this_track_has_no_lyrics">이 노래에는 가사가 없습니다</string>
+    <string name="ok">확인</string>
+    <string name="yes">네</string>
+    <string name="no">아니오</string>
+    <string name="downloading_lyrics">가사 다운로드 중</string>
+    <string name="song">노래: %1$s</string>
+    <string name="progress">진행도: %1$d/%2$d (%3$d%%)</string>
+    <string name="success_failed">성공: %1$d, 가사 없음: %2$d, 실패: %3$d</string>
+    <string name="please_do_not_close_the_app_this_may_take_a_while">앱을 닫지 말고 잠시만 기다려 주세요</string>
+    <string name="download_complete">다운로드 완료</string>
+    <string name="success">성공: %1$d</string>
 </resources>
