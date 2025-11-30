@@ -1,7 +1,7 @@
 package pl.lambada.songsync.data.remote.lyrics_providers
 
 import android.util.Log
-import pl.lambada.songsync.data.remote.lyrics_providers.others.AppleAPI
+import pl.lambada.songsync.data.remote.lyrics_providers.apple.AppleAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.LRCLibAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.MusixmatchAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.NeteaseAPI
