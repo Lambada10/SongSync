@@ -1,4 +1,4 @@
-package pl.lambada.songsync.data.remote.lyrics_providers.others
+package pl.lambada.songsync.data.remote.lyrics_providers.apple
 
 import io.ktor.client.request.get
 import io.ktor.client.request.header
