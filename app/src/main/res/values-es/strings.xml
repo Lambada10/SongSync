@@ -172,4 +172,5 @@
         <item quantity="other">%1$d canciones</item>
     </plurals>
     <string name="multi_person_word_by_word_summary2">Utilizar el formato de letras para varias personas, al obtener letras de un proveedor compatible</string>
+    <string name="select_language">Seleccionar idioma</string>
 </resources>
