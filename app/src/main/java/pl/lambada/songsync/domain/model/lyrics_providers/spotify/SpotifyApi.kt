@@ -1,3 +1,5 @@
+package pl.lambada.songsync.domain.model.lyrics_providers.spotify
+
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
