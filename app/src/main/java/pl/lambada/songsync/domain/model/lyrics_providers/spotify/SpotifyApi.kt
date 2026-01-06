@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TrackSearchResult(
     val data: Data,
-    val extensions: Extensions
+    val extensions: Extensions? = null
 )
 
 @Serializable
@@ -124,7 +124,7 @@ data class PagingInfo(
 @Serializable
 data class Extensions(
     val requestIds: RequestIds,
-    val cacheControl: CacheControl
+    val cacheControl: CacheControl? = null
 )
 
 @Serializable
