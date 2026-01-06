@@ -35,7 +35,7 @@ data class SecretData(
 
 class SpotifyAPI {
     private val webPlayerURL = "https://open.spotify.com/"
-    private val baseURL = "https://api.spotify.com/v1"
+    private val baseURL = "https://api-partner.spotify.com/pathfinder/v1/query"
 
     // TOTP variables
     private var totpSecret: ByteArray? = null
@@ -64,11 +64,10 @@ class SpotifyAPI {
             val responseBody = response.bodyAsText(Charsets.UTF_8)
             val secretDataList = json.decodeFromString<List<SecretData>>(responseBody)
             
-            // Get the last element
-            val gitu = secretDataList.last()
+            val lastSecretData = secretDataList.last()
             
-            totpSecret = toSecret(gitu.secret)
-            totpVer = gitu.version
+            totpSecret = toSecret(lastSecretData.secret)
+            totpVer = lastSecretData.version
             
             totpGenerator = TimeBasedOneTimePasswordGenerator(
                 totpSecret!!,
@@ -144,7 +143,7 @@ class SpotifyAPI {
                 parameter("productType", "mobile-web-player")
                 parameter("ts", totp.first)
                 parameter("totp", totp.second)
-                parameter("totpVer", totpVer) // Use dynamic version
+                parameter("totpVer", totpVer)
             }
             val responseBody = response.bodyAsText(Charsets.UTF_8)
             val json = json.decodeFromString<WebPlayerTokenResponse>(responseBody)
@@ -165,39 +164,51 @@ class SpotifyAPI {
         if (System.currentTimeMillis() - tokenTime > 1800000) // 30 minutes
             refreshToken()
 
-        val search = withContext(Dispatchers.IO) {
+        val searchTerm = withContext(Dispatchers.IO) {
             URLEncoder.encode(
                 "${query.songName} ${query.artistName}",
                 StandardCharsets.UTF_8.toString()
             )
         }
 
-        if (search == "+")
+        if (searchTerm == "+")
             throw EmptyQueryException()
 
+        val variables = """{"searchTerm":"$searchTerm","offset":$offset,"limit":1,"numberOfTopResults":20,"includeAudiobooks":false}"""
+        val extensions = """{"persistedQuery":{"version":1,"sha256Hash":"1d021289df50166c61630e02f002ec91182b518e56bcd681ac6b0640390c0245"}}"""
+
+        val encodedVariables = withContext(Dispatchers.IO) {
+            URLEncoder.encode(variables, StandardCharsets.UTF_8.toString())
+        }
+        val encodedExtensions = withContext(Dispatchers.IO) {
+            URLEncoder.encode(extensions, StandardCharsets.UTF_8.toString())
+        }
+
         val response = client.get(
-            "$baseURL/search?q=$search&type=track&limit=1&offset=$offset"
+           "$baseURL?operationName=searchTracks&variables=$encodedVariables&extensions=$encodedExtensions"
         ) {
-            headers.append("Authorization", "Bearer $spotifyToken")
+           headers.append("Authorization", "Bearer $spotifyToken")
         }
         val responseBody = response.bodyAsText(Charsets.UTF_8)
 
         val json = json.decodeFromString<TrackSearchResult>(responseBody)
-        if (json.tracks.items.isEmpty())
-            throw NoTrackFoundException()
-        val track = json.tracks.items[0]
+        if (json.data.searchV2.tracksV2.items.isEmpty())
+           throw NoTrackFoundException()
 
-        val artists = track.artists.joinToString(", ") { it.name }
+        val trackItem = json.data.searchV2.tracksV2.items[0]
+        val track = trackItem.item.data
 
-        val albumArtURL = track.album.images[0].url
+        val artists = track.artists.items.joinToString(", ") { it.profile.name }
 
-        val spotifyURL: String = track.externalUrls.spotify
+        val albumArtURL = track.albumOfTrack.coverArt.sources[0].url
+
+        val spotifyURL = "https://open.spotify.com/track/${track.id}"
 
         return SongInfo(
-            track.name,
-            artists,
-            spotifyURL,
-            albumArtURL
+           track.name,
+           artists,
+           spotifyURL,
+           albumArtURL
         )
     }
 }
