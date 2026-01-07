@@ -5,96 +5,142 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TrackSearchResult(
-    val tracks: Tracks
+    val data: Data,
+    val extensions: Extensions? = null
 )
 
 @Serializable
-data class Tracks(
-    val href: String,
-    val items: List<Track>,
-    val limit: Int,
-    val next: String?,
-    val offset: Int,
-    val previous: String?,
-    val total: Int
+data class Data(
+    val searchV2: SearchV2
 )
 
 @Serializable
-data class Track(
-    val album: Album,
-    val artists: List<Artist>,
-    @SerialName("available_markets")
-    val availableMarkets: List<String>,
-    @SerialName("disc_number")
-    val discNumber: Int,
-    @SerialName("duration_ms")
-    val durationMs: Int,
-    val explicit: Boolean,
-    @SerialName("external_ids")
-    val externalIds: ExternalIds,
-    @SerialName("external_urls")
-    val externalUrls: ExternalUrls,
-    val href: String,
-    val id: String,
-    @SerialName("is_local")
-    val isLocal: Boolean,
-    val name: String,
-    val popularity: Int,
-    @SerialName("preview_url")
-    val previewUrl: String?,
-    @SerialName("track_number")
-    val trackNumber: Int,
-    val type: String,
-    val uri: String
+data class SearchV2(
+    val query: String,
+    val tracksV2: TracksV2
 )
 
 @Serializable
-data class Album(
-    @SerialName("album_type")
-    val albumType: String,
-    val artists: List<Artist>,
-    @SerialName("available_markets")
-    val availableMarkets: List<String>,
-    @SerialName("external_urls")
-    val externalUrls: ExternalUrls,
-    val href: String,
-    val id: String,
-    val images: List<Image>,
-    val name: String,
-    @SerialName("release_date")
-    val releaseDate: String,
-    @SerialName("release_date_precision")
-    val releaseDatePrecision: String,
-    @SerialName("total_tracks")
-    val totalTracks: Int,
-    val type: String,
-    val uri: String
+data class TracksV2(
+    val totalCount: Int,
+    val items: List<TrackItem>,
+    val pagingInfo: PagingInfo
 )
 
 @Serializable
-data class Artist(
-    val externalUrls: ExternalUrls? = null,
-    val href: String,
+data class TrackItem(
+    val matchedFields: List<String>,
+    val item: Item
+)
+
+@Serializable
+data class Item(
+    val data: TrackData
+)
+
+@Serializable
+data class TrackData(
+    @SerialName("__typename")
+    val typename: String,
+    val uri: String,
     val id: String,
     val name: String,
-    val type: String,
-    val uri: String
-)
-
-@Suppress("SpellCheckingInspection")
-@Serializable
-data class ExternalIds(
-    val isrc: String
+    val albumOfTrack: AlbumOfTrack,
+    val artists: Artists,
+    val contentRating: ContentRating,
+    val duration: Duration,
+    val playability: Playability
 )
 
 @Serializable
-data class ExternalUrls(
-    val spotify: String
+data class AlbumOfTrack(
+    val uri: String,
+    val name: String,
+    val coverArt: CoverArt,
+    val id: String
 )
 
 @Serializable
-data class Image(
-    val height: Int,
+data class CoverArt(
+    val sources: List<ImageSource>,
+    val extractedColors: ExtractedColors
+)
+
+@Serializable
+data class ImageSource(
     val url: String,
-    val width: Int
+    val width: Int,
+    val height: Int
+)
+
+@Serializable
+data class ExtractedColors(
+    val colorDark: ColorDark
+)
+
+@Serializable
+data class ColorDark(
+    val hex: String,
+    val isFallback: Boolean
+)
+
+@Serializable
+data class Artists(
+    val items: List<ArtistItem>
+)
+
+@Serializable
+data class ArtistItem(
+    val uri: String,
+    val profile: Profile
+)
+
+@Serializable
+data class Profile(
+    val name: String
+)
+
+@Serializable
+data class ContentRating(
+    val label: String
+)
+
+@Serializable
+data class Duration(
+    val totalMilliseconds: Int
+)
+
+@Serializable
+data class Playability(
+    val playable: Boolean
+)
+
+@Serializable
+data class PagingInfo(
+    val nextOffset: Int,
+    val limit: Int
+)
+
+@Serializable
+data class Extensions(
+    val requestIds: RequestIds,
+    val cacheControl: CacheControl? = null
+)
+
+@Serializable
+data class RequestIds(
+    @SerialName("/searchV2")
+    val searchV2: SearchV2RequestId
+)
+
+@Serializable
+data class SearchV2RequestId(
+    @SerialName("search-api")
+    val searchApi: String
+)
+
+@Serializable
+data class CacheControl(
+    val version: Int,
+    val hints: List<String> = emptyList()
 )
