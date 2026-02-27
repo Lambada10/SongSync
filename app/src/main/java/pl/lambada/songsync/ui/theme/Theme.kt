@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val darkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -67,17 +66,13 @@ fun SongSyncTheme(
         darkTheme -> darkColorScheme
         else -> lightColorScheme
     }
-    val sysUiController = rememberSystemUiController()
     val view = LocalView.current
     if (!view.isInEditMode) {
-        LaunchedEffect(Unit) {
-            val window = (view.context as Activity).window
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-            sysUiController.setSystemBarsColor(
-                color = Color.Transparent, darkIcons = !darkTheme,
-                isNavigationBarContrastEnforced = false
-            )
-        }
+        val window = (view.context as Activity).window
+        val insetsController = WindowCompat.getInsetsController(window, view)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        insetsController.isAppearanceLightStatusBars = !darkTheme
+        insetsController.isAppearanceLightNavigationBars = !darkTheme
     }
 
     MaterialTheme(
