@@ -1,5 +1,4 @@
 [versions]
-accompanist-systemuicontroller = "0.34.0"
 accompanist-permissions = "0.34.0"
 agp = "8.7.1"
 coil-compose = "2.7.0"
@@ -23,7 +22,6 @@ kotlin-onetimepassword = "2.4.1"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
-accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist-systemuicontroller" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil-compose" }
