@@ -15,7 +15,7 @@ import java.net.URLEncoder
 
 class AppleAPI {
     private val lyricsBaseURL = "https://lyrics.paxsenix.org/"
-    private val apiBaseURL = "https://amp-api.music.apple.com/v1/catalog/au"
+    private val apiBaseURL = "https://amp-api.music.apple.com/v1/catalog/us"
     private val tokenManager = AppleTokenManager()
 
     /**
