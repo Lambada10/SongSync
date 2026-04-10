@@ -21,6 +21,7 @@
     </queries>
 
     <application
+        android:name=".SongSyncApp"
         android:enableOnBackInvokedCallback="true"
         android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
