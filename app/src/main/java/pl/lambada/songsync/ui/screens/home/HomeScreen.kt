@@ -276,7 +276,7 @@ fun HomeScreenLoaded(
                             folders = viewModel.getSongFolders(context),
                             blacklistedFolders = viewModel.userSettingsController.blacklistedFolders,
                             onDismiss = { viewModel.showFilters = false },
-                            onFilterChange = { viewModel.filterSongs() },
+                            onFilterChange = { viewModel.filterSongs(context) },
                             onHideLyricsChange = viewModel::onHideLyricsChange,
                             onToggleFolderBlacklist = viewModel::onToggleFolderBlacklist
                         )
