@@ -167,7 +167,7 @@ class HomeViewModel(
             }
             cursor?.close()
             cachedSongs = songs
-            viewModelScope.launch { filterSongs() }
+            viewModelScope.launch { filterSongs(context) }
             viewModelScope.launch { updatePlayingSongInfo(context) }
             cachedSongs!!
         }
@@ -222,16 +222,20 @@ class HomeViewModel(
 
     /**
      * Filter songs based on user's preferences.
+     * @param context The application context.
      * @return A list of songs depending on the user's preferences. If no preferences are set, null is returned, so app will use all songs.
      */
-    fun filterSongs() = viewModelScope.launch {
+    fun filterSongs(context: Context) = viewModelScope.launch {
         hideFolders = userSettingsController.blacklistedFolders.isNotEmpty()
 
+    val hasLyricsFilter: (Song) -> Boolean = { song ->
+            pl.lambada.songsync.util.hasLyrics(context, song.filePath)
+        }
         when {
             userSettingsController.hideLyrics && hideFolders -> {
                 _cachedFilteredSongs.value = cachedSongs!!
                     .filter {
-                        it.filePath.toLrcFile()?.exists() != true && !userSettingsController.blacklistedFolders.contains(
+                        !hasLyricsFilter(it) && !userSettingsController.blacklistedFolders.contains(
                             it.filePath!!.substring(
                                 0, it.filePath.lastIndexOf("/")
                             )
@@ -241,7 +245,7 @@ class HomeViewModel(
 
             userSettingsController.hideLyrics -> {
                 _cachedFilteredSongs.value = cachedSongs!!
-                    .filter { it.filePath.toLrcFile()?.exists() != true }
+                    .filter { !hasLyricsFilter(it) }
             }
 
             hideFolders -> {
