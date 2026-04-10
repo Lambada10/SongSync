@@ -25,14 +25,14 @@ import pl.lambada.songsync.ui.theme.SongSyncTheme
 import pl.lambada.songsync.util.dataStore
 
 class QuickLyricsSearchActivity : AppCompatActivity() {
-    private val lyricsProviderService = LyricsProviderService()
+    private val lyricsProviderService by lazy { (application as SongSyncApp).lyricsProviderService }
 
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val userSettingsController = UserSettingsController(dataStore)
+        val userSettingsController = (application as SongSyncApp).userSettingsController
         val viewModel: QuickLyricsSearchViewModel by viewModels {
             QuickLyricsSearchViewModelFactory(userSettingsController, lyricsProviderService)
         }
