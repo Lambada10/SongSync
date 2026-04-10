@@ -31,7 +31,6 @@ import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
 import pl.lambada.songsync.ui.Navigator
 import pl.lambada.songsync.ui.components.dialogs.NoInternetDialog
 import pl.lambada.songsync.ui.theme.SongSyncTheme
-import pl.lambada.songsync.util.dataStore
 import java.io.File
 
 /**
