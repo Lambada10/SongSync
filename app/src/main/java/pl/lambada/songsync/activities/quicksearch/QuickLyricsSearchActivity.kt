@@ -17,12 +17,12 @@ import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import kotlinx.coroutines.Dispatchers
 import pl.lambada.songsync.R
+import pl.lambada.songsync.SongSyncApp
 import pl.lambada.songsync.activities.quicksearch.viewmodel.QuickLyricsSearchViewModel
 import pl.lambada.songsync.activities.quicksearch.viewmodel.QuickLyricsSearchViewModelFactory
 import pl.lambada.songsync.data.UserSettingsController
 import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
 import pl.lambada.songsync.ui.theme.SongSyncTheme
-import pl.lambada.songsync.util.dataStore
 
 class QuickLyricsSearchActivity : AppCompatActivity() {
     private val lyricsProviderService by lazy { (application as SongSyncApp).lyricsProviderService }
@@ -118,6 +118,5 @@ class QuickLyricsSearchActivity : AppCompatActivity() {
 
     companion object {
         lateinit var activityImageLoader: ImageLoader
-        lateinit var userSettingsController: UserSettingsController
     }
 }
