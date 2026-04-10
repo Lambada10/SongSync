@@ -172,6 +172,35 @@ fun handleSecurityException(
 }
 
 /**
+ * Checks if a song has lyrics (either an .lrc file or embedded lyrics).
+ * @param context The application context.
+ * @param filePath The path of the audio file.
+ * @return True if lyrics are found, false otherwise.
+ */
+fun hasLyrics(context: Context, filePath: String?): Boolean {
+    if (filePath == null) return false
+    // 1. Check for .lrc file
+    if (filePath.toLrcFile()?.exists() == true) return true
+    // 2. Check for embedded lyrics
+    return try {
+        getFileDescriptorFromPath(context, filePath, mode = "r")?.use { pfd ->
+            val metadata = TagLib.getMetadata(pfd.detachFd(), false)
+            val propertyMap = metadata?.propertyMap
+            if (propertyMap != null) {
+                // Check common lyrics tags
+                val lyricsKeys = listOf("LYRICS", "UNSYNCEDLYRICS", "USLT", "TEXT")
+                lyricsKeys.any { key ->
+                    val value = propertyMap[key]?.firstOrNull()
+                    !value.isNullOrBlank()
+                }
+            } else false
+        } ?: false
+    } catch (e: Exception) {
+        Log.e("LyricsUtils", "Error checking for embedded lyrics in $filePath: ${e.message}")
+        false
+    }
+}
+/**
  * Defines possible provider choices
  */
 enum class Providers(val displayName: String, val hasWordByWord: Boolean) {
