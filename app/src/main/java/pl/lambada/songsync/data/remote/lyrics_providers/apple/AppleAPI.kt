@@ -15,7 +15,7 @@ import java.net.URLEncoder
 
 class AppleAPI {
     private val lyricsBaseURL = "https://lyrics.paxsenix.org/"
-    private val apiBaseURL = "https://amp-api.music.apple.com/v1/catalog/us"
+    private val apiBaseURL = "https://amp-api.music.apple.com/v1/catalog/au"
     private val tokenManager = AppleTokenManager()
 
     /**
@@ -109,7 +109,7 @@ class AppleAPI {
      */
     suspend fun getSyncedLyrics(id: Long, multiPersonWordByWord: Boolean): String? {
         val response = client.get(
-            lyricsBaseURL + "apple-music/lyrics?id=$id"
+            lyricsBaseURL + "apple-music/lyrics?id=$id&ttml=false"
         )
         val responseBody = response.bodyAsText(Charsets.UTF_8)
 
