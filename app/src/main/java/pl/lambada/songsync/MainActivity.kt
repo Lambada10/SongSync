@@ -38,7 +38,7 @@ import java.io.File
  * The main activity of the SongSync app.
  */
 class MainActivity : ComponentActivity() {
-    private val lyricsProviderService = LyricsProviderService()
+    private val lyricsProviderService by lazy { (application as SongSyncApp).lyricsProviderService }
 
     @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
