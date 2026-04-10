@@ -51,8 +51,7 @@ class MainActivity : ComponentActivity() {
             insets
         }
 
-        val dataStore = this.dataStore
-        val userSettingsController = UserSettingsController(dataStore)
+        val userSettingsController = (application as SongSyncApp).userSettingsController
         checkOrCreateDownloadSubFolder()
         createNotificationChannel()
 
