@@ -141,4 +141,5 @@
     <string name="translation_website">Weblate öffnen</string>
     <string name="help_us_translate">Hilf uns, die App in deine Sprache zu übersetzen!</string>
     <string name="date_modified">Änderungsdatum</string>
+    <string name="select_language">Sprache wählen</string>
 </resources>
