@@ -61,9 +61,10 @@ class PaxMusicHelper {
      */
     private fun formatLineLyrics(lyrics: List<PaxLyrics>): String {
         val syncedLyrics = StringBuilder()
+        val timestampRegex = Regex("""^\[\d+:\d+\.\d+]""")
         for (line in lyrics) {
-            syncedLyrics.append("[${line.timestamp.toLrcTimestamp()}]${line.text[0].text}\n")
-        }
+            val cleanText = line.text[0].text.replace(timestampRegex, "").trim()
+            syncedLyrics.append("[${line.timestamp.toLrcTimestamp()}]$cleanText\n")        }
         return syncedLyrics.toString()
     }
 
