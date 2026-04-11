@@ -7,6 +7,8 @@ import pl.lambada.songsync.util.networking.Ktor.json
 
 class PaxMusicHelper {
 
+        private val LYRICS_CLEANUP_REGEX = Regex("""(?i)v[l12]:|<[^>]+>""")
+
     /**
      * Formats syllable lyrics into LRC format.
      * @param lyrics The list of PaxLyrics objects.
@@ -24,15 +26,20 @@ class PaxMusicHelper {
                 )
             }
 
-            for (syllable in line.text) {
-                val formatedBeginTimestamp = "<${syllable.timestamp!!.toLrcTimestamp()}>"
-                val formatedEndTimestamp = "<${syllable.endtime?.toLrcTimestamp()}>"
-                if (!syncedLyrics.endsWith(formatedBeginTimestamp))
-                    syncedLyrics.append(formatedBeginTimestamp)
-                syncedLyrics.append(syllable.text)
-                if (!syllable.part)
-                    syncedLyrics.append(" ")
-                syncedLyrics.append(formatedEndTimestamp)
+                if (multiPersonWordByWord) {
+                    val formatedBeginTimestamp = "<${syllable.timestamp!!.toLrcTimestamp()}>"
+                    val formatedEndTimestamp = "<${syllable.endtime?.toLrcTimestamp()}>"
+                    if (!syncedLyrics.endsWith(formatedBeginTimestamp))
+                        syncedLyrics.append(formatedBeginTimestamp)
+                    syncedLyrics.append(syllable.text.replace(LYRICS_CLEANUP_REGEX, ""))
+                    if (!syllable.part)
+                        syncedLyrics.append(" ")
+                    syncedLyrics.append(formatedEndTimestamp)
+                } else {
+                    syncedLyrics.append(syllable.text.replace(LYRICS_CLEANUP_REGEX, ""))
+                    if (!syllable.part)
+                        syncedLyrics.append(" ")
+                }
             }
 
             if (line.background && multiPersonWordByWord) {
@@ -42,7 +49,7 @@ class PaxMusicHelper {
                     val formatedEndTimestamp = "<${syllable.endtime?.toLrcTimestamp()}>"
                     if (!syncedLyrics.endsWith(formatedBeginTimestamp))
                         syncedLyrics.append(formatedBeginTimestamp)
-                    syncedLyrics.append(syllable.text)
+                    syncedLyrics.append(syllable.text.replace(LYRICS_CLEANUP_REGEX, ""))
                     if (!syllable.part)
                         syncedLyrics.append(" ")
                     syncedLyrics.append(formatedEndTimestamp)
@@ -51,7 +58,10 @@ class PaxMusicHelper {
             }
             syncedLyrics.append("\n")
         }
-        return syncedLyrics.toString()
+         // Final cleanup of extra whitespace and possible empty brackets
+          return syncedLyrics.toString()
+            .replace(Regex(" +"), " ")
+            .replace("  ", " ")
     }
 
     /**
@@ -63,8 +73,13 @@ class PaxMusicHelper {
         val syncedLyrics = StringBuilder()
         val timestampRegex = Regex("""^\[\d+:\d+\.\d+]""")
         for (line in lyrics) {
-            val cleanText = line.text[0].text.replace(timestampRegex, "").trim()
-            syncedLyrics.append("[${line.timestamp.toLrcTimestamp()}]$cleanText\n")        }
+            val cleanText = line.text[0].text
+                .replace(timestampRegex, "")
+                .replace(LYRICS_CLEANUP_REGEX, "")
+                .replace(Regex(" +"), " ")
+                .trim()
+            syncedLyrics.append("[${line.timestamp.toLrcTimestamp()}]$cleanText\n")
+        }
         return syncedLyrics.toString()
     }
 
