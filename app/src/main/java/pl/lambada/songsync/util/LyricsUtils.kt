@@ -179,19 +179,23 @@ fun handleSecurityException(
  */
 fun hasLyrics(context: Context, filePath: String?): Boolean {
     if (filePath == null) return false
+
     // 1. Check for .lrc file
-    if (filePath.toLrcFile()?.exists() == true) return true
+    val lrcFile = filePath.toLrcFile()
+    if (lrcFile?.exists() == true && lrcFile.length() > 10) return true
+
     // 2. Check for embedded lyrics
     return try {
         getFileDescriptorFromPath(context, filePath, mode = "r")?.use { pfd ->
             val metadata = TagLib.getMetadata(pfd.detachFd(), false)
             val propertyMap = metadata?.propertyMap
             if (propertyMap != null) {
-                // Check common lyrics tags
-                val lyricsKeys = listOf("LYRICS", "UNSYNCEDLYRICS", "USLT", "TEXT")
+                // Check specific lyrics tags (removed 'TEXT' as it is too generic)
+                val lyricsKeys = listOf("LYRICS", "UNSYNCEDLYRICS", "USLT")
                 lyricsKeys.any { key ->
                     val value = propertyMap[key]?.firstOrNull()
-                    !value.isNullOrBlank()
+                    // Must be non-blank and have a reasonable length (e.g., > 30 chars)
+                    !value.isNullOrBlank() && value.trim().length > 30
                 }
             } else false
         } ?: false
@@ -200,6 +204,7 @@ fun hasLyrics(context: Context, filePath: String?): Boolean {
         false
     }
 }
+
 /**
  * Defines possible provider choices
  */
@@ -213,13 +218,8 @@ enum class Providers(val displayName: String, val hasWordByWord: Boolean) {
 }
 
 // only for invoking the task and handling and reporting progress
-suspend fun downloadLyrics(
-    songs: List<Song>,
-    viewModel: HomeViewModel,
-    context: Context,
-    onProgressUpdate: (successCount: Int, noLyricsCount: Int, failedCount: Int) -> Unit,
-    onDownloadComplete: () -> Unit,
     onRateLimitReached: () -> Unit,
+    onLyricsSaved: (Song) -> Unit = {}
 ) {
     var successCount = 0
     var noLyricsCount = 0
@@ -245,7 +245,10 @@ suspend fun downloadLyrics(
                     consecutiveNotFound++
                 }
             },
-            onLyricsSaved = { successCount++ }
+            onLyricsSaved = { 
+                successCount++
+                onLyricsSaved(song)
+            }
         )
 
         onProgressUpdate(successCount, noLyricsCount, failedCount)
