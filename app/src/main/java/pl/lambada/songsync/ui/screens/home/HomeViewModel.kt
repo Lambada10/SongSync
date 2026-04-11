@@ -220,49 +220,54 @@ class HomeViewModel(
         }
     }
 
+    private val lyricsStatusCache = mutableMapOf<String, Boolean>()
+
     /**
      * Filter songs based on user's preferences.
      * @param context The application context.
-     * @return A list of songs depending on the user's preferences. If no preferences are set, null is returned, so app will use all songs.
+     * @return A list of songs depending on the user's preferences.
      */
-    fun filterSongs(context: Context) = viewModelScope.launch {
+    fun filterSongs(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         hideFolders = userSettingsController.blacklistedFolders.isNotEmpty()
 
-    val hasLyricsFilter: (Song) -> Boolean = { song ->
-            pl.lambada.songsync.util.hasLyrics(context, song.filePath)
-        }
-        when {
-            userSettingsController.hideLyrics && hideFolders -> {
-                _cachedFilteredSongs.value = cachedSongs!!
-                    .filter {
-                        !hasLyricsFilter(it) && !userSettingsController.blacklistedFolders.contains(
-                            it.filePath!!.substring(
-                                0, it.filePath.lastIndexOf("/")
-                            )
-                        )
+        val songsToProcess = cachedSongs ?: return@launch
+        val hideLyrics = userSettingsController.hideLyrics
+        
+        // Progressively determine which songs to show
+        val filteredList = if (hideLyrics) {
+            // Parallelly check for lyrics to avoid blocking the thread and speed up IO
+            val results = songsToProcess.chunked(20).flatMap { chunk ->
+                chunk.map { song ->
+                    async {
+                        val path = song.filePath ?: return@async song to true // Treat as has lyrics if path is null to avoid showing it in "without lyrics" filter
+                        val cached = lyricsStatusCache[path]
+                        if (cached != null) {
+                            song to cached
+                        } else {
+                            val has = pl.lambada.songsync.util.hasLyrics(context, path)
+                            lyricsStatusCache[path] = has
+                            song to has
+                        }
                     }
+                }.awaitAll()
             }
-
-            userSettingsController.hideLyrics -> {
-                _cachedFilteredSongs.value = cachedSongs!!
-                    .filter { !hasLyricsFilter(it) }
+            
+            results.filter { (song, hasLyrics) ->
+                !hasLyrics && (!hideFolders || !userSettingsController.blacklistedFolders.contains(
+                    song.filePath!!.substring(0, song.filePath.lastIndexOf("/"))
+                ))
+            }.map { it.first }
+        } else if (hideFolders) {
+            songsToProcess.filter {
+                !userSettingsController.blacklistedFolders.contains(
+                    it.filePath!!.substring(0, it.filePath.lastIndexOf("/"))
+                )
             }
-
-            hideFolders -> {
-                _cachedFilteredSongs.value = cachedSongs!!.filter {
-                    !userSettingsController.blacklistedFolders.contains(
-                        it.filePath!!.substring(
-                            0,
-                            it.filePath.lastIndexOf("/")
-                        )
-                    )
-                }
-            }
-
-            else -> {
-                _cachedFilteredSongs.value = emptyList()
-            }
+        } else {
+            emptyList()
         }
+
+        _cachedFilteredSongs.value = filteredList
     }
 
     fun invertSongSelection() = viewModelScope.launch {
