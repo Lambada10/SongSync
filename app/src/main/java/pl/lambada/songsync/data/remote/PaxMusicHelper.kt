@@ -7,8 +7,11 @@ import pl.lambada.songsync.util.networking.Ktor.json
 
 class PaxMusicHelper {
 
-    private val LYRICS_CLEANUP_REGEX = Regex("""(?i)v[l12]:|<[^>]+>""")
-
+    // Regex to match:
+    // 1. Voice tags: v1:, v2:, vl: (case-insensitive)
+    // 2. Syllable timestamps: <00:00.00>
+    // 3. Metadata tags in brackets that are NOT timestamps: [bg:], [ar:], etc.
+    private val LYRICS_CLEANUP_REGEX = Regex("""(?i)v[l12]:|<[^>]+>|\[(?!\d{1,3}:\d{1,2}\.\d{1,3})[^\]]+\]""")
 
     private fun formatSyllableLyricsToString(lyrics: List<PaxLyrics>, multiPersonWordByWord: Boolean): String {
         val syncedLyrics = StringBuilder()
@@ -65,7 +68,8 @@ class PaxMusicHelper {
         }
         
         return syncedLyrics.toString()
-            .replace(Regex(" +"), " ")
+            .replace(LYRICS_CLEANUP_REGEX, "") // Final pass to catch anything built during formatting if word-by-word is off
+            .replace(Regex(" {2,}"), " ")
             .trim()
     }
 
@@ -82,7 +86,7 @@ class PaxMusicHelper {
             val cleanText = originalText
                 .replace(lineTimestampRegex, "")
                 .replace(LYRICS_CLEANUP_REGEX, "")
-                .replace(Regex(" +"), " ")
+                .replace(Regex(" {2,}"), " ")
                 .trim()
             syncedLyrics.append("[${line.timestamp.toLrcTimestamp()}]$cleanText\n")
         }
@@ -101,15 +105,18 @@ class PaxMusicHelper {
             val lines = data.content ?: return null
             if (lines.isEmpty()) return null
 
-            when (data.type) {
+            val result = when (data.type) {
                 "Syllable" -> formatSyllableLyricsToString(lines, multiPersonWordByWord).trim()
                 "Line" -> formatLineLyrics(lines).trim()
                 else -> null
             }
+            
+            result?.replace(Regex("(?m)^ +"), "")?.replace(Regex(" {2,}"), " ")
         } catch (e: Exception) {
             try {
                 val data = json.decodeFromString<List<PaxLyrics>>(apiResponse)
-                formatSyllableLyricsToString(data, multiPersonWordByWord).trim()
+                val result = formatSyllableLyricsToString(data, multiPersonWordByWord).trim()
+                result.replace(Regex("(?m)^ +"), "")?.replace(Regex(" {2,}"), " ")
             } catch (e2: Exception) {
                 null
             }
