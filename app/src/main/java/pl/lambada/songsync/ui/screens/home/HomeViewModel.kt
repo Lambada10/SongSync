@@ -24,7 +24,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import java.util.concurrent.ConcurrentHashMap
 import pl.lambada.songsync.R
 import pl.lambada.songsync.data.UserSettingsController
 import pl.lambada.songsync.data.remote.lyrics_providers.LyricsProviderService
@@ -220,7 +223,7 @@ class HomeViewModel(
         }
     }
 
-    private val lyricsStatusCache = mutableMapOf<String, Boolean>()
+    private val lyricsStatusCache = ConcurrentHashMap<String, Boolean>()
 
     /**
      * Filter songs based on user's preferences.
@@ -252,7 +255,9 @@ class HomeViewModel(
                 }.awaitAll()
             }
             
-            results.filter { (song, hasLyrics) ->
+            results.filter { pair ->
+                val song = pair.first
+                val hasLyrics = pair.second
                 !hasLyrics && (!hideFolders || !userSettingsController.blacklistedFolders.contains(
                     song.filePath!!.substring(0, song.filePath.lastIndexOf("/"))
                 ))
