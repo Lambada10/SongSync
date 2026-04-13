@@ -9,8 +9,6 @@ import pl.lambada.songsync.domain.model.lyrics_providers.others.VocaDBLyricsItem
 import pl.lambada.songsync.domain.model.lyrics_providers.others.VocaDBSearchResponse
 import pl.lambada.songsync.domain.model.lyrics_providers.others.VocaDBSongWithLyrics
 import pl.lambada.songsync.domain.model.lyrics_providers.others.VocaDBArtistSearchResponse
-import pl.lambada.songsync.util.EmptyQueryException
-import android.util.Log
 import pl.lambada.songsync.util.networking.Ktor.client
 import pl.lambada.songsync.util.networking.Ktor.json
 import java.net.URLEncoder
