@@ -106,13 +106,22 @@ class SpotifyAPI {
      * @return The server time in milliseconds.
      */
     private suspend fun getServerTime(): Long {
-        val response = client.get(
-            webPlayerURL + "api/server-time"
-        ) {
-            reqHeaders.forEach { (key, value) -> header(key, value) }
+        return try {
+            val response = client.get(
+                webPlayerURL + "api/server-time"
+            ) {
+                reqHeaders.forEach { (key, value) -> header(key, value) }
+            }
+            val body = response.bodyAsText(Charsets.UTF_8)
+            val serverTimeSeconds = json.decodeFromString<ServerTimeResponse>(body).serverTime
+            
+            // If serverTime is 0 (default) or missing, fallback to system time.
+            // Spotify returns seconds, so we multiply by 1000. System time is already millis.
+            if (serverTimeSeconds > 0) serverTimeSeconds * 1000 else System.currentTimeMillis()
+        } catch (e: Exception) {
+            // Fallback to local time if request fails completely
+            System.currentTimeMillis()
         }
-        val body = response.bodyAsText(Charsets.UTF_8)
-        return json.decodeFromString<ServerTimeResponse>(body).serverTime * 1000
     }
 
     /**
