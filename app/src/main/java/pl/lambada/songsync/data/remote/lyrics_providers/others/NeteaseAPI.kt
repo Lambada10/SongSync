@@ -1,6 +1,7 @@
 package pl.lambada.songsync.data.remote.lyrics_providers.others
 
 import android.util.Log
+import androidx.core.text.HtmlCompat
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
@@ -117,6 +118,16 @@ class NeteaseAPI {
         if (includeRomanization && json.romalrc?.lyric?.isNotEmpty() == true)
             lyric += "\n\n" + json.romalrc.lyric
 
-        return lyric
+        return decodeHtmlEntities(lyric)
+    }
+
+    /**
+     * Decodes HTML entities in lyrics text (e.g. &auml; -> ä).
+     * Processes line-by-line to preserve LRC timestamp format.
+     */
+    private fun decodeHtmlEntities(text: String): String {
+        return text.lines().joinToString("\n") { line ->
+            HtmlCompat.fromHtml(line, HtmlCompat.FROM_HTML_MODE_LEGACY).toString().trim()
+        }
     }
 }
