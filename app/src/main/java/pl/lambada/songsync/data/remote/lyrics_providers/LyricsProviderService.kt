@@ -3,6 +3,7 @@ package pl.lambada.songsync.data.remote.lyrics_providers
 import android.util.Log
 import pl.lambada.songsync.data.remote.lyrics_providers.apple.AppleAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.LRCLibAPI
+import pl.lambada.songsync.data.remote.lyrics_providers.others.VocaDBAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.MusixmatchAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.NeteaseAPI
 import pl.lambada.songsync.data.remote.lyrics_providers.others.QQMusicAPI
@@ -28,6 +29,9 @@ class LyricsProviderService {
 
     // LRCLib Track ID
     private var lrcLibID = 0
+
+    // VocaDB Track ID
+    private var vocadbID = 0
 
     // QQMusic request payload
     private var qqPayload = ""
@@ -76,6 +80,10 @@ class LyricsProviderService {
                     lrcLibID = it?.lrcLibID ?: 0
                 } ?: throw NoTrackFoundException()
 
+                Providers.VOCADB -> VocaDBAPI().getSongInfo(query, offset).also {
+                    vocadbID = it?.vocadbID ?: 0
+                } ?: throw NoTrackFoundException()
+
                 Providers.NETEASE -> NeteaseAPI().getSongInfo(query, offset).also {
                     neteaseID = it?.neteaseID ?: 0
                 } ?: throw NoTrackFoundException()
@@ -120,6 +128,12 @@ class LyricsProviderService {
             Providers.LRCLIB -> LRCLibAPI().getSyncedLyrics(lrcLibID)
             Providers.NETEASE -> NeteaseAPI().getSyncedLyrics(
                 neteaseID, includeTranslationNetEase, includeRomanizationNetEase
+            )
+
+            Providers.VOCADB -> VocaDBAPI().getSyncedLyrics(
+                vocadbID,
+                includeTranslation = includeTranslationNetEase,
+                includeRomanization = includeRomanizationNetEase
             )
 
             Providers.QQMUSIC -> QQMusicAPI().getSyncedLyrics(qqPayload, multiPersonWordByWord)

@@ -32,6 +32,7 @@ data class SongInfo(
     var qqPayload: String? = null, // QQMusic-only
     var neteaseID: Long? = null, // Netease-only
     var appleID: Long? = null, // Apple-only
+    var vocadbID: Int? = null, // VocaDB-only
     var musixmatchID: Long? = null, // Musixmatch-only
     var hasSyncedLyrics: Boolean? = null, // Musixmatch-only
     var hasUnsyncedLyrics: Boolean? = null, // Musixmatch-only

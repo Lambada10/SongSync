@@ -177,6 +177,7 @@ fun handleSecurityException(
 enum class Providers(val displayName: String, val hasWordByWord: Boolean) {
     APPLE("Apple Music", true),
     LRCLIB("LRCLib", false),
+    VOCADB("VocaDB", false),
     SPOTIFY("Spotify", false),
     MUSIXMATCH("Musixmatch", false),
     QQMUSIC("QQ Music", true),
